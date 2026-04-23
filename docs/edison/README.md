@@ -4,7 +4,7 @@ This directory holds the **verbatim** answers returned by the
 [Edison Scientific](https://edisonscientific.com/) tasks submitted from PR #2
 of this repository, archived here for provenance so future readers can see
 exactly what the model said before any of it was paraphrased into the
-`README.md` or `docs/brainstorming-and-literature.md`.
+`README.md` or `docs/manuscript/main.tex`.
 
 | File | Edison `task_id` | `job_name` | Status |
 |---|---|---|---|
@@ -53,7 +53,7 @@ has since changed) were also adopted:
   the README as part of the standard motion sequence.
 
 The literature-high task was used to expand the prior-art and benchmarking
-sections of `docs/brainstorming-and-literature.md` with peer-reviewed
+sections of `docs/manuscript/main.tex` with peer-reviewed
 references (Bahr ETC 2018, Bahr 2020, Jiang/Cooper PowderBot 2023, Szymanski
 A-Lab 2023, Tom et al. *Chemical Reviews* 2024, Yang & Evans 2007, Carruthers
 2025, Lunt 2023/2024, Hernandez del Valle 2024, Doloi 2025) and standardised

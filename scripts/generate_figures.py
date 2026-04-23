@@ -11,6 +11,9 @@ Outputs (all under ``docs/figures/``):
 * ``panel-C-isometric.svg``     -- 3D / isometric of the assembly on a gantry
 * ``panel-D-mechanism.svg``     -- 4-step mechanism (J-plunge -> strike-off
                                    -> transport -> sideways tilt against cam)
+* ``panel-E-pin-slot.svg``      -- pin-defined-path actuation variant: peg on
+                                   stem rides in a routed slot in a fixed
+                                   external board; slot path = tilt schedule
 * ``mechanism.gif``             -- animation of the cam-engagement + sideways
                                    tilt step
 
@@ -588,6 +591,215 @@ def _frame_svg(t: float) -> str:
     return "".join(s)
 
 
+def panel_E() -> str:
+    """Pin-defined-path actuation variant.
+
+    A vertical stem hangs from the gantry carriage on a pin pivot; a
+    transverse peg at the top of the stem rides in a routed slot cut into a
+    fixed external board (mounted at fixed height in the work area).  As the
+    gantry translates in X, the peg follows the slot path; the difference
+    between the carriage's straight-line trajectory and the slot's routed
+    path forces the stem (and the trough rigidly attached to it) to rotate
+    about the carriage pivot.
+
+    The figure shows three frozen poses (scoop / transport / pour) overlaid
+    against a single fixed slot board, so the slot's "program" for tilt-vs-X
+    is visible at a glance.
+    """
+    W, H = 760, 520
+    s: list[str] = [_svg_open(W, H)]
+    # Title
+    s.append(
+        '<text x="380" y="28" text-anchor="middle" font-size="15" '
+        'font-weight="600">Pin-defined-path actuation (cam-slot variant)</text>'
+    )
+    s.append(
+        '<text x="380" y="46" text-anchor="middle" font-size="11" fill="#555" '
+        'font-style="italic">peg on top of stem rides in routed slot in a fixed external board; '
+        'slot path = tilt schedule</text>'
+    )
+
+    # Fixed external board with the routed slot.  Mounted at a fixed Y.
+    board_y = 100
+    board_h = 56
+    s.append(
+        f'<rect x="60" y="{board_y}" width="640" height="{board_h}" '
+        'fill="#e8e2cc" stroke="#7a6f4a" stroke-width="2" rx="3"/>'
+    )
+    s.append(
+        f'<text x="68" y="{board_y - 6}" font-size="10" fill="#555">'
+        'fixed external slot board (mounted to lab frame)</text>'
+    )
+    # Routed slot path: flat over the bed (left), flat over transport
+    # (middle), then rising over the deposit station (right) — encoding the
+    # tilt schedule. Drawn as a darker channel inside the board.
+    slot_y_flat = board_y + board_h / 2
+    slot_y_top = board_y + 14            # rises this much over deposit
+    slot_w = 14                          # slot width (peg diameter ~slot)
+    # Centerline polyline for the slot path:
+    pts = [
+        (90,  slot_y_flat),     # leftmost: scoop X
+        (260, slot_y_flat),     # transport
+        (430, slot_y_flat),     # transport
+        (520, slot_y_flat - 6), # start to rise
+        (600, slot_y_top),      # tilt-hold detent at deposit
+        (680, slot_y_top),
+    ]
+    # Draw slot as a thick stroked polyline (looks like a routed channel)
+    pl = " ".join(f"{x},{y}" for x, y in pts)
+    s.append(
+        f'<polyline points="{pl}" fill="none" stroke="#3a342a" '
+        f'stroke-width="{slot_w}" stroke-linecap="round" stroke-linejoin="round"/>'
+    )
+    s.append(
+        f'<polyline points="{pl}" fill="none" stroke="#857a5a" '
+        f'stroke-width="{slot_w - 4}" stroke-linecap="round" stroke-linejoin="round"/>'
+    )
+
+    # Carriage pivot Y (the pin on the gantry that the stem hangs from)
+    carriage_y = 250
+    # Trough centre Y (below the carriage, hanging on the stem)
+    trough_y = 380
+    stem_len = trough_y - carriage_y     # stem length (carriage pivot -> trough)
+    peg_above = carriage_y - board_y - board_h / 2  # peg above carriage = (carriage_y - slot_centre_y)
+    # The peg sits on the *top* of the stem, above the carriage pivot.
+    # If the slot is straight at the carriage X, the stem is vertical;
+    # if the slot rises by dy at the carriage X, the stem leans by
+    # angle = atan2(dy, peg_above_carriage).
+    peg_above_carriage = carriage_y - slot_y_flat   # positive if peg above pivot
+
+    # Three frozen poses to draw, each at a different gantry X.
+    # For each pose: compute the slot Y at that X (linear interp on the
+    # polyline above) and the resulting stem tilt angle.
+    import math
+
+    def slot_y_at(x: float) -> float:
+        for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+            if x0 <= x <= x1:
+                if x1 == x0:
+                    return y0
+                return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+        return pts[-1][1]
+
+    poses = [
+        (140, "Scoop", "trough flat, peg in flat section of slot"),
+        (380, "Transport", "trough still flat (slot still flat)"),
+        (640, "Pour", "slot rises -> stem tilts -> trough rolls sideways"),
+    ]
+
+    for px, label, sub in poses:
+        # Where the peg sits in the slot at this gantry X:
+        peg_y = slot_y_at(px)
+        # Carriage pivot is at (px, carriage_y); peg sits "peg_above_carriage"
+        # above pivot along the stem.  Solve for stem angle (theta from
+        # vertical) such that pivot + peg_above_carriage * (sin t, -cos t)
+        # lands on (px, peg_y):
+        dy = carriage_y - peg_y          # how far peg is above pivot vertically
+        # stem length above pivot is fixed (peg_above_carriage); the peg can
+        # only reach the slot if the slot Y is within reach. By construction
+        # we made peg_above_carriage > maximum dy, so:
+        # sin(theta) = (peg_x - px) / peg_above_carriage   but peg_x = px (peg
+        # is constrained in *Y* by the slot, X follows the carriage), so the
+        # stem leans only if the slot moves vertically -> peg_above_carriage
+        # must shorten vertically. Approximate angle by:
+        #     cos(theta) = dy / peg_above_carriage
+        ratio = max(-1.0, min(1.0, dy / peg_above_carriage))
+        theta = math.acos(ratio)         # radians, 0 = vertical
+        theta_deg = math.degrees(theta)
+
+        # Carriage rail tick mark:
+        s.append(
+            f'<rect x="{px - 22}" y="{carriage_y - 10}" width="44" height="20" '
+            'fill="#cfd8dc" stroke="#37474f" stroke-width="1.5" rx="2"/>'
+        )
+        s.append(
+            f'<text x="{px}" y="{carriage_y - 14}" text-anchor="middle" '
+            f'font-size="10" fill="#37474f">carriage</text>'
+        )
+        # Carriage pivot dot:
+        s.append(
+            f'<circle cx="{px}" cy="{carriage_y}" r="3" fill="#222"/>'
+        )
+        # Stem (rotated about carriage pivot)
+        s.append(
+            f'<g transform="translate({px},{carriage_y}) rotate({theta_deg})">'
+        )
+        # stem above pivot (up to peg)
+        s.append(
+            f'  <line x1="0" y1="0" x2="0" y2="{-peg_above_carriage}" '
+            'stroke="#444" stroke-width="3"/>'
+        )
+        # peg (small horizontal cylinder at top of stem)
+        s.append(
+            f'  <rect x="-9" y="{-peg_above_carriage - 4}" width="18" height="8" '
+            'fill="#9aa0a6" stroke="#222" stroke-width="1.2" rx="1"/>'
+        )
+        # stem below pivot (down to trough)
+        s.append(
+            f'  <line x1="0" y1="0" x2="0" y2="{stem_len}" '
+            'stroke="#444" stroke-width="3"/>'
+        )
+        # Trough cross-section, rotated by the stem tilt.  At "pour" pose we
+        # tilt the trough further to make pouring visually clear.
+        extra = 25.0 if label == "Pour" else 0.0
+        # The trough is rigid with the stem, so it rotates with the stem; the
+        # ``transform`` group above already handles that. We pass extra tilt
+        # only to show the pour reveal.
+        s.append(
+            "  " + trough_cross_section(
+                cx=0, cy=stem_len, radius=22,
+                rotate_deg=extra,
+                powder_fill_frac=0.7 if label != "Pour" else 0.25,
+                bumper=False,
+            )
+        )
+        s.append("</g>")
+        # Pose label
+        s.append(
+            f'<text x="{px}" y="{trough_y + 70}" text-anchor="middle" '
+            f'font-size="12" font-weight="600">{label}</text>'
+        )
+        s.append(
+            f'<text x="{px}" y="{trough_y + 86}" text-anchor="middle" '
+            f'font-size="10" fill="#555">{sub}</text>'
+        )
+
+    # Annotate the slot regions:
+    s.append(
+        '<text x="170" y="180" text-anchor="middle" font-size="10" '
+        'fill="#3a342a">flat slot section -> trough level</text>'
+    )
+    s.append(
+        '<text x="555" y="86" text-anchor="middle" font-size="10" '
+        'fill="#3a342a">rising slot section -> stem leans -> trough tilts</text>'
+    )
+    # Bed and target plate as scenery:
+    s.append(
+        f'<rect x="100" y="{trough_y + 28}" width="80" height="34" '
+        'fill="url(#powder)" stroke="#7a6a3a" stroke-width="1.2"/>'
+    )
+    s.append(
+        f'<text x="140" y="{trough_y + 78}" text-anchor="middle" font-size="10" '
+        'fill="#7a6a3a">stock powder bed</text>'
+    )
+    s.append(
+        f'<rect x="600" y="{trough_y + 38}" width="80" height="6" '
+        'fill="#cfd8dc" stroke="#37474f" stroke-width="1"/>'
+    )
+    s.append(
+        f'<text x="640" y="{trough_y + 78}" text-anchor="middle" font-size="10" '
+        'fill="#555">deposit / target plate</text>'
+    )
+
+    # Footer pointer to corresponding section
+    s.append(
+        '<text x="380" y="500" text-anchor="middle" font-size="10" fill="#555" '
+        'font-style="italic">See manuscript Sec. "Pin-defined-path actuation" for the trade-off vs. the smooth cam ramp.</text>'
+    )
+    s.append(_svg_close())
+    return "".join(s)
+
+
 def render_gif() -> None:
     try:
         import cairosvg  # type: ignore
@@ -637,6 +849,7 @@ def main() -> None:
         "panel-B-pivot-detail.svg": panel_B,
         "panel-C-isometric.svg": panel_C,
         "panel-D-mechanism.svg": panel_D,
+        "panel-E-pin-slot.svg": panel_E,
     }
     for name, fn in panels.items():
         path = FIG_DIR / name

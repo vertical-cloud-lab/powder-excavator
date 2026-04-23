@@ -20,10 +20,18 @@ inclined cam ramp** does all the work.
 > The current design uses a **longitudinal** pivot pin and **sideways
 > tilt** so powder pours over the full 80 mm long edge, and replaces the
 > sawtooth with a **smooth cam ramp** that the trough's chamfered bumper
-> slides up. The full review and the verbatim Edison answers live in
-> [`docs/edison/`](docs/edison/); the literature-aware brainstorming
-> doc has been updated to match (see
-> [`docs/brainstorming-and-literature.md`](docs/brainstorming-and-literature.md)).
+> slides up. A follow-on hand sketch
+> ([`PXL_20260423_231729467.jpg`](PXL_20260423_231729467.jpg)) refines the
+> cam ramp into a **pin-defined-path** (peg-in-routed-slot) variant in
+> which a peg on a stem hanging from the gantry is captured in a slot
+> routed into a fixed external board, so the slot path deterministically
+> programs the trough's tilt schedule. The full review and the verbatim
+> Edison answers live in [`docs/edison/`](docs/edison/); the
+> literature-aware brainstorming doc has been ported to a LaTeX manuscript
+> with a proper BibTeX bibliography (see
+> [`docs/manuscript/main.tex`](docs/manuscript/main.tex) and
+> [`docs/manuscript/refs.bib`](docs/manuscript/refs.bib); build with
+> `cd docs/manuscript && make`).
 
 ## Original concept sketch
 
@@ -52,14 +60,33 @@ the mechanism animation below) by a single reproducible script,
 
 ![Panel D — mechanism of action](docs/figures/panel-D-mechanism.svg)
 
+### Panel E — Pin-defined-path actuation variant
+
+A follow-on hand sketch
+([`PXL_20260423_231729467.jpg`](PXL_20260423_231729467.jpg)) refines the
+smooth cam ramp into a peg-in-routed-slot mechanism. A vertical stem hangs
+from the gantry carriage on a pin pivot; a transverse peg at the top of the
+stem rides in a slot routed into a fixed external board. The slot's shape
+over `X` deterministically programs the trough's tilt schedule, with the peg
+captive in the slot for the entire stroke (no approach-and-contact
+ambiguity, and bidirectional return without relying on gravity). See
+[`docs/manuscript/main.tex`](docs/manuscript/main.tex) §"Pin-defined-path
+actuation" for the full trade-off discussion.
+
+![Panel E — pin-defined-path actuation](docs/figures/panel-E-pin-slot.svg)
+
 ### Animation — cam-engagement and sideways tilt
 
 ![Mechanism animation — trough rolls sideways about its longitudinal pin as its bumper rides up the cam ramp](docs/figures/mechanism.gif)
 
-A separate brainstorming &amp; prior-art writeup — framed roughly as the
+The full literature-aware design discussion — framed roughly as the
 introduction to a *Digital Discovery* manuscript on a new powder
 dispenser, with references to recent SDL / powder-handling literature —
-is in [`docs/brainstorming-and-literature.md`](docs/brainstorming-and-literature.md).
+is now a LaTeX manuscript with a proper BibTeX bibliography:
+[`docs/manuscript/main.tex`](docs/manuscript/main.tex),
+[`docs/manuscript/refs.bib`](docs/manuscript/refs.bib). Build with
+`cd docs/manuscript && make` (requires `pdflatex`, `bibtex`, and
+`cairosvg`).
 
 ## Design brainstorming
 
@@ -115,7 +142,7 @@ Picking shape matters:
    sits in the 15–30 % range across powder classes (Edison v2 §4); with
    it, ≈10 % CV is realistic on cohesive inorganics — comparable to the
    positive-displacement-pipette baseline reported by Alsenz (see
-   `docs/brainstorming-and-literature.md`).
+   [`docs/manuscript/main.tex`](docs/manuscript/main.tex)).
 3. **Transport to the deposit X.** The carriage translates in X over to
    the deposit station. Arms still vertical; trough still open-up,
    level under gravity.
