@@ -1,0 +1,48 @@
+name: bimodal-compliance
+
+# Installs the open-source Python analysis stack and runs the numerical
+# bimodal-compliance check for the secondary compliant-mechanism design.
+# See docs/bimodal-compliant-mechanism.md and scripts/bimodal_compliance.py.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/bimodal_compliance.py'
+      - 'tests/test_bimodal_compliance.py'
+      - 'requirements.txt'
+      - '.github/workflows/bimodal-compliance.yml'
+  pull_request:
+    paths:
+      - 'scripts/bimodal_compliance.py'
+      - 'tests/test_bimodal_compliance.py'
+      - 'requirements.txt'
+      - '.github/workflows/bimodal-compliance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install analysis dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run bistability analyzer
+        run: python scripts/bimodal_compliance.py
+      - name: Run pytest
+        run: pytest -v tests/test_bimodal_compliance.py
+      - name: Upload energy-landscape plot
+        uses: actions/upload-artifact@v4
+        with:
+          name: bimodal-energy-plot
+          path: docs/figures/bimodal-energy.svg
+          if-no-files-found: error
