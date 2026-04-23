@@ -26,11 +26,16 @@ into PNG bytes that ``Pillow`` then concatenates into an animated GIF.
 
 from __future__ import annotations
 
+import argparse
 import io
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-FIG_DIR = REPO_ROOT / "docs" / "figures"
+DEFAULT_FIG_DIR = REPO_ROOT / "docs" / "figures"
+# Module-level handle that ``main`` rebinds when ``--output-dir`` is given;
+# kept so ``render_gif`` (which doesn't take an argument) writes to the same
+# directory as the panels.
+FIG_DIR = DEFAULT_FIG_DIR
 
 # ---------------------------------------------------------------------------
 # Shared SVG building blocks
@@ -526,6 +531,19 @@ def panel_D() -> str:
 # ---------------------------------------------------------------------------
 
 def _frame_svg(t: float) -> str:
+    """Render a single GIF frame at parameter ``t`` in [0, 1].
+
+    The parameter linearly maps to "time" through the animation:
+
+    * ``0.00`` – ``0.35``: the trough translates in X (still horizontal)
+      towards the cam ramp; no roll yet.
+    * ``0.35`` – ``0.75``: the bumper rides up the cam's hypotenuse and
+      the trough rolls 0° → 60° about its longitudinal pin.
+    * ``0.75`` – ``1.00``: powder pours over the lowered long edge while
+      the trough holds the maximum tilt.
+
+    Returns the SVG markup for the single frame as a ``str``.
+    """
     W, H = 700, 460
     R = 50
     pivot_y = 240
@@ -600,6 +618,19 @@ def render_gif() -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=DEFAULT_FIG_DIR,
+        help=(
+            "Directory to write the generated panels and GIF into. Defaults "
+            "to docs/figures/ relative to the repository root."
+        ),
+    )
+    args = parser.parse_args()
+    global FIG_DIR
+    FIG_DIR = args.output_dir
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     panels = {
         "panel-A-orthographic.svg": panel_A,
