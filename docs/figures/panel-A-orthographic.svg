@@ -1,184 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 580"
-     font-family="Helvetica, Arial, sans-serif">
-  <!--
-    Subpanel A — Orthographic views.
-
-    GEOMETRY (corrected per review):
-      * Two vertical arms grip the trough on its two LONG FLAT SIDES
-        (front face and back face along the trough's long axis L), at
-        the midpoint along L.
-      * A single horizontal pivot pin spans the two arms perpendicular
-        to L (i.e. across width D), passing through pivot bosses on
-        each long side wall of the trough.
-      * The trough hangs between the arms exactly like a gondola hangs
-        between the two support arms of a ferris-wheel ride; gravity
-        keeps the open mouth pointing up. Only the trough rotates.
-
-    The three views below are now defined consistently:
-      End  : looking along L (you see the half-circle cross-section).
-             The arms and pin are out of plane, so they're shown as
-             hidden lines.
-      Side : looking along the pivot-pin axis. The trough appears as
-             its long profile; both arms project to the same single
-             arm; the pin is end-on (red dot).
-      Top  : looking straight down on the open mouth.
-  -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" font-family="Helvetica, Arial, sans-serif" font-size="13">
   <defs>
     <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0"   stop-color="#dfe4ea"/>
       <stop offset="0.5" stop-color="#aab2bd"/>
       <stop offset="1"   stop-color="#7e8794"/>
     </linearGradient>
+    <linearGradient id="metalH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"   stop-color="#dfe4ea"/>
+      <stop offset="0.5" stop-color="#aab2bd"/>
+      <stop offset="1"   stop-color="#7e8794"/>
+    </linearGradient>
+    <pattern id="powder" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#e8d9a8"/>
+      <circle cx="1.5" cy="1.5" r="0.6" fill="#b89a55"/>
+      <circle cx="4"   cy="3.5" r="0.6" fill="#b89a55"/>
+      <circle cx="2"   cy="5"   r="0.5" fill="#b89a55"/>
+    </pattern>
+    <marker id="arrowK" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#222"/>
+    </marker>
     <marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5"
             markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#1f5fbf"/>
     </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/>
+    </marker>
   </defs>
-
-  <text x="550" y="34" text-anchor="middle" font-size="22" font-weight="700">
-    Subpanel A — Orthographic views (end / side / top)
-  </text>
-  <text x="550" y="54" text-anchor="middle" font-size="13" fill="#555" font-style="italic">
-    arms grip the LONG sides of the trough at midpoint; pivot pin is transverse to L
-  </text>
-
-  <!-- ============== END VIEW (looking along L) ============== -->
-  <g transform="translate(60,100)">
-    <text x="120" y="0" text-anchor="middle" font-size="17" font-weight="600">
-      End view (looking along L)
-    </text>
-
-    <!-- half-cylinder cross-section -->
-    <line x1="20" y1="80" x2="220" y2="80" stroke="#222" stroke-width="2"/>
-    <path d="M20,80 A100,100 0 0 0 220,80" fill="url(#metal)" stroke="#222" stroke-width="2"/>
-    <path d="M28,80 A92,92 0 0 0 212,80" fill="none" stroke="#666"
-          stroke-width="1" stroke-dasharray="3,3"/>
-
-    <!-- hooked lip on each upper edge (end-on, both edges on this view) -->
-    <path d="M20,80 q-7,-5 -7,-13 q0,-3 4,-3" fill="none" stroke="#222" stroke-width="2"/>
-    <path d="M220,80 q7,-5 7,-13 q0,-3 -4,-3" fill="none" stroke="#222" stroke-width="2"/>
-
-    <!-- pivot pin head: pin runs INTO the page in this view, so it
-         appears as a circle on the trough's long side wall. Sits
-         slightly above the loaded centroid for stability. There are
-         two side walls; the near-side pin head is at the front, the
-         far-side one is hidden — use solid circle for the near, dashed
-         circle for the far (concentric with the near one in true ortho). -->
-    <circle cx="120" cy="60" r="7" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>
-    <text x="135" y="64" font-size="11" fill="#c0392b">pivot pin (end-on)</text>
-
-    <!-- arms are out-of-plane in this view: show as hidden dashed
-         vertical lines, one in front (slightly below centerline because
-         it's the near long side wall) -->
-    <line x1="120" y1="-20" x2="120" y2="60" stroke="#888"
-          stroke-width="1.5" stroke-dasharray="4,3"/>
-    <text x="125" y="-10" font-size="11" fill="#888">
-      arm (in front + behind, hidden)
-    </text>
-
-    <!-- D dimension -->
-    <line x1="20" y1="200" x2="220" y2="200" stroke="#1f5fbf" stroke-width="1"
-          marker-start="url(#arrowB)" marker-end="url(#arrowB)"/>
-    <text x="120" y="220" text-anchor="middle" font-size="13" fill="#1f5fbf">
-      diameter D
-    </text>
-  </g>
-
-  <!-- ============== SIDE VIEW (looking along pin axis) ============== -->
-  <g transform="translate(370,100)">
-    <text x="200" y="0" text-anchor="middle" font-size="17" font-weight="600">
-      Side view (looking along the pivot pin axis)
-    </text>
-
-    <!-- The two arms project to the SAME location in this view; draw one. -->
-    <rect x="190" y="-30" width="20" height="110" fill="url(#metal)" stroke="#333"/>
-    <text x="220" y="-15" font-size="11" fill="#333">two arms (in-line in this view)</text>
-
-    <!-- long profile of the trough: a long shallow shape — open top
-         (straight rim), straight side walls down to a curved bottom. -->
-    <path d="M20,80 L380,80 L380,100 Q200,200 20,100 Z"
-          fill="url(#metal)" stroke="#222" stroke-width="2"/>
-    <!-- top rim -->
-    <line x1="20" y1="80" x2="380" y2="80" stroke="#222" stroke-width="2"/>
-
-    <!-- hooked end lips (these are the rims of the trough's two end caps,
-         seen edge-on at the left and right ends of this profile) -->
-    <path d="M20,80 q-6,-5 -6,-12 q0,-3 4,-3" fill="none" stroke="#222" stroke-width="2"/>
-    <path d="M380,80 q6,-5 6,-12 q0,-3 -4,-3" fill="none" stroke="#222" stroke-width="2"/>
-
-    <!-- pivot pin: end-on (red dot) at midpoint along L, slightly above
-         the trough's geometric centre so the loaded trough hangs level. -->
-    <circle cx="200" cy="80" r="7" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>
-    <text x="215" y="76" font-size="11" fill="#c0392b">pivot pin (end-on)</text>
-
-    <!-- L dimension -->
-    <line x1="20" y1="220" x2="380" y2="220" stroke="#1f5fbf" stroke-width="1"
-          marker-start="url(#arrowB)" marker-end="url(#arrowB)"/>
-    <text x="200" y="240" text-anchor="middle" font-size="13" fill="#1f5fbf">
-      length L  ≈ 3 D
-    </text>
-
-    <!-- end-lip callouts -->
-    <text x="20"  y="260" font-size="11" fill="#444">hooked end-lip (left)</text>
-    <text x="380" y="260" text-anchor="end" font-size="11" fill="#444">hooked end-lip (right)</text>
-  </g>
-
-  <!-- ============== TOP VIEW (looking down on open mouth) ============== -->
-  <g transform="translate(800,100)">
-    <text x="130" y="0" text-anchor="middle" font-size="17" font-weight="600">
-      Top view
-    </text>
-
-    <!-- long rectangular mouth -->
-    <rect x="10" y="30" width="240" height="80" rx="4" ry="4"
-          fill="#f4e9c8" stroke="#222" stroke-width="2"/>
-    <rect x="18" y="38" width="224" height="64" rx="3" ry="3"
-          fill="none" stroke="#666" stroke-width="1" stroke-dasharray="3,3"/>
-
-    <!-- The two arms are on the FRONT and BACK long sides of the
-         trough at the midpoint along L. From above they appear as
-         small rectangles flush with each long side. -->
-    <rect x="120" y="14" width="20" height="16" fill="url(#metal)" stroke="#333"/>
-    <rect x="120" y="110" width="20" height="16" fill="url(#metal)" stroke="#333"/>
-    <text x="143" y="24" font-size="10" fill="#333">arm (front)</text>
-    <text x="143" y="124" font-size="10" fill="#333">arm (back)</text>
-
-    <!-- pivot pin: runs across the trough's width D, perpendicular to L.
-         Solid where it sits between the arms (in air); dashed where
-         hidden inside the trough side walls. -->
-    <line x1="125" y1="30" x2="135" y2="30" stroke="#c0392b" stroke-width="3"/>
-    <line x1="125" y1="110" x2="135" y2="110" stroke="#c0392b" stroke-width="3"/>
-    <line x1="130" y1="30" x2="130" y2="110"
-          stroke="#c0392b" stroke-width="2" stroke-dasharray="4,3"/>
-    <text x="145" y="73" font-size="11" fill="#c0392b">pivot pin (transverse)</text>
-
-    <!-- L dim -->
-    <line x1="10" y1="155" x2="250" y2="155" stroke="#1f5fbf" stroke-width="1"
-          marker-start="url(#arrowB)" marker-end="url(#arrowB)"/>
-    <text x="130" y="174" text-anchor="middle" font-size="13" fill="#1f5fbf">length L</text>
-
-    <!-- D dim -->
-    <line x1="278" y1="30" x2="278" y2="110" stroke="#1f5fbf" stroke-width="1"
-          marker-start="url(#arrowB)" marker-end="url(#arrowB)"/>
-    <text x="285" y="74" font-size="13" fill="#1f5fbf">D</text>
-  </g>
-
-  <!-- caption -->
-  <text x="550" y="430" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
-    Two vertical arms hang from the gantry carriage, gripping the trough's two long
-    side walls at midpoint along L (one arm in front, one behind).
-  </text>
-  <text x="550" y="450" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
-    A single horizontal pivot pin (red) spans both arms perpendicular to L, passing
-    through pivot bosses on each long side wall — exactly like a ferris-wheel gondola.
-  </text>
-  <text x="550" y="476" text-anchor="middle" font-size="12" fill="#888">
-    Hooked lips on the SHORT end-cap rims (visible end-on in the side view) are what
-    later catch the wall-mounted sawtooth ledge, tipping the trough end-over-end.
-  </text>
-  <text x="550" y="496" text-anchor="middle" font-size="12" fill="#888">
-    Pin sits slightly above the loaded centroid, so gravity returns the trough to
-    open-up after each dump (a stable pendulum).
-  </text>
-</svg>
+<text x="600" y="34" text-anchor="middle" font-size="22" font-weight="700">Subpanel A — Orthographic views (end, side, top)</text><text x="600" y="56" text-anchor="middle" font-size="13" fill="#555" font-style="italic">longitudinal pivot axis along L; arms grip the two short end caps; trough rolls SIDEWAYS to pour</text><g transform="translate(60,110)"><text x="160" y="0" text-anchor="middle" font-size="16" font-weight="600">End view (along L)</text><rect x="155" y="20" width="10" height="160" fill="url(#metal)" stroke="#333"/><text x="170" y="35" font-size="11" fill="#444">arm (one of two,</text><text x="170" y="49" font-size="11" fill="#444">on the end cap)</text><g transform="translate(160,180) rotate(0)">
+  <path d="M -60 0 L 60 0 A 60 60 0 0 1 -60 0 Z" fill="url(#metal)" stroke="#222" stroke-width="2"/>
+  <path d="M -59.1 9.0 L 59.1 9.0 A 59.1 59.1 0 0 1 -59.1 9.0 Z" fill="url(#powder)" opacity="0.95"/>
+  <path d="M 60 0 L 66 -2 L 66 4 L 60 6 Z" fill="#7e8794" stroke="#222" stroke-width="1.2"/>
+</g><circle cx="160" cy="180" r="6" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/><text x="172" y="184" font-size="11" fill="#c0392b">pivot pin (end-on)</text><line x1="100" y1="270" x2="220" y2="270" stroke="#222" stroke-width="1.2" marker-start="url(#arrowK)" marker-end="url(#arrowK)"/><text x="160" y="290" text-anchor="middle" font-size="13">D ≈ 27 mm</text></g><g transform="translate(430,110)"><text x="200" y="0" text-anchor="middle" font-size="16" font-weight="600">Side view (looking at long side)</text><rect x="34" y="20" width="12" height="140" fill="url(#metal)" stroke="#333"/><rect x="354" y="20" width="12" height="140" fill="url(#metal)" stroke="#333"/><path d="M 40 140 L 360 140 L 360 150 Q 200.0 200 40 150 Z" fill="url(#metalH)" stroke="#222" stroke-width="2"/><path d="M 50 144 L 350 144 L 350 152 Q 200.0 194 50 152 Z" fill="url(#powder)" opacity="0.95"/><line x1="28" y1="148" x2="372" y2="148" stroke="#c0392b" stroke-width="3"/><text x="200.0" y="142" text-anchor="middle" font-size="11" fill="#c0392b">longitudinal pivot pin (axis ∥ L, runs through both end caps)</text><line x1="40" y1="230" x2="360" y2="230" stroke="#222" stroke-width="1.2" marker-start="url(#arrowK)" marker-end="url(#arrowK)"/><text x="200.0" y="250" text-anchor="middle" font-size="13">L ≈ 3 D ≈ 80 mm</text><path d="M 52 140 L 68 135 L 68 144 L 52 144 Z" fill="#7e8794" stroke="#222" stroke-width="1.2"/><path d="M 348 140 L 364 135 L 364 144 L 348 144 Z" fill="#7e8794" stroke="#222" stroke-width="1.2"/><text x="200.0" y="128" text-anchor="middle" font-size="11" fill="#444">chamfered bumper (one per end) — slides up the cam track</text></g><g transform="translate(880,110)"><text x="130" y="0" text-anchor="middle" font-size="16" font-weight="600">Top view</text><rect x="20" y="40" width="220" height="50" fill="url(#metalH)" stroke="#222" stroke-width="2"/><rect x="26" y="46" width="208" height="38" fill="url(#powder)" opacity="0.95"/><line x1="8" y1="65.0" x2="252" y2="65.0" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6 4"/><text x="130.0" y="108" text-anchor="middle" font-size="11" fill="#c0392b">pivot pin axis (along centre line of trough length)</text><rect x="2" y="34" width="12" height="62" fill="url(#metal)" stroke="#333"/><rect x="234" y="34" width="12" height="62" fill="url(#metal)" stroke="#333"/><text x="-4" y="32" font-size="11" fill="#444">arms grip the two end caps</text><line x1="80.0" y1="140" x2="180.0" y2="140" stroke="#5a4a30" stroke-width="6"/><text x="130.0" y="160" text-anchor="middle" font-size="11" fill="#5a4a30">fixed strike-off bar (bed-edge mounted)</text></g><text x="600" y="660" text-anchor="middle" font-size="13" fill="#444" font-style="italic">The pivot pin runs along the trough's LONG axis L (not across its width).  Arms grip the two end caps,</text><text x="600" y="680" text-anchor="middle" font-size="13" fill="#444" font-style="italic">so when the trough rolls about the pin it pours over the FULL 80 mm long edge — eliminating the narrow-bottleneck</text><text x="600" y="700" text-anchor="middle" font-size="13" fill="#444" font-style="italic">and trapped-volume problems of an end-over-end tilt of a half-cylinder (Edison analysis-v2 §3).</text></svg>
