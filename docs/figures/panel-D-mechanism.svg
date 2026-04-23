@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 640"
      font-family="Helvetica, Arial, sans-serif">
   <!--
-    Subpanel D — Mechanism of action (3 steps).
+    Subpanel D — Mechanism of action (3 steps), drawn from the SIDE
+    (looking along the pivot pin axis).
 
-    KEY CORRECTIONS vs. previous version:
-      * The two vertical arms (and the carriage above them) ALWAYS stay
-        vertical. Only the trough rotates, and only about the pivot pin.
-      * The sawtooth ledge is wall-/post-mounted at trough-lip height,
-        NOT a sawtooth on the floor of the powder bed.
-      * The hooked lip on the trough's upper long edge is what catches
-        a sawtooth tooth when the gantry pushes the trough sideways.
+    KEY POINTS (corrected per review):
+      * Two vertical arms project to the same single arm in this view
+        (they're in line because we're looking along the pin axis).
+      * Pivot pin is end-on (red dot) at the trough's midpoint along L.
+      * The trough rotates END-OVER-END about that pin (like a
+        ferris-wheel gondola pushed past horizontal).
+      * Sawtooth ledge is wall-/post-mounted at trough-end-lip height
+        (NOT on the powder-bed floor).
+      * Arms always stay vertical; only the trough rotates.
   -->
   <defs>
     <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
@@ -34,199 +37,176 @@
     </marker>
   </defs>
 
-  <text x="600" y="34" text-anchor="middle" font-size="22" font-weight="700">
-    Subpanel D — Mechanism of action
+  <text x="650" y="34" text-anchor="middle" font-size="22" font-weight="700">
+    Subpanel D — Mechanism of action (side view, looking along pivot axis)
   </text>
-  <text x="600" y="56" text-anchor="middle" font-size="13" fill="#555" font-style="italic">
-    arms remain vertical at all times; only the trough rotates about the pivot pin
+  <text x="650" y="56" text-anchor="middle" font-size="13" fill="#555" font-style="italic">
+    arms always vertical; only the trough rotates (end-over-end about the transverse pin)
   </text>
 
-  <!-- ============================================================
-       STEP 1 — DIP DOWN INTO POWDER
-       Trough is open-up (gravity); arms vertical; bucket plunged into bed.
-       ============================================================ -->
+  <!-- ============== STEP 1 — DIP DOWN ============== -->
   <g id="step1" transform="translate(40,90)">
-    <text x="170" y="0" text-anchor="middle" font-size="17" font-weight="600">
+    <text x="200" y="0" text-anchor="middle" font-size="17" font-weight="600">
       1. Dip down into powder
     </text>
 
     <!-- powder bed -->
-    <rect x="0" y="290" width="340" height="80" fill="url(#powder)" stroke="#7a5a1a" stroke-width="1"/>
-    <text x="170" y="395" text-anchor="middle" font-size="12" fill="#7a5a1a">powder bed</text>
+    <rect x="0" y="320" width="400" height="100" fill="url(#powder)" stroke="#7a5a1a"/>
+    <text x="200" y="445" text-anchor="middle" font-size="12" fill="#7a5a1a">powder bed</text>
 
-    <!-- two vertical arms (always vertical) -->
-    <rect x="100" y="40" width="14" height="240" fill="url(#metal)" stroke="#333"/>
-    <rect x="226" y="40" width="14" height="240" fill="url(#metal)" stroke="#333"/>
+    <!-- Single arm (the two arms project to the same line in this view) -->
+    <rect x="190" y="40" width="20" height="240" fill="url(#metal)" stroke="#333"/>
+    <text x="220" y="55" font-size="11" fill="#444">two arms (in-line)</text>
 
-    <!-- pivot pin -->
-    <line x1="100" y1="280" x2="240" y2="280" stroke="#c0392b" stroke-width="4"/>
-    <circle cx="100" cy="280" r="4" fill="#7a1f15"/>
-    <circle cx="240" cy="280" r="4" fill="#7a1f15"/>
+    <!-- Pivot pin end-on at the bottom of the arm -->
+    <circle cx="200" cy="280" r="8" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>
 
-    <!-- trough hanging open-up, dipped into powder -->
-    <line x1="60" y1="280" x2="280" y2="280" stroke="#222" stroke-width="2"/>
-    <path d="M60,280 A110,110 0 0 0 280,280"
-          fill="url(#metal)" stroke="#222" stroke-width="2"/>
-    <path d="M67,280 A103,103 0 0 0 273,280 Z" fill="url(#powder)" opacity="0.95"/>
-
-    <!-- pivot bosses -->
-    <circle cx="60"  cy="280" r="6" fill="#aab2bd" stroke="#333"/>
-    <circle cx="280" cy="280" r="6" fill="#aab2bd" stroke="#333"/>
-
-    <!-- hooked lip -->
-    <path d="M60,280 q-7,-5 -7,-13 q0,-3 4,-3" fill="none" stroke="#222" stroke-width="2"/>
-    <path d="M280,280 q7,-5 7,-13 q0,-3 -4,-3" fill="none" stroke="#222" stroke-width="2"/>
+    <!-- Trough — long profile, level (open up), centred on the pivot pin,
+         dipped into the powder bed.
+         Trough sits BELOW the pivot pin; the pin is at the top of the
+         long side wall. -->
+    <g transform="translate(0,0)">
+      <!-- top rim -->
+      <line x1="40" y1="280" x2="360" y2="280" stroke="#222" stroke-width="2"/>
+      <!-- body: shallow rectangle with curved bottom -->
+      <path d="M40,280 L360,280 L360,300 Q200,400 40,300 Z"
+            fill="url(#metal)" stroke="#222" stroke-width="2"/>
+      <!-- powder filling -->
+      <path d="M48,280 L352,280 L352,300 Q200,392 48,300 Z" fill="url(#powder)" opacity="0.95"/>
+      <!-- hooked end lips -->
+      <path d="M40,280 q-6,-5 -6,-12 q0,-3 4,-3" fill="none" stroke="#222" stroke-width="2"/>
+      <path d="M360,280 q6,-5 6,-12 q0,-3 -4,-3" fill="none" stroke="#222" stroke-width="2"/>
+    </g>
 
     <!-- Z↓ arrow -->
-    <line x1="20" y1="60" x2="20" y2="240" stroke="#1f5fbf" stroke-width="3"
+    <line x1="20" y1="60" x2="20" y2="220" stroke="#1f5fbf" stroke-width="3"
           marker-end="url(#arrowB)"/>
-    <text x="6" y="155" font-size="13" fill="#1f5fbf" transform="rotate(-90,6,155)" text-anchor="middle">
-      Z ↓
-    </text>
+    <text x="6" y="140" font-size="13" fill="#1f5fbf"
+          transform="rotate(-90,6,140)" text-anchor="middle">Z ↓</text>
   </g>
 
-  <!-- arrow between step 1 and step 2 -->
-  <line x1="400" y1="240" x2="450" y2="240" stroke="#222" stroke-width="2.5"
+  <line x1="450" y1="270" x2="500" y2="270" stroke="#222" stroke-width="2.5"
         marker-end="url(#arrowK)"/>
 
-  <!-- ============================================================
-       STEP 2 — LIFT & TRANSPORT
-       ============================================================ -->
-  <g id="step2" transform="translate(470,90)">
-    <text x="170" y="0" text-anchor="middle" font-size="17" font-weight="600">
+  <!-- ============== STEP 2 — LIFT & TRANSPORT ============== -->
+  <g id="step2" transform="translate(520,90)">
+    <text x="200" y="0" text-anchor="middle" font-size="17" font-weight="600">
       2. Lift &amp; transport
     </text>
 
-    <!-- low / distant powder bed -->
-    <rect x="0" y="350" width="340" height="20" fill="url(#powder)" stroke="#7a5a1a" stroke-width="1"/>
+    <!-- distant powder bed -->
+    <rect x="0" y="430" width="400" height="20" fill="url(#powder)" stroke="#7a5a1a"/>
 
-    <!-- two vertical arms (raised) -->
-    <rect x="100" y="40" width="14" height="140" fill="url(#metal)" stroke="#333"/>
-    <rect x="226" y="40" width="14" height="140" fill="url(#metal)" stroke="#333"/>
+    <!-- Arm (raised) -->
+    <rect x="190" y="40" width="20" height="140" fill="url(#metal)" stroke="#333"/>
 
-    <!-- pivot pin -->
-    <line x1="100" y1="180" x2="240" y2="180" stroke="#c0392b" stroke-width="4"/>
-    <circle cx="100" cy="180" r="4" fill="#7a1f15"/>
-    <circle cx="240" cy="180" r="4" fill="#7a1f15"/>
+    <!-- Pivot pin -->
+    <circle cx="200" cy="180" r="8" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>
 
-    <!-- trough still open-up, full of powder -->
-    <line x1="60" y1="180" x2="280" y2="180" stroke="#222" stroke-width="2"/>
-    <path d="M60,180 A110,110 0 0 0 280,180"
-          fill="url(#metal)" stroke="#222" stroke-width="2"/>
-    <path d="M67,180 A103,103 0 0 0 273,180 Z" fill="url(#powder)" opacity="0.95"/>
-
-    <!-- pivot bosses -->
-    <circle cx="60"  cy="180" r="6" fill="#aab2bd" stroke="#333"/>
-    <circle cx="280" cy="180" r="6" fill="#aab2bd" stroke="#333"/>
-
-    <!-- hooked lip -->
-    <path d="M60,180 q-7,-5 -7,-13 q0,-3 4,-3" fill="none" stroke="#222" stroke-width="2"/>
-    <path d="M280,180 q7,-5 7,-13 q0,-3 -4,-3" fill="none" stroke="#222" stroke-width="2"/>
+    <!-- Trough — still level, full of powder, raised above the bed -->
+    <g>
+      <line x1="40" y1="180" x2="360" y2="180" stroke="#222" stroke-width="2"/>
+      <path d="M40,180 L360,180 L360,200 Q200,300 40,200 Z"
+            fill="url(#metal)" stroke="#222" stroke-width="2"/>
+      <path d="M48,180 L352,180 L352,200 Q200,292 48,200 Z" fill="url(#powder)" opacity="0.95"/>
+      <path d="M40,180 q-6,-5 -6,-12 q0,-3 4,-3" fill="none" stroke="#222" stroke-width="2"/>
+      <path d="M360,180 q6,-5 6,-12 q0,-3 -4,-3" fill="none" stroke="#222" stroke-width="2"/>
+    </g>
 
     <!-- Z↑ -->
     <line x1="20" y1="240" x2="20" y2="60" stroke="#1f5fbf" stroke-width="3"
           marker-end="url(#arrowB)"/>
-    <text x="6" y="155" font-size="13" fill="#1f5fbf" transform="rotate(-90,6,155)" text-anchor="middle">
-      Z ↑
-    </text>
+    <text x="6" y="140" font-size="13" fill="#1f5fbf"
+          transform="rotate(-90,6,140)" text-anchor="middle">Z ↑</text>
 
-    <!-- X→ -->
-    <line x1="300" y1="220" x2="350" y2="220" stroke="#1f5fbf" stroke-width="3"
+    <!-- X→ arrow -->
+    <line x1="380" y1="320" x2="430" y2="320" stroke="#1f5fbf" stroke-width="3"
           marker-end="url(#arrowB)"/>
-    <text x="325" y="240" text-anchor="middle" font-size="13" fill="#1f5fbf">X →</text>
+    <text x="405" y="340" text-anchor="middle" font-size="13" fill="#1f5fbf">X →</text>
   </g>
 
-  <!-- arrow between step 2 and step 3 -->
-  <line x1="820" y1="240" x2="870" y2="240" stroke="#222" stroke-width="2.5"
+  <line x1="930" y1="270" x2="980" y2="270" stroke="#222" stroke-width="2.5"
         marker-end="url(#arrowK)"/>
 
-  <!-- ============================================================
-       STEP 3 — TIP AGAINST WALL-MOUNTED LEDGE → DEPOSIT
-       Arms still vertical. Trough has rotated about the pin. The
-       sawtooth ledge is mounted to a fixed post/wall at lip height,
-       not lying on the floor.
-       ============================================================ -->
-  <g id="step3" transform="translate(880,90)">
-    <text x="160" y="0" text-anchor="middle" font-size="17" font-weight="600">
-      3. Tip against ledge → deposit
+  <!-- ============== STEP 3 — TIP END-OVER-END AGAINST LEDGE ============== -->
+  <g id="step3" transform="translate(1000,90)">
+    <text x="140" y="0" text-anchor="middle" font-size="17" font-weight="600">
+      3. Tip end-over-end → deposit
     </text>
 
-    <!-- Two arms — STILL VERTICAL -->
-    <rect x="100" y="40" width="14" height="140" fill="url(#metal)" stroke="#333"/>
-    <rect x="226" y="40" width="14" height="140" fill="url(#metal)" stroke="#333"/>
+    <!-- Arm — STILL VERTICAL -->
+    <rect x="100" y="40" width="20" height="140" fill="url(#metal)" stroke="#333"/>
 
-    <!-- pivot pin (still horizontal, same height) -->
-    <line x1="100" y1="180" x2="240" y2="180" stroke="#c0392b" stroke-width="4"/>
-    <circle cx="100" cy="180" r="4" fill="#7a1f15"/>
-    <circle cx="240" cy="180" r="4" fill="#7a1f15"/>
+    <!-- Pivot pin (still horizontal, same height) -->
+    <circle cx="110" cy="180" r="8" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>
 
-    <!-- ROTATED trough (rotates about pivot at (170,180) by -55deg) -->
-    <g transform="rotate(-55 170 180)">
-      <!-- trough top rim line -->
-      <line x1="60" y1="180" x2="280" y2="180" stroke="#222" stroke-width="2"/>
-      <!-- half-cyl -->
-      <path d="M60,180 A110,110 0 0 0 280,180"
+    <!-- ROTATED trough: rotates about the pin (110,180) by -45 deg, so the
+         RIGHT end drops down (into the dump zone) and the LEFT end rises. -->
+    <g transform="rotate(-45 110 180)">
+      <line x1="-50" y1="180" x2="270" y2="180" stroke="#222" stroke-width="2"/>
+      <path d="M-50,180 L270,180 L270,200 Q110,300 -50,200 Z"
             fill="url(#metal)" stroke="#222" stroke-width="2"/>
-      <!-- pivot bosses -->
-      <circle cx="60"  cy="180" r="6" fill="#aab2bd" stroke="#333"/>
-      <circle cx="280" cy="180" r="6" fill="#aab2bd" stroke="#333"/>
-      <!-- hooked lips -->
-      <path d="M60,180 q-7,-5 -7,-13 q0,-3 4,-3" fill="none" stroke="#222" stroke-width="2"/>
-      <path d="M280,180 q7,-5 7,-13 q0,-3 -4,-3" fill="none" stroke="#222" stroke-width="2"/>
+      <!-- powder shifted toward the lower (right) end -->
+      <path d="M120,182 L262,182 L262,200 Q200,272 120,232 Z"
+            fill="url(#powder)" opacity="0.95"/>
+      <path d="M-50,180 q-6,-5 -6,-12 q0,-3 4,-3" fill="none" stroke="#222" stroke-width="2"/>
+      <path d="M270,180 q6,-5 6,-12 q0,-3 -4,-3" fill="none" stroke="#222" stroke-width="2"/>
     </g>
 
-    <!-- wall-mounted sawtooth LEDGE: a horizontal beam at lip height,
-         with a sawtooth top edge facing UP. Mounted to a fixed
-         post on the right side. -->
+    <!-- Wall-mounted sawtooth LEDGE: a horizontal bar at trough-end-lip
+         height, mounted on a fixed post on the right side.  -->
     <!-- post -->
     <rect x="320" y="120" width="14" height="320" fill="#8a7a5e" stroke="#444"/>
     <text x="340" y="430" font-size="11" fill="#5a4a30">fixed post</text>
     <!-- horizontal ledge bar -->
-    <rect x="200" y="190" width="120" height="18" fill="#8a7a5e" stroke="#444"/>
-    <!-- sawtooth top edge of the ledge bar -->
-    <polygon points="200,190 208,176 216,190 224,176 232,190 240,176 248,190 256,176 264,190 272,176 280,190 288,176 296,190 304,176 312,190 320,176 320,190"
+    <rect x="220" y="200" width="100" height="18" fill="#8a7a5e" stroke="#444"/>
+    <!-- sawtooth top edge -->
+    <polygon points="220,200 228,186 236,200 244,186 252,200 260,186 268,200 276,186 284,200 292,186 300,200 308,186 316,200 320,200"
              fill="#8a7a5e" stroke="#444"/>
-    <text x="240" y="232" font-size="12" fill="#5a4a30">wall-mounted sawtooth ledge</text>
-    <text x="240" y="248" font-size="11" fill="#7a6a4a">(at trough-lip height — NOT on the floor)</text>
+    <text x="260" y="240" font-size="12" fill="#5a4a30">wall-mounted sawtooth ledge</text>
+    <text x="260" y="256" font-size="11" fill="#7a6a4a">(at trough-END-lip height)</text>
 
-    <!-- where the lip catches a tooth -->
-    <circle cx="232" cy="178" r="6" fill="none" stroke="#c0392b" stroke-width="2"/>
-    <text x="155" y="105" font-size="11" fill="#c0392b">hooked lip catches</text>
-    <text x="170" y="120" font-size="11" fill="#c0392b">a sawtooth tooth →</text>
+    <!-- engagement marker — the trough's end-lip caught a tooth -->
+    <circle cx="248" cy="188" r="7" fill="none" stroke="#c0392b" stroke-width="2"/>
+    <text x="100" y="115" font-size="11" fill="#c0392b">end-lip caught</text>
+    <text x="120" y="130" font-size="11" fill="#c0392b">on a tooth →</text>
 
-    <!-- powder pours out (downward stream) -->
+    <!-- powder pours out the LOWERED (right) end -->
     <g fill="url(#powder)" opacity="0.95">
-      <path d="M70,270 Q80,310 90,360 L130,360 Q140,310 110,270 Z"/>
+      <path d="M210,330 Q220,380 230,440 L270,440 Q280,380 250,330 Z"/>
     </g>
     <g fill="#b89a55">
-      <circle cx="80"  cy="300" r="1.5"/>
-      <circle cx="120" cy="320" r="1.5"/>
-      <circle cx="100" cy="345" r="1.5"/>
+      <circle cx="220" cy="360" r="1.5"/>
+      <circle cx="260" cy="395" r="1.5"/>
+      <circle cx="240" cy="425" r="1.5"/>
     </g>
-    <text x="100" y="400" text-anchor="middle" font-size="11" fill="#7a5a1a">powder pours out</text>
+    <text x="240" y="475" text-anchor="middle" font-size="11" fill="#7a5a1a">powder pours out lowered end</text>
 
-    <!-- horizontal X-push arrow on the carriage region -->
-    <line x1="40" y1="100" x2="100" y2="100" stroke="#1f5fbf" stroke-width="3"
+    <!-- gantry X-push -->
+    <line x1="20" y1="100" x2="80" y2="100" stroke="#1f5fbf" stroke-width="3"
           marker-end="url(#arrowB)"/>
-    <text x="70" y="92" text-anchor="middle" font-size="12" fill="#1f5fbf">gantry pushes X →</text>
+    <text x="50" y="92" text-anchor="middle" font-size="12" fill="#1f5fbf">gantry pushes X →</text>
 
-    <!-- rotation indicator on trough -->
-    <path d="M195,225 a32,32 0 0 1 28,-44" fill="none" stroke="#1f5fbf"
+    <!-- rotation indicator -->
+    <path d="M70,210 a35,35 0 0 1 30,-46" fill="none" stroke="#1f5fbf"
           stroke-width="2.5" marker-end="url(#arrowB)"/>
-    <text x="160" y="260" font-size="12" fill="#1f5fbf">trough rotates about pin</text>
+    <text x="40" y="240" font-size="12" fill="#1f5fbf">trough tips end-over-end about pin</text>
   </g>
 
   <!-- caption -->
-  <text x="600" y="540" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
-    Across all three steps the two arms (and therefore the pivot pin's height) remain unchanged.
-    The trough is the only part that ever rotates,
+  <text x="650" y="555" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
+    Across all three steps the carriage / arms / pivot-pin height stay unchanged.  Only the
+    trough rotates, and only when its hooked end-lip is forced
   </text>
-  <text x="600" y="560" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
-    and only when its hooked lip is forced against the wall-mounted sawtooth ledge during X
-    travel. No actuator on the bucket itself.
+  <text x="650" y="575" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
+    against the wall-mounted sawtooth ledge during X-travel.  Continued X-push tips the
+    trough end-over-end about the transverse pin and powder slides
   </text>
-  <text x="600" y="585" text-anchor="middle" font-size="12" fill="#888">
-    Choosing the X-coordinate at which the lip first engages the sawtooth selects the deposit
-    location; multiple teeth give discrete, repeatable engagement points.
+  <text x="650" y="595" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
+    out the lowered end.  Backing the carriage off lets gravity right the trough (open up).
+  </text>
+  <text x="650" y="619" text-anchor="middle" font-size="12" fill="#888">
+    Choosing which sawtooth tooth the lip engages selects the dump-tilt magnitude;
+    a deeper-engaged tooth = larger tilt = more aggressive pour.
   </text>
 </svg>

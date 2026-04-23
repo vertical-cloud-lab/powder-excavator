@@ -1,10 +1,14 @@
 # powder-excavator
 
 A pure-mechanical, gantry-mounted "ladle / trough" for picking up loose
-powder from a bed and depositing it at a target location. There are no
-actuators on the bucket itself — the gantry's existing X / Z motion plus
-a fixed wall-mounted **sawtooth ledge** (a horizontal bar at trough-lip
-height with a comb of teeth on its top edge) does all the work.
+powder from a bed and depositing it at a target location. The trough
+hangs between two vertical arms exactly like a **ferris-wheel gondola**:
+the arms grip the trough's two long side walls at midpoint, with a
+single horizontal pivot pin running across the trough perpendicular to
+its long axis. There are no actuators on the bucket itself — the
+gantry's existing X / Z motion plus a fixed wall-mounted **sawtooth
+ledge** (a horizontal bar at trough-end-lip height with a comb of teeth
+on its top edge) does all the work.
 
 ## Original concept sketch
 
@@ -15,7 +19,7 @@ height with a comb of teeth on its top edge) does all the work.
 The sketch above has been recreated as four labelled subpanels. Each is
 a self-contained SVG with its own caption.
 
-### Panel A — Orthographic views (front / side / top)
+### Panel A — Orthographic views (end / side / top)
 
 ![Panel A — orthographic](docs/figures/panel-A-orthographic.svg)
 
@@ -31,6 +35,10 @@ a self-contained SVG with its own caption.
 
 ![Panel D — mechanism of action](docs/figures/panel-D-mechanism.svg)
 
+### Animation — mechanism of action
+
+![Mechanism animation — trough tips end-over-end about the pivot pin](docs/figures/mechanism.gif)
+
 A separate brainstorming &amp; prior-art writeup — framed roughly as the
 introduction to a *Digital Discovery* manuscript on a new powder
 dispenser, with references to recent SDL / powder-handling literature —
@@ -43,25 +51,31 @@ is in [`docs/brainstorming-and-literature.md`](docs/brainstorming-and-literature
 The bucket is an **elongated half-cylinder trough** (think: a long,
 narrow ladle with a semicircular cross-section and an open top). It is
 suspended between **two parallel vertical arms** that hang from the
-gantry carriage, via a **single horizontal pivot pin** that passes
-through clearance holes in both arms and through pivot bosses on the
-trough's two side walls (panels B and C).
+gantry carriage exactly like a **ferris-wheel gondola** hangs between
+its two support arms. A **single horizontal pivot pin** runs across the
+trough's *width* (perpendicular to its long axis L), passing through
+clearance holes in both arms and through pivot bosses on the trough's
+two **long side walls** at midpoint along L (panels B and C).
 
 - The two arms are rigidly bolted to the carriage and **always stay
   vertical** during operation.
 - The trough is the **only** part that ever rotates, and only about the
-  pivot pin.
+  pivot pin — tipping **end-over-end** when its hooked end-lip catches
+  the sawtooth ledge.
 - The pin sits slightly above the loaded trough's centre of mass, so
   gravity returns the trough to "open-up" once the dumping ledge is
-  cleared (a stable pendulum).
+  cleared (a stable pendulum / gondola).
 
 Picking shape matters:
 
 - A **half-cylinder** maximises the volume of powder retained per unit
-  of "scoop depth", while presenting a flat top edge that is easy to
-  give a hooked lip for engaging the sawtooth.
+  of "scoop depth", while presenting flat top edges (one rim along each
+  long side) plus two short end-cap rims that are easy to give a
+  **hooked end-lip** for engaging the sawtooth.
 - An **elongated** trough (length L ≈ 3 × diameter D) lets us scoop a
-  larger sample without a deeper plunge into the bed.
+  larger sample without a deeper plunge into the bed. It also gives
+  the gondola arrangement a long lever arm: a small X-push from the
+  gantry produces a useful torque about the pin.
 - **No moving lid / hinge in the baseline design** — powder is held in
   by gravity alone, which keeps the part count and the failure modes to
   a minimum.
@@ -74,25 +88,29 @@ Picking shape matters:
 2. **Lift &amp; transport** — the carriage rises (Z↑); powder is retained
    in the open-top trough by gravity. The carriage then translates (X→)
    over to the deposit location. Arms still vertical, trough still open-up.
-3. **Tip against ledge → deposit** — the gantry pushes the trough
+3. **Tip end-over-end → deposit** — the gantry pushes the trough
    sideways (X→) into a fixed, wall-/post-mounted **sawtooth ledge**
-   positioned at trough-lip height. The hooked lip on the trough's upper
-   long edge catches a sawtooth tooth, and continued X-travel applies a
-   torque about the pivot pin that **rotates only the trough**. Powder
-   pours out at a controlled X-coordinate. Backing the carriage off
-   re-aligns the trough open-up under gravity.
+   positioned at trough-end-lip height. The hooked lip on the trough's
+   short end-cap rim catches a sawtooth tooth, and continued X-travel
+   applies a torque about the pivot pin that **rotates only the trough
+   end-over-end** (one end drops, the other rises — like a ferris-wheel
+   gondola pushed past horizontal). Powder slides out the lowered end
+   at a controlled X-coordinate. Backing the carriage off lets gravity
+   right the trough (open-up) under its pendulum action.
 
 The "push against a wall to dump" trick is what makes this fully
 mechanical — no servo / solenoid is needed on the bucket itself.
 
 ### What is the sawtooth ledge?
 
-A **fixed, wall- or post-mounted horizontal bar** at roughly trough-lip
-height, with a comb of triangular teeth along its top edge (see Panel D,
-Step 3). It is *not* on the floor of the powder bed and is *not* part of
-the moving assembly. The trough's hooked lip slides past the teeth as
-the gantry pushes it in X; when the lip drops behind a tooth, continued
-X-travel forces the trough to rotate about the pivot pin.
+A **fixed, wall- or post-mounted horizontal bar** at roughly trough-
+*end*-lip height, with a comb of triangular teeth along its top edge
+(see Panel D, Step 3, and the GIF above). It is *not* on the floor of
+the powder bed and is *not* part of the moving assembly. The trough's
+hooked end-lip slides past the teeth as the gantry pushes it in X;
+when the lip drops behind a tooth, continued X-travel applies a
+moment about the transverse pivot pin that tilts the trough end-over-
+end.
 
 Why teeth and not a smooth bar?
 
@@ -126,10 +144,12 @@ Why teeth and not a smooth bar?
   interior helps with sticky/tribocharging powders. For 3D-printed
   parts this might mean a vapour-smoothing pass (PETG / ABS) or an ESD-
   safe filament; for an aluminium revision, hard-anodised or polished.
-- **Lip profile.** A thin, slightly hooked lip will engage the
+- **Lip profile.** A thin, slightly hooked end-lip will engage the
   sawtooth ledge more reliably; a chamfered lip will pour more
-  cleanly. We may need both (hook on one long edge, chamfer on the
-  other).
+  cleanly. The same end-lip serves both roles in the baseline; if the
+  trade-off is too tight we may end up with two different end-lips
+  (one on each end), or hooks on both ends to make the dump
+  reversible.
 - **Repeatability of dose.** How consistent is the scooped volume?
   Likely needs a **strike-off bar** mounted at the bed edge that the
   bucket passes under on the way out, to wipe excess powder back into
