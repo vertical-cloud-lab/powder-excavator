@@ -17,6 +17,11 @@ view, and a step-by-step mechanism of action) lives in
 
 ![Cleaned-up design](docs/powder-excavator-design.svg)
 
+A separate brainstorming &amp; prior-art writeup — framed roughly as the
+introduction to a *Digital Discovery* manuscript on a new powder
+dispenser, with references to recent SDL / powder-handling literature —
+is in [`docs/brainstorming-and-literature.md`](docs/brainstorming-and-literature.md).
+
 ## Design brainstorming
 
 ### Core idea
