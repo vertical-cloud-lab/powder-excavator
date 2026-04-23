@@ -10,12 +10,13 @@ it trying to fill, and what would we need to measure to defend that claim.
 > **Provenance note.** This brainstorm was prompted by feedback on PR #2 to
 > "send the idea to Edison for high-effort literature search" and to consider
 > the discussion at
-> <https://accelerated-discovery.org/t/accurate-powder-dispensing-for-chemistry-and-materials-science-applications/177/24>.
-> That URL was not reachable from this sandboxed environment (`fetch failed`),
-> so the citations below come from a parallel literature scan rather than from
-> the thread itself. Anyone with access to the linked discussion should fold
-> its specific suggestions back into this document — please leave a follow-up
-> comment or PR.
+> <https://accelerated-discovery.org/t/accurate-powder-dispensing-for-chemistry-and-materials-science-applications/177>.
+> An "Edison" literature-search service is **not wired into this agent's
+> tools**, so what follows is a manual pass: a parallel web-literature scan
+> plus a direct read of the linked accelerated-discovery thread (the thread
+> was unreachable in the previous session but did load on retry). The
+> community-thread-specific contributions are summarised in §2.5 below and
+> credited inline.
 
 ---
 
@@ -61,6 +62,79 @@ roadmap [1] and the *ChemRxiv* / Digital Synthesis &amp; Catalysis Lab review
 of SDL hardware for chemistry and materials [4]. Both flag *bulk powder
 transfer from stock containers into a precision dispenser* as a step that
 is still almost universally manual.
+
+### 2.5 Community prior art from the Accelerated Discovery thread
+
+The
+[Accelerated Discovery thread "Accurate powder dispensing for chemistry
+and materials science applications"](https://accelerated-discovery.org/t/accurate-powder-dispensing-for-chemistry-and-materials-science-applications/177)
+[8] is a useful, opinionated cross-section of what practitioners have
+actually tried. The points most relevant to our design:
+
+- **Framing (sgbaird, post 1).** Accurate powder dispensing is "around an
+  order of magnitude more complex and more expensive than liquid handling."
+  This matches the SDL reviews [1, 4] and is the gap we are trying to chip
+  away at on the cheap, mechanical end of the design space.
+- **3D-printed calibrated spatulas (post 2, after Cook et al. 2020 [9]).**
+  Sets of spatulas with known volumes give a calibration curve from volume
+  → mass; decent accuracy in isolation, but degraded by static in
+  gloveboxes and by lighter powders. Two takeaways for us: (i) **a
+  strike-off bar is essentially required** ("just manually tapped the
+  spatula until each scoop is level… it doesn't seem too difficult to
+  physically level it by passing something against the top of the scoop")
+  — directly endorses the strike-off bar variant in §5; (ii) per-material
+  calibration is realistic if the trough is geometrically well-defined.
+- **Positive-displacement-pipette method (post 3, Alsenz [10]).** Packs a
+  pipette tip into the powder; spans ~0.6–20 mg with ~10 % CV across tip
+  sizes. The 10 % CV is a **useful baseline target** for our scoop on
+  cohesive powders.
+- **Auger / screw-feed builds (loppe35 post 4; later post with stepper +
+  3D-printed adapter).** Cheap (jewelry-scale load cell ≈ USD 25, stepper
+  + control board), but "leaky when dispensing vertically" and needs hopper
+  flow aids. Reinforces our decision to keep the excavator's bucket
+  *un-augered* in the baseline design — the auger is positioned in §5 as
+  an optional add-on, not the core mechanism.
+- **The "pick it back up" problem (muon, posts 5/7/14).** Dispensing is
+  only half the workflow; recovering powder *after* an operation
+  (ball-milling, acoustic mixing, weighing) is at least as hard, and a
+  vacuum/pipette approach is awkward when the milled powder is fine and
+  multi-precursor cross-contamination matters. The excavator's open-top
+  ladle is in principle a recovery tool too — worth calling out as an
+  underexplored capability.
+- **Autotrickler v4 + A&D FX-120i (sgbaird, post 6).** ±1 mg, fast-response
+  scale, BLE-controllable from a Pico W; community-validated reference for
+  the "scale + metered feed" downstream of a bulk-transfer device.
+  Suggests a concrete integration target: excavator → tared
+  Autotrickler-style trickler/scale.
+- **PowderBot (Cooper group, [11]) and ALab (Ceder group, [12]).** Two
+  published end-to-end SDLs that *did* solve solids handling, but with
+  workflow-specific workarounds (typically involving milling). Useful
+  honest comparators; the excavator is aimed at being more general at the
+  cost of precision.
+- **Powder-bed AM cross-pollination (kthchow, post 16).** Insstek's
+  "clogged vibration mechanism" / blow-disk approach from directed-energy-
+  deposition AM, and the pharmaceutical SDL community at CMAC, both have
+  mature solutions for sticky / triboelectrically charged powders that
+  could be borrowed wholesale rather than re-invented.
+- **Low-cost dispensing platforms (mreish video, post 15; Tourlomousis
+  ~USD 100 dispenser for biopolymers, post 18).** Demonstrate a market for
+  the same "good-enough, cheap, hackable" niche the excavator targets.
+- **Ceramics-robot survey (Maruyama, post 19).** Explicitly enumerates the
+  commercial vendor list a real lab is currently choosing among
+  (Trajan/Mettler-Toledo, Chemspeed, Unchained Labs, Hamilton,
+  ThermoFisher), confirming the prior-art rows in §2.
+- **Manual MTI PF-A glass dispenser (sgbaird, post 24 — the specific post
+  linked in the review feedback [13]).** A 250 mL hand dispenser whose
+  geometry is reminiscent of Owen Melville's earlier scoop. Worth
+  inspecting the video for the exact lip / tilt geometry it uses; that is
+  effectively a manual ancestor of the excavator's scoop motion and is the
+  closest existing artifact to our bucket.
+
+The thread is also a *de facto* community wishlist: cheap, integrable with
+an existing gantry/robot, tolerant of cohesive and statically-charged
+powders, ideally bidirectional (dispense *and* recover). The excavator
+hits the first three at the cost of precision; the fourth is a free
+side-benefit worth claiming in a writeup.
 
 ## 3. Where the powder-excavator fits
 
@@ -157,6 +231,24 @@ Carrying over from the README brainstorming, with the literature in mind:
    ±0.01–0.02 mg for ≤10 mg doses on the QX-series.
 8. Accelerated Discovery community thread, *Accurate powder dispensing for
    chemistry and materials science applications.*
-   <https://accelerated-discovery.org/t/accurate-powder-dispensing-for-chemistry-and-materials-science-applications/177/24>
-   (referenced in the original feedback; not reachable from this sandbox —
-   should be folded in by a human reviewer).
+   <https://accelerated-discovery.org/t/accurate-powder-dispensing-for-chemistry-and-materials-science-applications/177>
+   Posts referenced individually in §2.5.
+9. C. J. Cook *et al.*, *A guide to the inert-atmosphere processing of
+   sol–gel reactions.* Nature Protocols 16, 365–388 (2021) — solid
+   dispensing into 8×30 mm vials with calibrated spatulas.
+   <https://www.nature.com/articles/s41596-020-00452-7>
+10. J. Alsenz, *Powder dispensing using positive-displacement pipettes for
+    small-scale solubility/formulation work.* Powder Technology, 2011.
+    <https://www.sciencedirect.com/science/article/abs/pii/S0032591011000696>
+11. *PowderBot: An automated robotic platform for handling solids* (Cooper
+    group), arXiv:2309.00544.
+    <https://arxiv.org/abs/2309.00544>
+12. N. J. Szymanski *et al.*, *An autonomous laboratory for the accelerated
+    synthesis of novel materials* ("A-Lab", Ceder group). Nature 624,
+    86–91 (2023).
+    <https://www.nature.com/articles/s41586-023-06734-w>
+13. MTI Corporation, *Manual dispenser of 250 mL made of glass for solid
+    powder, model PF-A* — referenced in the Accelerated Discovery thread,
+    post 24 (the specific URL called out in the review feedback).
+    Demo video: <https://www.youtube.com/watch?v=Ur7GZV2PaPQ>
+
