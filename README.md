@@ -27,7 +27,7 @@ attached to a **vertical arm** hanging from a gantry carriage.
 
 Picking shape matters:
 
-- A **half-cylinder** maximises the volume of powder retained per unit
+- A **half-cylinder** maximizes the volume of powder retained per unit
   of "scoop depth", while presenting a flat top that is easy to mount
   to a vertical arm.
 - An **elongated** trough (length L ≈ 3 × diameter D) lets us scoop a
@@ -63,7 +63,7 @@ mechanical — no servo / solenoid is needed on the bucket itself.
 
 ### Open questions / things to prototype
 
-- **Material & finish.** Anodised aluminum or stainless? Powders can be
+- **Material & finish.** Anodized aluminum or stainless? Powders can be
   sticky / tribocharging — a smooth, conductive, polished interior is
   probably worth the cost.
 - **Trough geometry.** Pure semicircle vs. a slightly deeper "U" or a
@@ -79,7 +79,7 @@ mechanical — no servo / solenoid is needed on the bucket itself.
 - **Powder retention during transport.** For very fine / fluffy
   powders, an open trough may shed material. Options: (a) move slowly,
   (b) add a passive flap that closes under its own weight when the
-  bucket is upright, (c) accept some loss and characterise it.
+  bucket is upright, (c) accept some loss and characterize it.
 - **Deposit precision.** If we need a tight pile rather than a line, a
   shorter trough (smaller L/D) or a funnel under the ledge may help.
 - **Cleaning / cross-contamination.** For multi-material campaigns we
