@@ -661,12 +661,10 @@ def panel_E() -> str:
     # Trough centre Y (below the carriage, hanging on the stem)
     trough_y = 380
     stem_len = trough_y - carriage_y     # stem length (carriage pivot -> trough)
-    peg_above = carriage_y - board_y - board_h / 2  # peg above carriage = (carriage_y - slot_centre_y)
-    # The peg sits on the *top* of the stem, above the carriage pivot.
-    # If the slot is straight at the carriage X, the stem is vertical;
-    # if the slot rises by dy at the carriage X, the stem leans by
-    # angle = atan2(dy, peg_above_carriage).
-    peg_above_carriage = carriage_y - slot_y_flat   # positive if peg above pivot
+    # Distance from the carriage pivot up to where the peg sits in the slot
+    # when the slot is at its flat Y. Must be larger than the slot's
+    # maximum vertical excursion so the peg can always reach the slot.
+    peg_offset_above_pivot = carriage_y - slot_y_flat
 
     # Three frozen poses to draw, each at a different gantry X.
     # For each pose: compute the slot Y at that X (linear interp on the
@@ -690,20 +688,20 @@ def panel_E() -> str:
     for px, label, sub in poses:
         # Where the peg sits in the slot at this gantry X:
         peg_y = slot_y_at(px)
-        # Carriage pivot is at (px, carriage_y); peg sits "peg_above_carriage"
+        # Carriage pivot is at (px, carriage_y); peg sits "peg_offset_above_pivot"
         # above pivot along the stem.  Solve for stem angle (theta from
-        # vertical) such that pivot + peg_above_carriage * (sin t, -cos t)
+        # vertical) such that pivot + peg_offset_above_pivot * (sin t, -cos t)
         # lands on (px, peg_y):
         dy = carriage_y - peg_y          # how far peg is above pivot vertically
-        # stem length above pivot is fixed (peg_above_carriage); the peg can
+        # stem length above pivot is fixed (peg_offset_above_pivot); the peg can
         # only reach the slot if the slot Y is within reach. By construction
-        # we made peg_above_carriage > maximum dy, so:
-        # sin(theta) = (peg_x - px) / peg_above_carriage   but peg_x = px (peg
+        # we made peg_offset_above_pivot > maximum dy, so:
+        # sin(theta) = (peg_x - px) / peg_offset_above_pivot   but peg_x = px (peg
         # is constrained in *Y* by the slot, X follows the carriage), so the
-        # stem leans only if the slot moves vertically -> peg_above_carriage
+        # stem leans only if the slot moves vertically -> peg_offset_above_pivot
         # must shorten vertically. Approximate angle by:
-        #     cos(theta) = dy / peg_above_carriage
-        ratio = max(-1.0, min(1.0, dy / peg_above_carriage))
+        #     cos(theta) = dy / peg_offset_above_pivot
+        ratio = max(-1.0, min(1.0, dy / peg_offset_above_pivot))
         theta = math.acos(ratio)         # radians, 0 = vertical
         theta_deg = math.degrees(theta)
 
@@ -726,12 +724,12 @@ def panel_E() -> str:
         )
         # stem above pivot (up to peg)
         s.append(
-            f'  <line x1="0" y1="0" x2="0" y2="{-peg_above_carriage}" '
+            f'  <line x1="0" y1="0" x2="0" y2="{-peg_offset_above_pivot}" '
             'stroke="#444" stroke-width="3"/>'
         )
         # peg (small horizontal cylinder at top of stem)
         s.append(
-            f'  <rect x="-9" y="{-peg_above_carriage - 4}" width="18" height="8" '
+            f'  <rect x="-9" y="{-peg_offset_above_pivot - 4}" width="18" height="8" '
             'fill="#9aa0a6" stroke="#222" stroke-width="1.2" rx="1"/>'
         )
         # stem below pivot (down to trough)
