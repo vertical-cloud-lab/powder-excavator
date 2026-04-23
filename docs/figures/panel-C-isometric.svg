@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560"
+     font-family="Helvetica, Arial, sans-serif">
+  <!--
+    Subpanel C — Isometric view of the assembly mounted on a gantry.
+    Two parallel vertical arms hang from the carriage; horizontal pivot
+    pin spans both arms and the trough's pivot bosses.
+  -->
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#dfe4ea"/>
+      <stop offset="0.5" stop-color="#aab2bd"/>
+      <stop offset="1"   stop-color="#7e8794"/>
+    </linearGradient>
+    <pattern id="powder" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#e8d9a8"/>
+      <circle cx="1.5" cy="1.5" r="0.6" fill="#b89a55"/>
+      <circle cx="4" cy="3.5" r="0.6" fill="#b89a55"/>
+      <circle cx="2" cy="5"   r="0.5" fill="#b89a55"/>
+    </pattern>
+  </defs>
+
+  <text x="450" y="34" text-anchor="middle" font-size="22" font-weight="700">
+    Subpanel C — 3D / isometric view of trough on gantry
+  </text>
+
+  <!-- Gantry beam -->
+  <g stroke="#444" stroke-width="2" fill="none">
+    <line x1="120" y1="80" x2="780" y2="80"/>
+    <line x1="120" y1="80" x2="120" y2="120"/>
+    <line x1="780" y1="80" x2="780" y2="120"/>
+  </g>
+  <text x="130" y="72" font-size="13" fill="#444">gantry beam (X-axis travel)</text>
+
+  <!-- Carriage on gantry -->
+  <rect x="380" y="72" width="160" height="22" fill="url(#metal)" stroke="#333"/>
+  <text x="460" y="62" text-anchor="middle" font-size="12" fill="#444">carriage (Z-axis lift)</text>
+
+  <!-- TWO vertical arms (one in front, one slightly offset behind for iso effect) -->
+  <!-- Front (left-side) arm -->
+  <rect x="395" y="94" width="14" height="220" fill="url(#metal)" stroke="#333"/>
+  <!-- Back (right-side) arm -->
+  <rect x="510" y="94" width="14" height="220" fill="url(#metal)" stroke="#333"/>
+
+  <!-- Pivot pin (red) spanning both arms; in iso it appears as a slightly slanted rod -->
+  <line x1="395" y1="320" x2="524" y2="320" stroke="#c0392b" stroke-width="5"/>
+  <circle cx="395" cy="320" r="4" fill="#7a1f15"/>
+  <circle cx="524" cy="320" r="4" fill="#7a1f15"/>
+
+  <!-- Pivot pin extending into the trough's pivot boss area -->
+  <line x1="375" y1="328" x2="544" y2="312" stroke="#c0392b" stroke-width="5"/>
+
+  <!-- Isometric trough hung between the arms by the pin -->
+  <g transform="translate(280,310)">
+    <!-- top rim parallelogram -->
+    <polygon points="0,0 320,0 380,50 60,50"
+             fill="#f4e9c8" stroke="#222" stroke-width="2"/>
+    <polygon points="14,8 306,8 362,44 78,44"
+             fill="none" stroke="#888" stroke-width="1" stroke-dasharray="3,3"/>
+
+    <!-- front curved face of half-cylinder -->
+    <path d="M60,50 C 80,170 360,170 380,50"
+          fill="url(#metal)" stroke="#222" stroke-width="2"/>
+
+    <!-- left end cap -->
+    <path d="M0,0 C -10,55 30,110 60,50 Z"
+          fill="url(#metal)" stroke="#222" stroke-width="2"/>
+
+    <!-- right end cap -->
+    <path d="M320,0 C 350,55 410,80 380,50 Z"
+          fill="#aab2bd" stroke="#222" stroke-width="2"/>
+
+    <!-- pivot bosses on the side walls (small circular ears the pin passes through) -->
+    <circle cx="30"  cy="20" r="9" fill="#aab2bd" stroke="#333"/>
+    <circle cx="350" cy="20" r="9" fill="#aab2bd" stroke="#333"/>
+    <circle cx="30"  cy="20" r="3" fill="#fff" stroke="#333"/>
+    <circle cx="350" cy="20" r="3" fill="#fff" stroke="#333"/>
+
+    <!-- hooked lip on the front upper edge (drawn as small overhang) -->
+    <path d="M60,50 q-5,-7 -5,-15 q1,-3 5,-3" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M380,50 q5,-7 5,-15 q-1,-3 -5,-3" fill="none" stroke="#222" stroke-width="2"/>
+    <line x1="60" y1="35" x2="380" y2="35" stroke="#222" stroke-width="1.5"/>
+
+    <!-- highlight curve -->
+    <path d="M80,80 C 130,130 320,130 360,80"
+          fill="none" stroke="#fff" stroke-width="1.5" opacity="0.6"/>
+  </g>
+
+  <!-- Callouts -->
+  <line x1="540" y1="320" x2="610" y2="280" stroke="#c0392b" stroke-width="1"/>
+  <text x="615" y="278" font-size="13" fill="#c0392b" font-weight="600">pivot pin</text>
+  <text x="615" y="295" font-size="11" fill="#444">(single horizontal rod through both arms)</text>
+
+  <line x1="395" y1="200" x2="320" y2="170" stroke="#444" stroke-width="1"/>
+  <text x="120" y="170" font-size="13" fill="#444">two parallel vertical arms (rigid)</text>
+
+  <line x1="650" y1="380" x2="720" y2="430" stroke="#444" stroke-width="1"/>
+  <text x="700" y="450" font-size="13" fill="#444">elongated half-cylinder trough</text>
+  <text x="710" y="466" font-size="11" fill="#666">(open top, hangs by gravity)</text>
+
+  <line x1="290" y1="365" x2="220" y2="430" stroke="#444" stroke-width="1"/>
+  <text x="40"  y="445" font-size="13" fill="#444">hooked lip on long upper edge</text>
+  <text x="60"  y="461" font-size="11" fill="#666">catches the sawtooth ledge during dump</text>
+
+  <!-- caption -->
+  <text x="450" y="510" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
+    Two parallel vertical arms are bolted to the gantry carriage. A single horizontal pivot pin (red)
+    captures the trough between them via pivot bosses on its side walls.
+  </text>
+  <text x="450" y="530" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
+    There are no actuators on the bucket: the gantry's existing X / Z travel + a fixed sawtooth
+    ledge perform both scoop and dump.
+  </text>
+</svg>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 520"
+     font-family="Helvetica, Arial, sans-serif">
+  <!--
+    Subpanel B — Pivot detail.
+
+    Cutaway / exploded view of the pivot region: two vertical arms,
+    a horizontal pin that passes through a clearance hole in each
+    arm and through pivot bosses on the trough's side walls. A small
+    retaining E-clip / collar on each end keeps the pin in place.
+    The trough is free to rotate about the pin.
+  -->
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#dfe4ea"/>
+      <stop offset="0.5" stop-color="#aab2bd"/>
+      <stop offset="1"   stop-color="#7e8794"/>
+    </linearGradient>
+    <marker id="arrowK" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#222"/>
+    </marker>
+  </defs>
+
+  <text x="350" y="34" text-anchor="middle" font-size="22" font-weight="700">
+    Subpanel B — Pivot pin / two-arm assembly (detail)
+  </text>
+
+  <!-- Trough as a half-cylinder seen end-on, large -->
+  <g transform="translate(120,150)">
+    <!-- Two arms -->
+    <rect x="40"  y="0"   width="20" height="120" fill="url(#metal)" stroke="#333" stroke-width="1.5"/>
+    <rect x="400" y="0"   width="20" height="120" fill="url(#metal)" stroke="#333" stroke-width="1.5"/>
+    <text x="50"  y="-8"  font-size="12" fill="#333">left arm</text>
+    <text x="410" y="-8"  font-size="12" fill="#333">right arm</text>
+
+    <!-- Trough -->
+    <line x1="80" y1="120" x2="380" y2="120" stroke="#222" stroke-width="2.5"/>
+    <path d="M80,120 A150,150 0 0 0 380,120"
+          fill="url(#metal)" stroke="#222" stroke-width="2.5"/>
+    <path d="M88,120 A142,142 0 0 0 372,120"
+          fill="none" stroke="#666" stroke-width="1" stroke-dasharray="3,3"/>
+
+    <!-- Pivot bosses on the trough side walls (the "ears" the pin passes through) -->
+    <circle cx="80"  cy="120" r="14" fill="#aab2bd" stroke="#333" stroke-width="1.5"/>
+    <circle cx="380" cy="120" r="14" fill="#aab2bd" stroke="#333" stroke-width="1.5"/>
+    <circle cx="80"  cy="120" r="5"  fill="#fff" stroke="#333"/>
+    <circle cx="380" cy="120" r="5"  fill="#fff" stroke="#333"/>
+
+    <!-- Pivot pin (long horizontal rod through both arms + both bosses) -->
+    <line x1="20" y1="120" x2="440" y2="120" stroke="#c0392b" stroke-width="6"/>
+    <!-- pin head left -->
+    <rect x="14" y="113" width="10" height="14" fill="#7a1f15" stroke="#5a160f"/>
+    <!-- E-clip / retaining ring right -->
+    <path d="M438,108 q10,12 0,24" fill="none" stroke="#7a1f15" stroke-width="3"/>
+
+    <!-- Hooked lip on the long upper edges (drawn as small chevrons) -->
+    <path d="M80,120 q-7,-5 -7,-13 q0,-3 4,-3"
+          fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M380,120 q7,-5 7,-13 q0,-3 -4,-3"
+          fill="none" stroke="#222" stroke-width="2"/>
+
+    <!-- callouts -->
+    <line x1="230" y1="120" x2="230" y2="-30" stroke="#c0392b" stroke-width="1"
+          stroke-dasharray="3,3"/>
+    <text x="230" y="-40" text-anchor="middle" font-size="13" fill="#c0392b" font-weight="600">
+      pivot pin (single horizontal rod)
+    </text>
+
+    <line x1="80" y1="120" x2="20" y2="220" stroke="#444" stroke-width="1"/>
+    <text x="0" y="240" font-size="12" fill="#444">pivot boss / "ear" on trough side wall</text>
+
+    <line x1="73" y1="105" x2="20" y2="60" stroke="#444" stroke-width="1"/>
+    <text x="-15" y="50" font-size="12" fill="#444">hooked lip catches sawtooth ledge</text>
+
+    <line x1="438" y1="120" x2="500" y2="170" stroke="#444" stroke-width="1"/>
+    <text x="500" y="186" font-size="12" fill="#444">retaining clip</text>
+
+    <!-- rotation indicator (the trough rotates about the pin) -->
+    <path d="M230,180 a40,40 0 1 1 -1,0" fill="none" stroke="#1f5fbf"
+          stroke-width="2" marker-end="url(#arrowK)"/>
+    <text x="230" y="245" text-anchor="middle" font-size="12" fill="#1f5fbf">
+      trough free to rotate about pin
+    </text>
+  </g>
+
+  <!-- caption -->
+  <text x="350" y="450" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
+    A single horizontal pivot pin (red) passes through clearance holes in both vertical
+    arms and through pivot bosses on each side wall of the trough.
+  </text>
+  <text x="350" y="470" text-anchor="middle" font-size="13" fill="#444" font-style="italic">
+    A retaining clip on the far end keeps the pin captive. Arms are rigidly bolted to the
+    gantry carriage and stay vertical at all times; only the trough rotates.
+  </text>
+  <text x="350" y="495" text-anchor="middle" font-size="12" fill="#888">
+    The pin sits slightly above the centroid of the loaded trough so gravity returns the
+    trough to "open-up" once the dumping ledge is cleared.
+  </text>
+</svg>
