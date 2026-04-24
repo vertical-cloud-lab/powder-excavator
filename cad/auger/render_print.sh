@@ -44,7 +44,7 @@ echo "==> [2/4] admesh manifold check"
 # can over-report when the sealed interior cavity is opened by the M3 pilot
 # hole; admesh's connected-part / disconnected-edge analysis is what slicers
 # actually rely on.
-admesh -fundecvb /tmp/auger-clean.stl "${STL}" | tail -25
+admesh -fundecvb "${SLICE_DIR}/auger-clean.stl" "${STL}" | tail -25
 
 echo "==> [3/4] Preview PNGs (iso + half-cutaway)"
 xvfb-run -a openscad -o "${ISO_PNG}" --imgsize=600,750 \
