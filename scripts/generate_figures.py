@@ -367,51 +367,136 @@ def panel_C() -> str:
 # Panel D — Mechanism (4 steps now: J-plunge, strike-off, transport, tilt)
 # ---------------------------------------------------------------------------
 
+## Shared layout constants for the 4-step Panel D frames.
+## Every frame uses identical X/Y so the eye can compare them.
+PANEL_D_FRAME_W = 400        # nominal viewbox of one frame
+PANEL_D_BED_Y = 360          # top of powder bed
+PANEL_D_BED_H = 50
+PANEL_D_PIVOT_X = 200        # arm/pivot X within frame (centred)
+PANEL_D_PIVOT_Y = 270        # pivot pin Y (above the bed)
+PANEL_D_ARM_TOP = 40
+PANEL_D_TROUGH_R = 38
+PANEL_D_STRIKEOFF_Y = PANEL_D_PIVOT_Y - 4   # bar sits at the trough rim height
+PANEL_D_GROUND_Y = PANEL_D_BED_Y            # for cam base alignment
+
+
 def _draw_step_frame(
     title: str,
     *,
     show_bed: bool,
-    arm_xy,
-    arm_h,
-    pivot_xy,
-    trough_rotate: float,
-    trough_radius: float,
     show_cam: bool,
     powder_pour: bool,
     show_strike_off: bool,
+    trough_rotate: float = 0.0,
     extra: str = "",
 ) -> str:
+    """Draw one Panel D step in a fixed local coordinate frame.
+
+    All four frames share PANEL_D_PIVOT_X / PANEL_D_PIVOT_Y / PANEL_D_BED_Y, so
+    when they are placed side-by-side in panel_D() the powder bed, pivot pin
+    and arm line up across the row.  Per-step variation is limited to which
+    scenery objects are shown and the trough roll angle.
+    """
+    px = PANEL_D_PIVOT_X
+    py = PANEL_D_PIVOT_Y
+    R = PANEL_D_TROUGH_R
     parts = []
-    parts.append(f'<text x="200" y="0" text-anchor="middle" font-size="17" font-weight="600">{title}</text>')
+    parts.append(
+        f'<text x="{PANEL_D_FRAME_W // 2}" y="0" text-anchor="middle" '
+        'font-size="17" font-weight="600">' + title + '</text>'
+    )
+    # Always-visible "ground" / bed line to anchor the eye, even on steps
+    # where we hide the bed colour fill.
+    parts.append(
+        f'<line x1="0" y1="{PANEL_D_BED_Y}" x2="{PANEL_D_FRAME_W}" y2="{PANEL_D_BED_Y}" '
+        'stroke="#bdb085" stroke-width="1" stroke-dasharray="4 3"/>'
+    )
     if show_bed:
-        parts.append('<rect x="0" y="380" width="400" height="60" fill="url(#powder)" stroke="#7a5a1a"/>')
-        parts.append('<text x="200" y="430" text-anchor="middle" font-size="11" fill="#7a5a1a">powder bed</text>')
+        parts.append(
+            f'<rect x="0" y="{PANEL_D_BED_Y}" width="{PANEL_D_FRAME_W}" '
+            f'height="{PANEL_D_BED_H}" fill="url(#powder)" stroke="#7a5a1a"/>'
+        )
+        parts.append(
+            f'<text x="{PANEL_D_FRAME_W // 2}" y="{PANEL_D_BED_Y + PANEL_D_BED_H + 14}" '
+            'text-anchor="middle" font-size="11" fill="#7a5a1a">powder bed</text>'
+        )
     if show_strike_off:
-        parts.append('<rect x="240" y="332" width="120" height="6" fill="#5a4a30" stroke="#222"/>')
-        parts.append('<text x="300" y="328" text-anchor="middle" font-size="10" fill="#5a4a30">strike-off bar</text>')
+        # Strike-off bar at trough rim height, just to the right of the pivot
+        # so the rim wipes past it as the gantry travels +X (lift-out).
+        bar_x0 = px + R - 4
+        bar_x1 = px + R + 110
+        parts.append(
+            f'<rect x="{bar_x0}" y="{PANEL_D_STRIKEOFF_Y - 3}" '
+            f'width="{bar_x1 - bar_x0}" height="6" fill="#5a4a30" stroke="#222"/>'
+        )
+        parts.append(
+            f'<text x="{(bar_x0 + bar_x1) // 2}" y="{PANEL_D_STRIKEOFF_Y - 8}" '
+            'text-anchor="middle" font-size="10" fill="#5a4a30">strike-off bar</text>'
+        )
     if show_cam:
-        parts.append('<rect x="370" y="160" width="14" height="260" fill="#8a7a5e" stroke="#444"/>')
-        parts.append('<polygon points="270,300 370,300 370,230 270,300" fill="#8a7a5e" stroke="#444"/>')
-        parts.append('<text x="320" y="320" text-anchor="middle" font-size="10" fill="#5a4a30">smooth cam ramp</text>')
-    ax, ay = arm_xy
-    parts.append(f'<rect x="{ax - 8}" y="{ay}" width="16" height="{arm_h}" fill="url(#metal)" stroke="#333"/>')
-    px, py = pivot_xy
-    parts.append(f'<circle cx="{px}" cy="{py}" r="7" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>')
-    parts.append(trough_cross_section(px, py, trough_radius, rotate_deg=trough_rotate))
+        # Cam ramp anchored on the bed line; the ramp's apex meets the
+        # trough's bumper at the (rotated) rim — i.e. the contact point is
+        # actually drawn touching, not floating off to the side.
+        cam_base_x = px + R + 30
+        cam_top_x = px + R - 4         # apex meets bumper
+        cam_top_y = py - 4
+        parts.append(
+            f'<rect x="{cam_base_x + 30}" y="{cam_top_y - 30}" width="14" '
+            f'height="{PANEL_D_BED_Y - (cam_top_y - 30)}" fill="#8a7a5e" stroke="#444"/>'
+        )
+        parts.append(
+            f'<polygon points="{cam_base_x + 44},{cam_top_y - 30} '
+            f'{cam_top_x},{cam_top_y} '
+            f'{cam_base_x + 44},{PANEL_D_BED_Y}" '
+            'fill="#8a7a5e" stroke="#444"/>'
+        )
+        parts.append(
+            f'<text x="{cam_base_x + 60}" y="{PANEL_D_BED_Y + 14}" '
+            'text-anchor="middle" font-size="10" fill="#5a4a30">smooth cam ramp</text>'
+        )
+    # Arm — top anchored to PANEL_D_ARM_TOP so all arms line up vertically
+    arm_h = py - PANEL_D_ARM_TOP
+    parts.append(
+        f'<rect x="{px - 8}" y="{PANEL_D_ARM_TOP}" width="16" height="{arm_h}" '
+        'fill="url(#metal)" stroke="#333"/>'
+    )
+    parts.append(
+        f'<circle cx="{px}" cy="{py}" r="7" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>'
+    )
+    parts.append(trough_cross_section(px, py, R, rotate_deg=trough_rotate))
     if powder_pour:
+        # Pour stream emerges from the lowered (right) rim of the rotated
+        # trough — so its top must sit at the rim's actual rotated position,
+        # not at a hard-coded location.
+        import math
+        rad = math.radians(trough_rotate)
+        rim_x = px + R * math.cos(rad)
+        rim_y = py + R * math.sin(rad)
+        stream_bottom_y = PANEL_D_BED_Y - 2
         parts.append(
             '<g fill="url(#powder)" opacity="0.95">'
-            '<path d="M 305,255 Q 310,310 320,375 L 360,375 Q 370,310 345,255 Z"/>'
+            f'<path d="M {rim_x - 6} {rim_y} '
+            f'Q {rim_x + 4} {(rim_y + stream_bottom_y) / 2} '
+            f'{rim_x + 14} {stream_bottom_y} '
+            f'L {rim_x + 30} {stream_bottom_y} '
+            f'Q {rim_x + 26} {(rim_y + stream_bottom_y) / 2} '
+            f'{rim_x + 14} {rim_y - 4} Z"/>'
             '</g>'
         )
-        parts.append('<text x="335" y="395" text-anchor="middle" font-size="11" fill="#7a5a1a">'
-                     'powder pours over the FULL long edge</text>')
+        parts.append(
+            f'<text x="{rim_x + 12}" y="{stream_bottom_y + 16}" text-anchor="middle" '
+            'font-size="11" fill="#7a5a1a">powder pours over FULL long edge</text>'
+        )
     parts.append(extra)
     return "\n".join(parts)
 
 
 def panel_D() -> str:
-    W, H = 1760, 600
+    # 4 frames, each PANEL_D_FRAME_W wide, separated by 60 px gutter for arrow.
+    gutter = 60
+    n = 4
+    W = n * PANEL_D_FRAME_W + (n - 1) * gutter + 80
+    H = 600
     s = [_svg_open(W, H)]
     s.append(
         f'<text x="{W//2}" y="34" text-anchor="middle" font-size="22" font-weight="700">'
@@ -420,101 +505,101 @@ def panel_D() -> str:
     )
     s.append(
         f'<text x="{W//2}" y="56" text-anchor="middle" font-size="13" fill="#555" font-style="italic">'
-        "arms always vertical; trough rolls SIDEWAYS about its longitudinal pin; smooth cam ramp (no sawtooth)"
+        "all four frames share the same powder-bed line, pivot height and arm length so motion is comparable"
         "</text>"
     )
-    R = 38
+    R = PANEL_D_TROUGH_R
+    top = 80
+    py = PANEL_D_PIVOT_Y
+    bed_y = PANEL_D_BED_Y
+    frame_x = [40 + i * (PANEL_D_FRAME_W + gutter) for i in range(n)]
+
     # Step 1 — J-curve plunge
-    s.append('<g transform="translate(20,80)">')
+    s.append(f'<g transform="translate({frame_x[0]},{top})">')
     s.append(_draw_step_frame(
         "1. J-curve plunge",
-        show_bed=True,
-        arm_xy=(200, 30),
-        arm_h=240,
-        pivot_xy=(200, 290),
-        trough_rotate=0,
-        trough_radius=R,
-        show_cam=False,
-        powder_pour=False,
-        show_strike_off=False,
+        show_bed=True, show_cam=False, powder_pour=False,
+        show_strike_off=False, trough_rotate=0,
         extra=(
-            '<path d="M 60 60 L 60 200 Q 60 260 130 280" fill="none" stroke="#1f5fbf" '
-            'stroke-width="3" marker-end="url(#arrowB)"/>'
-            '<text x="48" y="120" font-size="11" fill="#1f5fbf" transform="rotate(-90 48 120)" text-anchor="middle">Z ↓</text>'
-            '<text x="100" y="294" font-size="11" fill="#1f5fbf">then X →</text>'
-            '<text x="36" y="22" font-size="10" fill="#1f5fbf">J-curve avoids flat-blunt compaction</text>'
+            f'<path d="M 60 60 L 60 {py - 60} Q 60 {py - 10} {PANEL_D_PIVOT_X - R - 10} {py - 4}" '
+            'fill="none" stroke="#1f5fbf" stroke-width="3" marker-end="url(#arrowB)"/>'
+            '<text x="48" y="160" font-size="11" fill="#1f5fbf" '
+            'transform="rotate(-90 48 160)" text-anchor="middle">Z ↓</text>'
+            f'<text x="120" y="{py + 4}" font-size="11" fill="#1f5fbf">then X →</text>'
+            '<text x="20" y="20" font-size="10" fill="#1f5fbf">J-curve avoids flat-blunt compaction</text>'
         ),
     ))
     s.append('</g>')
-    s.append('<line x1="430" y1="280" x2="465" y2="280" stroke="#222" stroke-width="2.5" marker-end="url(#arrowK)"/>')
-    # Step 2 — strike-off
-    s.append('<g transform="translate(480,80)">')
+
+    # Step 2 — strike-off (lift)
+    s.append(f'<g transform="translate({frame_x[1]},{top})">')
     s.append(_draw_step_frame(
         "2. Lift past strike-off bar",
-        show_bed=True,
-        arm_xy=(160, 30),
-        arm_h=200,
-        pivot_xy=(160, 250),
-        trough_rotate=0,
-        trough_radius=R,
-        show_cam=False,
-        powder_pour=False,
-        show_strike_off=True,
+        show_bed=True, show_cam=False, powder_pour=False,
+        show_strike_off=True, trough_rotate=0,
         extra=(
-            '<line x1="40" y1="280" x2="40" y2="120" stroke="#1f5fbf" stroke-width="3" marker-end="url(#arrowB)"/>'
-            '<text x="26" y="200" font-size="11" fill="#1f5fbf" transform="rotate(-90 26 200)" text-anchor="middle">Z ↑</text>'
-            '<text x="290" y="290" font-size="10" fill="#5a4a30">trough wipes under bar →</text>'
-            '<text x="290" y="304" font-size="10" fill="#5a4a30">defines fill volume</text>'
+            f'<line x1="40" y1="{py + 30}" x2="40" y2="{PANEL_D_ARM_TOP + 40}" '
+            'stroke="#1f5fbf" stroke-width="3" marker-end="url(#arrowB)"/>'
+            '<text x="26" y="200" font-size="11" fill="#1f5fbf" '
+            'transform="rotate(-90 26 200)" text-anchor="middle">Z ↑</text>'
+            f'<text x="{PANEL_D_PIVOT_X + R + 60}" y="{PANEL_D_STRIKEOFF_Y + 28}" '
+            'text-anchor="middle" font-size="10" fill="#5a4a30">'
+            'rim wipes past bar → defines fill volume</text>'
         ),
     ))
     s.append('</g>')
-    s.append('<line x1="890" y1="280" x2="925" y2="280" stroke="#222" stroke-width="2.5" marker-end="url(#arrowK)"/>')
+
     # Step 3 — transport
-    s.append('<g transform="translate(940,80)">')
+    s.append(f'<g transform="translate({frame_x[2]},{top})">')
     s.append(_draw_step_frame(
         "3. Transport (X →)",
-        show_bed=False,
-        arm_xy=(120, 30),
-        arm_h=200,
-        pivot_xy=(120, 250),
-        trough_rotate=0,
-        trough_radius=R,
-        show_cam=False,
-        powder_pour=False,
-        show_strike_off=False,
+        show_bed=False, show_cam=False, powder_pour=False,
+        show_strike_off=False, trough_rotate=0,
         extra=(
-            '<line x1="220" y1="180" x2="320" y2="180" stroke="#1f5fbf" stroke-width="3" marker-end="url(#arrowB)"/>'
-            '<text x="270" y="170" font-size="12" fill="#1f5fbf" text-anchor="middle">X →</text>'
-            '<text x="200" y="320" font-size="10" fill="#444" text-anchor="middle">'
-            'trough hangs level under gravity</text>'
+            f'<line x1="{PANEL_D_PIVOT_X - 80}" y1="{PANEL_D_ARM_TOP + 80}" '
+            f'x2="{PANEL_D_PIVOT_X + 80}" y2="{PANEL_D_ARM_TOP + 80}" '
+            'stroke="#1f5fbf" stroke-width="3" marker-end="url(#arrowB)"/>'
+            f'<text x="{PANEL_D_PIVOT_X}" y="{PANEL_D_ARM_TOP + 70}" '
+            'font-size="12" fill="#1f5fbf" text-anchor="middle">X →</text>'
+            f'<text x="{PANEL_D_PIVOT_X}" y="{py + R + 30}" font-size="10" fill="#444" '
+            'text-anchor="middle">trough hangs level under gravity</text>'
         ),
     ))
     s.append('</g>')
-    s.append('<line x1="1300" y1="280" x2="1335" y2="280" stroke="#222" stroke-width="2.5" marker-end="url(#arrowK)"/>')
+
     # Step 4 — sideways tilt against cam
-    s.append('<g transform="translate(1340,80)">')
+    s.append(f'<g transform="translate({frame_x[3]},{top})">')
     s.append(_draw_step_frame(
         "4. Sideways tilt → deposit",
-        show_bed=False,
-        arm_xy=(120, 30),
-        arm_h=200,
-        pivot_xy=(120, 250),
-        trough_rotate=55,
-        trough_radius=R,
-        show_cam=True,
-        powder_pour=True,
-        show_strike_off=False,
+        show_bed=False, show_cam=True, powder_pour=True,
+        show_strike_off=False, trough_rotate=55,
         extra=(
-            '<line x1="20" y1="100" x2="80" y2="100" stroke="#1f5fbf" stroke-width="3" marker-end="url(#arrowB)"/>'
-            '<text x="50" y="92" text-anchor="middle" font-size="11" fill="#1f5fbf">gantry pushes X →</text>'
-            '<path d="M 90 220 a 36 36 0 0 1 38 -42" fill="none" stroke="#1f5fbf" stroke-width="2.5" '
+            f'<line x1="20" y1="{PANEL_D_ARM_TOP + 20}" x2="80" y2="{PANEL_D_ARM_TOP + 20}" '
+            'stroke="#1f5fbf" stroke-width="3" marker-end="url(#arrowB)"/>'
+            f'<text x="50" y="{PANEL_D_ARM_TOP + 12}" text-anchor="middle" '
+            'font-size="11" fill="#1f5fbf">gantry pushes X →</text>'
+            f'<path d="M {PANEL_D_PIVOT_X - 60} {py + 10} '
+            f'a 36 36 0 0 1 38 -42" fill="none" stroke="#1f5fbf" stroke-width="2.5" '
             'marker-end="url(#arrowB)"/>'
-            '<text x="50" y="248" font-size="10" fill="#1f5fbf">trough rolls sideways</text>'
-            '<text x="50" y="262" font-size="10" fill="#1f5fbf">about its long axis</text>'
-            '<text x="160" y="190" font-size="10" fill="#c0392b">bumper rides up cam</text>'
+            f'<text x="{PANEL_D_PIVOT_X - 50}" y="{py + 32}" font-size="10" fill="#1f5fbf">'
+            'trough rolls sideways</text>'
+            f'<text x="{PANEL_D_PIVOT_X - 50}" y="{py + 46}" font-size="10" fill="#1f5fbf">'
+            'about its long axis</text>'
+            f'<text x="{PANEL_D_PIVOT_X + R + 4}" y="{py - R - 6}" font-size="10" fill="#c0392b">'
+            'bumper rides up cam</text>'
         ),
     ))
     s.append('</g>')
+
+    # Inter-frame chevron arrows aligned to pivot height
+    for i in range(n - 1):
+        ax = frame_x[i] + PANEL_D_FRAME_W + 8
+        bx = frame_x[i + 1] - 8
+        s.append(
+            f'<line x1="{ax}" y1="{top + py}" x2="{bx}" y2="{top + py}" '
+            'stroke="#222" stroke-width="2.5" marker-end="url(#arrowK)"/>'
+        )
+
     s.append(
         f'<text x="{W//2}" y="{H - 50}" text-anchor="middle" font-size="13" fill="#444" font-style="italic">'
         "Pure-X gantry travel works because the smooth cam ramp gives a continuously varying engagement point"
