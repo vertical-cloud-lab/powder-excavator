@@ -8,14 +8,37 @@ exactly what the model said before any of it was paraphrased into the
 
 | File | Edison `task_id` | `job_name` | Status |
 |---|---|---|---|
-| `literature-high-powder-dispensing.md` | `86968176-9927-43b4-aa09-e7e4f86855be` | `job-futurehouse-paperqa3-high` (`JobNames.LITERATURE_HIGH`) | success |
-| `analysis-v1-pre-ferris-wheel.md` | `faeecd89-ea28-403b-94f3-c8402a79e78a` | `job-futurehouse-data-analysis-crow-high` (`JobNames.ANALYSIS`) | success — superseded by v2 |
-| `analysis-v2-corrected-gondola.md` | `844f6123-36b7-4e61-a0f6-c2e357f804b0` | `job-futurehouse-data-analysis-crow-high` (`JobNames.ANALYSIS`) | success |
+| `literature-high-powder-dispensing.md` | `86968176-9927-43b4-aa09-e7e4f86855be` | `job-futurehouse-paperqa3-high` | success |
+| `analysis-v1-pre-ferris-wheel.md` | `faeecd89-ea28-403b-94f3-c8402a79e78a` | `job-futurehouse-data-analysis-crow-high` | success — superseded by v2 |
+| `analysis-v2-corrected-gondola.md` | `844f6123-36b7-4e61-a0f6-c2e357f804b0` | `job-futurehouse-data-analysis-crow-high` | success |
+| _generative-CAD lit-review (resubmitted)_ | `f5a27ed3-8530-4102-9e31-5af9bbe9b0e0` | `job-futurehouse-paperqa3-high` | submitted, polling |
+| _gantry-only analysis iter 1 of 3_ | `d6e32c46-2774-4477-a060-9993ef51ab10` | `job-futurehouse-data-analysis-crow-high` | submitted, polling |
 
-A fourth task — `JobNames.LITERATURE_HIGH` on **generative-CAD / digital-twin
-tooling for mechanical hardware prototypes**, `task_id`
-`524e7e92-a326-440a-b6fd-f6eb220d9019` — was still in progress at the time of
-this commit and will be folded in by a follow-up session.
+A previous generative-CAD literature query (`task_id`
+`524e7e92-a326-440a-b6fd-f6eb220d9019`) was sent to the **wrong endpoint**
+(`api.platform.futurehouse.org`) and ended up cancelled; it has been
+resubmitted at the correct Edison endpoint (`f5a27ed3-…`). Iterations 2 and
+3 of the gantry-only analysis cycle are queued behind iter 1 because each
+iteration's prompt builds on the prior iteration's verbatim answer.
+
+## Submitting / polling tasks
+
+All Edison traffic must go through `https://api.platform.edisonscientific.com`
+(the `api.platform.futurehouse.org` endpoint is a different cluster).
+`scripts/edison_submit.py` pins the SDK's `service_uri` to the Edison host
+and exposes three subcommands:
+
+```bash
+export EDISON_API_KEY=...                              # provided by Edison
+python scripts/edison_submit.py submit-cad-litreview   # paperqa3-high
+python scripts/edison_submit.py submit-analysis 1      # data-analysis-crow-high
+python scripts/edison_submit.py poll <task_id>         # status + answer
+```
+
+The script embeds the design-context files (README, manuscript, prior
+analyses, CadQuery model, DFM checks) inline as fenced code blocks rather
+than using `upload_file`, because the chunked-upload endpoint currently 404s
+on the Edison cluster.
 
 ## How the feedback was applied
 
