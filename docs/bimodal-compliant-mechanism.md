@@ -262,8 +262,11 @@ parametric OpenSCAD source, and a full PETG print/test guide:
 | ---- | ---------- |
 | [`cad/bimodal_trough.scad`](../cad/bimodal_trough.scad) | Parametric source — variables mirror `FlexureParams`. |
 | [`cad/bimodal-trough.stl`](../cad/bimodal-trough.stl) | 76 × 26 × 20 mm mesh, 1 264 triangles, manifold. ~45 min / ~6 g of PETG. |
-| [`cad/bimodal-trough-iso.png`](../cad/bimodal-trough-iso.png) | Render. |
+| [`cad/bimodal-trough-iso.png`](../cad/bimodal-trough-iso.png) | Isometric render. |
+| [`cad/bimodal-trough-spin.gif`](../cad/bimodal-trough-spin.gif) | 360° turntable spin render (see below). |
 | [`cad/README.md`](../cad/README.md) | Print settings, mounting, and the snap-force / cycle / powder test procedure. |
+
+![3D turntable spin of the printable trough](../cad/bimodal-trough-spin.gif)
 
 ## Open questions / next steps
 
