@@ -68,19 +68,26 @@ flex_segments = 60;       // # of segments along each flexure arch
 // Helpers
 // =====================================================================
 
-// A 2-D quadratic-Bezier-style arch from (x0,0) to (x1,0) with mid
-// height ``mid``, returned as a list of [x,y] points.
-function arch_points(x0, x1, mid, n) =
+// A 2-D arch from (x0, y0) to (x1, y1). The straight chord between the
+// endpoints is bulged above by ``mid_kick`` at the parametric midpoint
+// (i.e. the curve is the chord plus a parabolic offset of ``mid_kick``
+// at u=0.5). Returned as a list of [x, y] points.
+//
+// This shape is what bakes the geometric pre-compression into the
+// printed flexure: the arclength of the curve is greater than the
+// straight chord between foot and apex, so the as-printed beam is
+// already pre-compressed with no assembly stress.
+function arch_points(x0, x1, y0, y1, mid_kick, n) =
     [ for (i = [0 : n]) let (
         u  = i / n,
         x  = x0 + (x1 - x0) * u,
-        y  = 4 * mid * u * (1 - u)
+        y  = y0 + (y1 - y0) * u + 4 * mid_kick * u * (1 - u)
       ) [x, y] ];
 
 // Build the two surfaces of a constant-thickness arched beam by
 // offsetting the centreline normal to itself.
-module arched_beam(x0, x1, mid, thick, n) {
-    pts = arch_points(x0, x1, mid, n);
+module arched_beam(x0, x1, y0, y1, mid_kick, thick, n) {
+    pts = arch_points(x0, x1, y0, y1, mid_kick, n);
     // build top and bottom polylines by offsetting along local normals
     tops = [ for (i = [0 : n]) let (
         prev = pts[max(i-1, 0)],
@@ -127,25 +134,28 @@ module base_plate() {
             cube([foot_w, flexure_width, 2.0]);
 }
 
-// One pre-curved flexure (root at +half_span, apex at 0). Mirrored to
-// produce the matching beam on the opposite side.
+// One pre-curved flexure (root at +half_span on the bed, apex at the
+// trough centreline). Mirrored with ``side = -1`` for the other beam.
 //
-// The arch midpoint sits at ``initial_rise + flex_arch_kick`` above the
-// foot — the ``flex_arch_kick`` term is what bakes in the geometric
-// pre-compression that the analyser models mathematically (1.5%
-// shorter natural length than chord). Dropping it would give a
-// straight-from-foot-to-apex flexure that is monostable.
+// The curve runs from foot ``(±half_span, 0)`` to apex ``(0, initial_rise)``
+// — i.e. the beam *climbs* from the bed up to the apex carrier — and is
+// bulged above the straight chord by ``flex_arch_kick`` at its
+// midpoint. The kick is what gives the printed beam an arclength
+// greater than its chord, baking in the geometric pre-compression that
+// the analyser models mathematically (1.5 % shorter natural length than
+// chord). Setting ``flex_arch_kick = 0`` would give a straight foot-to-
+// apex flexure that is monostable.
 module flexure(side = +1) {
     x_root = side * (half_span);
     x_apex = 0;
-    arch_height = initial_rise + flex_arch_kick;
     // extrude the 2-D arched beam through the out-of-plane width
     translate([0, -flexure_width / 2, 0])
         rotate([90, 0, 0])
         rotate([0, 0, 0])
         linear_extrude(height = flexure_width)
-        // the arch is laid out in (x, y); build it directly
-        arched_beam(x_root, x_apex, arch_height, flexure_thick, flex_segments);
+        // the arch is laid out in (x, z); build it directly
+        arched_beam(x_root, x_apex, 0, initial_rise,
+                    flex_arch_kick, flexure_thick, flex_segments);
 }
 
 // Rigid apex carrier: a small block on top of the apex that the trough
