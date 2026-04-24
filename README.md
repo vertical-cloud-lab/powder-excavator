@@ -5,6 +5,6 @@
 ## Research
 
 - [Commercial powder dispensing solutions — landscape](research/commercial-powder-dispensing-landscape.md)
-  (Edison Scientific queries submitted; task IDs in
-  [`research/edison_queries.json`](research/edison_queries.json), to be
-  fetched in a follow-up session.)
+  (Edison Scientific queries fetched and synthesised; raw per-query
+  answers under [`research/edison_results/`](research/edison_results/),
+  task IDs in [`research/edison_queries.json`](research/edison_queries.json).)
