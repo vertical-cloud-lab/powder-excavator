@@ -41,10 +41,15 @@
 //
 // Render:  Paste into https://openscad.org/demo/ → F6 (Render)
 // Export:  File → Export → Export as STL
-// Headless STL + checks (CI/local):
+// Headless STL + STEP + checks (CI/local):
+//   bash cad/auger/render_print.sh
+// One-shot STL only:
 //   xvfb-run -a openscad -o archimedes-auger.stl \
 //       --export-format=binstl archimedes-auger.scad
 //   admesh -fundecvb /tmp/clean.stl archimedes-auger.stl
+// One-shot STEP from STL (FreeCAD OCCT bindings):
+//   freecadcmd cad/auger/stl_to_step.py \
+//       cad/auger/archimedes-auger.stl cad/auger/archimedes-auger.stp
 // Headless slice for Ultimaker (PrusaSlicer 2.7+):
 //   prusa-slicer --export-gcode -o auger.gcode \
 //       --filament-diameter 2.85 --nozzle-diameter 0.4 \

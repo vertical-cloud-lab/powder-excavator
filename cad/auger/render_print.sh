@@ -7,13 +7,16 @@
 # so it works in CI on the GitHub-hosted runner.
 #
 # Outputs (next to this script):
-#   archimedes-auger.stl              binary STL (single manifold part)
-#   archimedes-auger-iso.png          opaque isometric preview
-#   archimedes-auger-cutaway.png      half-cutaway showing helix + funnel
-#   /tmp/auger/archimedes-auger.gcode Ultimaker-class slice (PrusaSlicer CLI)
+#   archimedes-auger.stl                 binary STL (single manifold part)
+#   archimedes-auger.stp                 STEP (B-rep, faceted shell of the STL)
+#   archimedes-auger-iso.png             opaque iso preview (rendered from SCAD)
+#   archimedes-auger-cutaway.png         half-cutaway preview (rendered from SCAD)
+#   archimedes-auger-stp-iso.png         iso preview rendered FROM the STEP file
+#   archimedes-auger-stp-cutaway.png     half-cutaway rendered FROM the STEP file
+#   /tmp/auger/archimedes-auger.gcode    Ultimaker-class slice (PrusaSlicer CLI)
 #
-# Pre-reqs: openscad, admesh, prusa-slicer, xvfb-run.
-#   sudo apt-get install -y openscad admesh prusa-slicer xvfb
+# Pre-reqs: openscad, admesh, prusa-slicer, freecadcmd, xvfb-run.
+#   sudo apt-get install -y openscad admesh prusa-slicer freecad xvfb
 #
 # Filament note: standard Ultimaker filament is 2.85 mm. The PR comment
 # floated "2.4 (?) mm" — we slice at 2.85 mm (the actual Ultimaker size).
@@ -24,8 +27,11 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCAD="${HERE}/archimedes-auger.scad"
 STL="${HERE}/archimedes-auger.stl"
+STP="${HERE}/archimedes-auger.stp"
 ISO_PNG="${HERE}/archimedes-auger-iso.png"
 CUT_PNG="${HERE}/archimedes-auger-cutaway.png"
+STP_ISO_PNG="${HERE}/archimedes-auger-stp-iso.png"
+STP_CUT_PNG="${HERE}/archimedes-auger-stp-cutaway.png"
 SLICE_DIR="${SLICE_DIR:-/tmp/auger}"
 GCODE="${SLICE_DIR}/archimedes-auger.gcode"
 
@@ -65,7 +71,64 @@ xvfb-run -a openscad -o "${CUT_PNG}" --imgsize=600,750 \
     --camera=0,0,50,75,0,25,250 --colorscheme=Tomorrow "${CUT_SCAD}"
 rm -f "${CUT_SCAD}"
 
-echo "==> [4/4] PrusaSlicer slice for Ultimaker-class FDM"
+echo "==> [4/5] STL -> STEP via FreeCAD (faceted B-rep)"
+# OpenSCAD's kernel is mesh-based and has no native STEP exporter, so we
+# convert the STL to a STEP via FreeCAD's OCCT bindings. The result is a
+# faceted shell (one planar face per STL triangle) sewn into a single
+# closed solid — accepted by every CAM/CAD tool that "requires STEP"
+# (FreeCAD Path, Fusion 360, SolidWorks import, Cura via plugin, etc.).
+freecadcmd "${HERE}/stl_to_step.py" "${STL}" "${STP}" 2>&1 | tail -8 || true
+ls -la "${STP}" 2>/dev/null || { echo "ERROR: STEP not produced"; exit 1; }
+
+echo "==> [4b/5] STEP spot-check (load back, compare to STL)"
+ROUNDTRIP_STL="${SLICE_DIR}/auger_step_roundtrip.stl"
+STP_CHECK_TXT="${SLICE_DIR}/step_check.txt"
+STP_CHECK_PY="$(mktemp --suffix=.py)"
+cat > "${STP_CHECK_PY}" <<PYEOF
+import Part, Mesh
+shape = Part.Shape(); shape.read("${STP}")
+solid = shape.Solids[0]
+verts, tris = shape.tessellate(0.1)
+m = Mesh.Mesh()
+for a, b, c in tris: m.addFacet(verts[a], verts[b], verts[c])
+m.write("${ROUNDTRIP_STL}")
+report = (
+    f"  STEP solids/shells/faces: "
+    f"{len(shape.Solids)}/{len(shape.Shells)}/{len(shape.Faces)}\n"
+    f"  STEP solid valid={solid.isValid()} closed={solid.isClosed()}\n"
+    f"  STEP volume:              {solid.Volume:.3f} mm^3\n"
+    f"  STEP bbox:                "
+    f"X=[{shape.BoundBox.XMin:.2f},{shape.BoundBox.XMax:.2f}] "
+    f"Y=[{shape.BoundBox.YMin:.2f},{shape.BoundBox.YMax:.2f}] "
+    f"Z=[{shape.BoundBox.ZMin:.2f},{shape.BoundBox.ZMax:.2f}]"
+)
+open("${STP_CHECK_TXT}", "w").write(report)
+PYEOF
+freecadcmd "${STP_CHECK_PY}" >/dev/null 2>&1 || true
+rm -f "${STP_CHECK_PY}"
+cat "${STP_CHECK_TXT}" 2>/dev/null || true
+admesh -fundecvb "${SLICE_DIR}/auger_rt_clean.stl" "${ROUNDTRIP_STL}" 2>&1 \
+    | grep -E '(Volume|Number of parts|disconnected|Degenerate)' | head -6 || true
+
+echo "==> [4c/5] Preview PNGs from the STEP file"
+STP_ISO_SCAD="$(mktemp --suffix=.scad)"
+echo "color(\"#5B9BD5\", 0.95) import(\"${ROUNDTRIP_STL}\", convexity=10);" \
+    > "${STP_ISO_SCAD}"
+xvfb-run -a openscad -o "${STP_ISO_PNG}" --imgsize=500,900 \
+    --camera=0,0,50,60,0,30,180 --colorscheme=Tomorrow "${STP_ISO_SCAD}"
+
+STP_CUT_SCAD="$(mktemp --suffix=.scad)"
+cat > "${STP_CUT_SCAD}" <<EOSCAD
+difference() {
+    color("#A8C8E8") import("${ROUNDTRIP_STL}", convexity=10);
+    translate([-12, -0.5, -1]) cube([24, 12, 102]);
+}
+EOSCAD
+xvfb-run -a openscad -o "${STP_CUT_PNG}" --imgsize=500,900 \
+    --camera=0,0,50,75,0,30,90 --colorscheme=Tomorrow "${STP_CUT_SCAD}"
+rm -f "${STP_ISO_SCAD}" "${STP_CUT_SCAD}"
+
+echo "==> [5/5] PrusaSlicer slice for Ultimaker-class FDM"
 echo "    filament=${FILAMENT_DIAMETER}mm nozzle=${NOZZLE_DIAMETER}mm" \
      "layer=${LAYER_HEIGHT}mm material=${FILAMENT_TYPE}"
 prusa-slicer --export-gcode --output "${GCODE}" \
@@ -85,8 +148,11 @@ prusa-slicer --export-gcode --output "${GCODE}" \
 
 echo
 echo "==> Done."
-echo "    STL:     ${STL}"
-echo "    Iso:     ${ISO_PNG}"
-echo "    Cutaway: ${CUT_PNG}"
-echo "    G-code:  ${GCODE}"
+echo "    STL:        ${STL}"
+echo "    STEP:       ${STP}"
+echo "    Iso (SCAD): ${ISO_PNG}"
+echo "    Cut (SCAD): ${CUT_PNG}"
+echo "    Iso (STEP): ${STP_ISO_PNG}"
+echo "    Cut (STEP): ${STP_CUT_PNG}"
+echo "    G-code:     ${GCODE}"
 grep -E '^; (estimated|filament used|total)' "${GCODE}" | head -6 || true
