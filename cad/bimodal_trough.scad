@@ -23,8 +23,8 @@
 //
 // Render an isometric preview PNG:
 //
-//     openscad -o cad/bimodal-trough.png \
-//         --imgsize=1024,768 --camera=0,0,8,55,0,25,260 \
+//     openscad -o cad/bimodal-trough-iso.png \
+//         --imgsize=1100,800 --camera=0,0,8,55,0,25,180 \
 //         --colorscheme=Tomorrow cad/bimodal_trough.scad
 //
 // Tested with OpenSCAD 2021.01.
@@ -129,17 +129,23 @@ module base_plate() {
 
 // One pre-curved flexure (root at +half_span, apex at 0). Mirrored to
 // produce the matching beam on the opposite side.
+//
+// The arch midpoint sits at ``initial_rise + flex_arch_kick`` above the
+// foot — the ``flex_arch_kick`` term is what bakes in the geometric
+// pre-compression that the analyser models mathematically (1.5%
+// shorter natural length than chord). Dropping it would give a
+// straight-from-foot-to-apex flexure that is monostable.
 module flexure(side = +1) {
     x_root = side * (half_span);
     x_apex = 0;
-    mid_height = (initial_rise + flex_arch_kick) / 2;
+    arch_height = initial_rise + flex_arch_kick;
     // extrude the 2-D arched beam through the out-of-plane width
     translate([0, -flexure_width / 2, 0])
         rotate([90, 0, 0])
         rotate([0, 0, 0])
         linear_extrude(height = flexure_width)
         // the arch is laid out in (x, y); build it directly
-        arched_beam(x_root, x_apex, initial_rise, flexure_thick, flex_segments);
+        arched_beam(x_root, x_apex, arch_height, flexure_thick, flex_segments);
 }
 
 // Rigid apex carrier: a small block on top of the apex that the trough
