@@ -1,0 +1,61 @@
+% Bare-bones LaTeX template for a Digital Discovery (RSC) submission.
+% Uses the standard `article` class so it compiles with a minimal TeX Live
+% installation, while following the structure expected by the journal:
+%   https://www.rsc.org/journals-books-databases/author-and-reviewer-hub/authors-information/prepare-and-format/
+%
+% Build with:
+%   latexmk -pdf main.tex
+% or:
+%   pdflatex main.tex
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{authblk}
+\usepackage{lipsum} % placeholder lorem ipsum text
+
+\title{A Bare-Bones Digital Discovery Submission Template}
+
+\author[1]{Jane Doe}
+\author[1,2]{John Smith}
+\affil[1]{Department of Powder Science, University of Example, City, Country}
+\affil[2]{Vertical Cloud Lab, Example Institute, City, Country}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\lipsum[1]
+\end{abstract}
+
+\section{Introduction}
+\lipsum[2-3]
+
+\section{Methods}
+\lipsum[4]
+
+\section{Results and Discussion}
+\lipsum[5-6]
+
+\section{Conclusions}
+\lipsum[7]
+
+\section*{Conflicts of Interest}
+There are no conflicts to declare.
+
+\section*{Acknowledgements}
+\lipsum[8]
+
+\begin{thebibliography}{1}
+\bibitem{example}
+A.~Author, B.~Author and C.~Author, \emph{J. Example}, 2026, \textbf{1}, 1--10.
+\end{thebibliography}
+
+\end{document}
