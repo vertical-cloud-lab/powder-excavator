@@ -9,12 +9,30 @@ recommended in PR #7's revised toolchain.
 
 | Printer | G-code | Bed shape | Filament | Nozzle | Layer | Time | Material |
 |---|---|---|---|---|---|---|---|
-| Original Prusa MK3S+ | [`archimedes-auger.MK3S.gcode`](archimedes-auger.MK3S.gcode) | 250 × 210 mm | 1.75 mm PLA, 215 °C | 0.4 mm | 0.2 mm | ≈ 2 h 29 m | 20.91 cm³ (~26 g) |
+| Original Prusa MK3S+ | [`archimedes-auger.MK3S.gcode`](archimedes-auger.MK3S.gcode) | 250 × 210 mm | 1.75 mm PLA, 215 °C | 0.4 mm | 0.2 mm | ≈ 2 h 28 m | 20.91 cm³ (~26 g) |
 | Creality Ender-3     | [`archimedes-auger.Ender3.gcode`](archimedes-auger.Ender3.gcode) | 220 × 220 mm | 1.75 mm PLA, 205/200 °C | 0.4 mm | 0.2 mm | ≈ 2 h 21 m | 20.91 cm³ (~26 g) |
+| Creality Ender-3 (USB short-name copy) | [`AUGER.gcode`](AUGER.gcode) | same as above | same | 0.4 mm | 0.2 mm | ≈ 2 h 21 m | 20.91 cm³ (~26 g) |
 
 Common settings: 3 perimeters · 5 top / 4 bottom solid layers · 40 % gyroid
 infill · 4 mm brim · auto-supports at 50° · single skirt loop · print
 orientation **exit-hole-down** (Z+ = M3 boss). No slicer warnings on either.
+
+## Printing on the Ender-3 from a USB stick
+
+1. Format a USB stick as **FAT32** (Marlin on the stock Ender-3 8-bit board
+   does not read exFAT/NTFS).
+2. Copy **`AUGER.gcode`** (the short-named copy above — the stock LCD12864
+   truncates long filenames and some firmware revisions refuse names over
+   ~20 chars) to the **root** of the stick. Do not put it in a subfolder.
+3. Insert the stick, **Print from media → AUGER.gcode**, confirm.
+4. Pre-flight: bed levelled, nozzle clean, **PLA at 200/205 °C, bed 60 °C**
+   (the file sets these — don't override on the LCD before start). The
+   start-block is `G28` → `G1 Z5 F5000`, so the printer will home, lift
+   5 mm, then begin layer 1.
+
+If your Ender has the newer Creality 32-bit board / TFT (Ender-3 V2 / S1 /
+Pro with the silent board), the long-named `archimedes-auger.Ender3.gcode`
+works fine — the short copy is just defensive for stock 8-bit boards.
 
 ## Why two slices
 

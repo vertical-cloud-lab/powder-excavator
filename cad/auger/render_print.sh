@@ -156,7 +156,7 @@ slice_one () {
         --support-material --support-material-auto \
         --support-material-threshold 50 \
         --start-gcode "${extra_start}" \
-        --end-gcode "M104 S0\nM140 S0\nG28 X\nM84\n" \
+        --end-gcode $'M104 S0\nM140 S0\nG28 X\nM84\n' \
         "${STL}" 2>&1 | tail -3
     echo "     metrics:"
     grep -E '^; (estimated printing time|filament used \[(mm|cm3)\])' "${out}" \
@@ -165,15 +165,23 @@ slice_one () {
 
 # 1.75 mm filament for both (MK3 and Ender-3 are 1.75 mm machines —
 # the Ultimaker default 2.85 mm value is not used here).
+# NOTE: $'...' ANSI-C quoting expands \n to real newlines BEFORE the string
+# is handed to PrusaSlicer; plain "..." would have written literal "\n" into
+# the start-gcode block, producing a single mangled line that Marlin chokes on.
 slice_one "Prusa MK3S+ (0.4 mm)" \
     "${SLICES_REPO_DIR}/archimedes-auger.MK3S.gcode" \
     "0x0,250x0,250x210,0x210" 215 215 \
-    "M201 X1000 Y1000 Z200 E5000\nM862.3 P\"MK3S\"\nG28\nG1 Z5 F5000\n"
+    $'M201 X1000 Y1000 Z200 E5000\nM862.3 P"MK3S"\nG28\nG1 Z5 F5000\n'
 
 slice_one "Creality Ender-3 (0.4 mm)" \
     "${SLICES_REPO_DIR}/archimedes-auger.Ender3.gcode" \
     "0x0,220x0,220x220,0x220" 200 205 \
-    "G28\nG1 Z5 F5000\n"
+    $'G28\nG1 Z5 F5000\n'
+
+# Short-name 8.3 copy for the Ender-3's stock LCD12864, which truncates
+# long names and reads files most reliably from the FAT32 root.
+cp "${SLICES_REPO_DIR}/archimedes-auger.Ender3.gcode" \
+   "${SLICES_REPO_DIR}/AUGER.gcode"
 
 echo
 echo "==> Done."
