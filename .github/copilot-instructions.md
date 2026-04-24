@@ -6,3 +6,5 @@ client = FutureHouseClient(service_uri="https://api.platform.edisonscientific.co
 ```
 
 A pre-wired wrapper (`scripts/edison_submit.py`) is provided in this repo for submit/poll workflows.
+
+If you make changes to CAD drawings, recompile/render them (images, GIFs, STLs, etc.).
