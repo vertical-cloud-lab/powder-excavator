@@ -1,73 +1,84 @@
 // ================================================================
-// Powder Excavator — Archimedes Auger Attachment
+// Powder Excavator — Archimedes Auger Attachment  v2
 // ================================================================
 //
 // One-piece rotating helical dispenser.
-// The entire unit mounts to the frankenmitsu spindle via M3 and
-// rotates as a single body. Powder loaded from the top through
-// four loading slots before mounting. Spindle rotation drives
-// powder down the helical channel to the exit hole at the bottom.
+// Mounts to frankenmitsu spindle via M3 boss at top.
+// Spindle rotation drives powder down the helical channel.
+// Conical funnel bottom collects powder at exit hole.
 //
 // Mechanism: rotating helical chute (gravity-assisted).
-// As the unit spins, the helical fin continuously agitates and
-// advances powder downward. Rotation speed controls dose rate.
+// Rotation agitates and advances powder downward; conical base
+// funnels it to the exit hole when rotation slows.
 // Closed-loop gravimetric feedback (load cell) handles precision.
+//
+// v2 changes vs v1:
+//   - M3 boss added below top cap (12mm total engagement vs 4mm)
+//   - Conical funnel bottom replaces flat cap (fixes centrifugal issue)
+//   - Exit hole 3.0mm CAD diameter (prints to ~2.5mm on 0.4mm nozzle)
+//   - Top cap increased to 6mm
+//   - fin_inner_r increased to 2.0mm for cleaner central flow path
 //
 // Print:   PLA or PETG, 0.2mm layer height, 0.4mm nozzle
 //          Print VERTICALLY (flat bottom on build plate)
-//          40% infill on fins, 3+ perimeters on outer walls
-//          No supports needed if printed vertically
+//          3+ perimeters on outer walls, 40% infill fins
+//          NO supports needed when printed vertically
+//          After printing: tap M3 boss hole with M3 hand tap
 //
-// Render:  Paste into https://openscad.org/demo/ and click Render
-//
-// Export:  File → Export → Export as STL (Part A: full assembly)
+// Render:  Paste into https://openscad.org/demo/ → F6 (Render)
+// Export:  File → Export → Export as STL
 //
 // ================================================================
 
 /* [Main Dimensions] */
-outer_diameter  = 20;    // mm — outer cylinder OD (= 2cm width)
-total_height    = 100;   // mm — total length (= 10cm)
-wall_thickness  = 2;     // mm — outer tube wall thickness
+outer_diameter  = 20;    // mm — outer cylinder OD
+total_height    = 100;   // mm — total length
+wall_thickness  = 2;     // mm — outer tube wall
 
 /* [M3 Mount — Top] */
-m3_pilot_d      = 2.5;   // mm — M3 pilot hole diameter (tap to M3 after printing)
-m3_pilot_depth  = 10;    // mm — depth of M3 pilot hole
-top_cap_height  = 4;     // mm — solid cap thickness at top
+// Boss protrudes below the top cap to give 12mm of M3 engagement.
+// After printing, use an M3 hand tap to cut threads.
+// M3 minor diameter = 2.459mm; pilot at 2.5mm is correct for tapping.
+m3_pilot_d      = 2.5;   // mm — M3 pilot hole (tap after print)
+top_cap_height  = 6;     // mm — solid cap at top
+m3_boss_r       = 4;     // mm — radius of central boss below cap
+m3_boss_h       = 6;     // mm — boss height below cap (adds to cap for total depth)
+// Total M3 engagement = top_cap_height + m3_boss_h = 12mm
 
 /* [Powder Exit — Bottom] */
-// 2.5mm chosen as optimal: large enough to prevent bridging for
-// micron-scale cohesive powders with auger-assisted flow,
-// small enough for controlled deposition.
-exit_hole_d     = 2.5;   // mm — exit hole at bottom center
-bottom_cap_h    = 4;     // mm — solid cap thickness at bottom
+// Conical funnel guides powder from outer wall to exit hole.
+// 3.0mm CAD diameter accounts for FDM shrinkage;
+// as-printed on 0.4mm nozzle ≈ 2.5mm functional diameter.
+// If too small after printing, open with a 2.5mm drill bit.
+exit_hole_d     = 3.0;   // mm — exit hole diameter (CAD)
+bottom_cap_h    = 6;     // mm — height of conical funnel section
 
-/* [Helical Fin Geometry] */
+/* [Helical Fin] */
 pitch           = 10;    // mm per full 360° rotation
-// Steeper pitch → larger helix angle → better gravity flow
-// 10mm pitch gives ~18° helix angle at mid-radius: good for PLA printing
-// and gravity-assisted powder flow.
+// Helix angle at mid-radius ≈ 18° → printable without support (FDM ok)
+// Each layer rotates by (layer_h / pitch) × 360° = 7.2° at 0.2mm layers
+// Inner edge overhang per layer ≈ 0.19mm — well within FDM bridge capability
 
-fin_thickness   = 2;     // mm — fin blade thickness (printable on Prusa: min ~1.6mm)
-fin_inner_r     = 1.5;   // mm — fin inner edge radius (leaves center clear for exit flow)
-// fin outer edge = inner_r of tube (full contact with inner wall)
+fin_thickness   = 2;     // mm — blade thickness (≥1.6mm for Prusa 0.4mm nozzle)
+fin_inner_r     = 2.0;   // mm — inner edge radius (clear of exit hole and M3)
 
 /* [Loading Slots — Top Cap] */
-slot_count      = 4;     // number of powder loading slots
-slot_width      = 3;     // mm
+slot_count      = 4;     // slots for loading powder from top before mounting
+slot_width      = 4;     // mm — wider than v1 (3mm → 4mm) for easier loading
 slot_length     = 6;     // mm
-slot_radius     = 5;     // mm from center to slot midpoint
+slot_radius     = 5;     // mm from center
 
 // ================================================================
-// Derived values — do not edit below unless you know what you're doing
+// Derived — do not edit
 // ================================================================
-
 inner_d         = outer_diameter - 2 * wall_thickness;  // 16mm
 inner_r         = inner_d / 2;                           // 8mm
 outer_r         = outer_diameter / 2;                    // 10mm
+m3_pilot_depth  = top_cap_height + m3_boss_h;            // 12mm total
 helix_z_start   = bottom_cap_h;
-helix_z_end     = total_height - top_cap_height;
-helix_height    = helix_z_end - helix_z_start;           // 92mm
-turns           = helix_height / pitch;                  // 9.2 turns
+helix_z_end     = total_height - top_cap_height - m3_boss_h;
+helix_height    = helix_z_end - helix_z_start;
+turns           = helix_height / pitch;
 slices_per_turn = 80;
 total_slices    = ceil(turns * slices_per_turn);
 
@@ -77,7 +88,7 @@ $fn = 64;
 // Modules
 // ================================================================
 
-// Outer tube walls (hollow cylinder)
+// Outer tube walls — hollow cylinder, full height
 module tube_walls() {
     difference() {
         cylinder(r=outer_r, h=total_height);
@@ -86,26 +97,40 @@ module tube_walls() {
     }
 }
 
-// Bottom cap with exit hole
-module bottom_cap() {
+// Conical funnel bottom — directs powder to exit hole as rotation slows.
+// Inner surface tapers from inner_r at the top to exit_hole_d/2 at the base.
+// Outer surface is flat cylinder (matches tube OD).
+module bottom_funnel() {
     difference() {
         cylinder(r=outer_r, h=bottom_cap_h);
+        // Conical void: wide at top (inner_r - 0.5), narrow at bottom (exit hole)
         translate([0, 0, -0.1])
-            cylinder(d=exit_hole_d, h=bottom_cap_h + 0.2);
+            cylinder(
+                r1 = exit_hole_d / 2,       // narrow at z=0 (exit)
+                r2 = inner_r - 0.5,          // wide at top of funnel (7.5mm)
+                h  = bottom_cap_h + 0.2
+            );
     }
 }
 
-// Top cap with M3 pilot hole and powder loading slots
+// Top cap with M3 boss, pilot hole, and powder loading slots.
+// Boss protrudes below the cap to extend M3 engagement depth.
 module top_cap() {
     difference() {
-        translate([0, 0, total_height - top_cap_height])
-            cylinder(r=outer_r, h=top_cap_height);
+        union() {
+            // Solid disc cap
+            translate([0, 0, total_height - top_cap_height])
+                cylinder(r=outer_r, h=top_cap_height);
+            // Central boss below cap for M3 depth
+            translate([0, 0, total_height - top_cap_height - m3_boss_h])
+                cylinder(r=m3_boss_r, h=m3_boss_h);
+        }
 
-        // M3 pilot hole (center)
-        translate([0, 0, total_height - m3_pilot_depth])
-            cylinder(d=m3_pilot_d, h=m3_pilot_depth + 0.1);
+        // M3 pilot hole — full depth through cap + boss
+        translate([0, 0, total_height - m3_pilot_depth - 0.1])
+            cylinder(d=m3_pilot_d, h=m3_pilot_depth + 0.2);
 
-        // Powder loading slots (4x, evenly spaced)
+        // Powder loading slots (4x, 90° apart)
         for (i = [0 : slot_count - 1]) {
             angle = i * (360 / slot_count);
             translate([0, 0, total_height - top_cap_height - 0.1])
@@ -116,12 +141,12 @@ module top_cap() {
     }
 }
 
-// Helical fin — the Archimedes element
-// A thin rectangular blade, extruded with twist, spans from
-// fin_inner_r to inner_r (inner wall). Connects to the tube walls
-// structurally. One-start helix.
+// Helical fin — Archimedes element.
+// Single-start helix from fin_inner_r to inner_r.
+// Outer edge flush with tube inner wall (structurally bonded).
+// Inner edge (fin_inner_r=2mm) clear of M3 boss (boss_r=4mm in overlap zone).
 module helical_fin() {
-    fin_width = inner_r - fin_inner_r;  // 6.5mm
+    fin_width = inner_r - fin_inner_r;
     translate([0, 0, helix_z_start])
     linear_extrude(
         height    = helix_height,
@@ -129,7 +154,6 @@ module helical_fin() {
         slices    = total_slices,
         convexity = 10
     ) {
-        // 2D cross-section: rectangle from fin_inner_r to inner_r
         translate([(fin_inner_r + inner_r) / 2, 0])
             square([fin_width, fin_thickness], center=true);
     }
@@ -140,23 +164,22 @@ module helical_fin() {
 // ================================================================
 
 module archimedes_auger() {
-    color("#5B9BD5", 0.85)
+    color("#5B9BD5", 0.9)
     union() {
         tube_walls();
-        bottom_cap();
+        bottom_funnel();
         top_cap();
         helical_fin();
     }
 }
 
 // ================================================================
-// Render
+// Full render
 // ================================================================
-
 archimedes_auger();
 
 // ================================================================
-// Cross-section preview (comment out above, uncomment below)
+// Cross-section view — uncomment to inspect interior geometry:
 // ================================================================
 // difference() {
 //     archimedes_auger();
