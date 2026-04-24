@@ -240,7 +240,191 @@ def check_gantry_only_slot_board(p: ExcavatorParams) -> list[CheckResult]:
         z_span <= p.gantry_z_travel,
         f"slot Z span = {z_span:.1f} mm (<= gantry_z_travel = {p.gantry_z_travel} mm)",
     ))
+
+    # Pin-slot friction proxy (Edison v3 sec. 4): sharp corners in the
+    # slot path spike the normal force on the peg and bind the mechanism.
+    # We measure the largest direction change across any interior
+    # waypoint and fail if it exceeds slot_max_corner_deg.
+    worst_corner_deg = 0.0
+    worst_idx = -1
+    for i in range(1, len(p.slot_path) - 1):
+        x0, z0 = p.slot_path[i - 1]
+        x1, z1 = p.slot_path[i]
+        x2, z2 = p.slot_path[i + 1]
+        a1 = math.atan2(z1 - z0, x1 - x0)
+        a2 = math.atan2(z2 - z1, x2 - x1)
+        d = math.degrees(abs(a2 - a1))
+        if d > 180.0:
+            d = 360.0 - d
+        if d > worst_corner_deg:
+            worst_corner_deg = d
+            worst_idx = i
+    rs.append(_check(
+        "kinematics.slot.peg_friction.corner_angle",
+        worst_corner_deg <= p.slot_max_corner_deg,
+        (f"largest slot-path corner = {worst_corner_deg:.1f} deg at waypoint "
+         f"{worst_idx} (<= slot_max_corner_deg = {p.slot_max_corner_deg:.1f} deg "
+         "to avoid binding the peg)") if worst_idx >= 0
+        else "no interior waypoints to evaluate corner angle",
+    ))
     return rs
+
+
+# ---------------------------------------------------------------------------
+# Physics-of-mechanism checks (Edison v3 sec. 4)
+# ---------------------------------------------------------------------------
+
+
+def _loaded_cg_y(p: ExcavatorParams) -> tuple[float, float]:
+    """Return ``(cg_y_mm, total_mass_g)`` for the loaded trough.
+
+    Treats the half-cylinder shell as a thin-walled half-cylinder (centroid
+    at -2 r / pi from the rim), the powder column as a uniform half-disk
+    extruded by the cavity length (centroid at -4 r / (3 pi) from the
+    rim), and each rim lip as a small rectangular bar at Y ~ +bumper_height/2.
+    Densities come from ``p.print_material_density`` and
+    ``p.powder_bulk_density`` (g/cm^3); lengths in mm so volumes are in
+    mm^3 and masses divided by 1000 give grams.
+    """
+    r_in = p.trough_radius                           # mm
+    r_out = p.trough_radius + p.trough_wall          # mm
+    L = p.trough_length                              # mm
+    cavity_len = L - 2 * p.end_cap_thickness         # mm
+    rho_p = p.print_material_density / 1000.0        # g/mm^3
+    rho_pw = p.powder_bulk_density / 1000.0          # g/mm^3
+
+    # Thin-walled half-cylinder shell, full length L.
+    shell_vol = 0.5 * math.pi * (r_out ** 2 - r_in ** 2) * L
+    shell_cg_y = -2 * ((r_out + r_in) / 2) / math.pi  # ~ -2 r_mean / pi
+    # End caps (two thin half-disks at +/- L/2). Their CG is the half-disk
+    # centroid at -4 r_out / (3 pi).
+    cap_vol = 2 * 0.5 * math.pi * r_out ** 2 * p.end_cap_thickness
+    cap_cg_y = -4 * r_out / (3 * math.pi)
+    # Powder column: uniform half-disk of inner radius r_in extruded by
+    # cavity length.
+    powder_vol = 0.5 * math.pi * r_in ** 2 * cavity_len
+    powder_cg_y = -4 * r_in / (3 * math.pi)
+    # Two rim lips along the full length L. Each lip is a bumper_width x
+    # bumper_height x L bar. The chamfer trims a corner, but for the CG
+    # estimate we approximate the lip as a solid bar centred at
+    # Y = bumper_height/2.
+    lip_vol = 2 * (p.bumper_width * p.bumper_height * L)
+    lip_cg_y = p.bumper_height / 2.0
+    # Pivot bosses (two short cylinders, axis along Z) at Y = pivot_offset_y.
+    boss_vol = 2 * math.pi * (p.pivot_boss_diameter / 2) ** 2 * p.pivot_boss_thickness
+    boss_cg_y = p.pivot_offset_y
+
+    pieces = [
+        (shell_vol, shell_cg_y, rho_p),
+        (cap_vol, cap_cg_y, rho_p),
+        (lip_vol, lip_cg_y, rho_p),
+        (boss_vol, boss_cg_y, rho_p),
+        (powder_vol, powder_cg_y, rho_pw),
+    ]
+    total_m = sum(v * rho for v, _, rho in pieces)
+    if total_m <= 0:
+        return (0.0, 0.0)
+    cg_y = sum(v * rho * y for v, y, rho in pieces) / total_m
+    return (cg_y, total_m)
+
+
+def check_pendulum_stability(p: ExcavatorParams) -> list[CheckResult]:
+    """The loaded CG must sit BELOW the pivot for a stable pendulum."""
+    cg_y, mass_g = _loaded_cg_y(p)
+    margin = p.pivot_offset_y - cg_y  # positive => pivot above CG => stable
+    return [_check(
+        "physics.pendulum.cg_below_pivot",
+        margin > 0.5,
+        (f"loaded CG at Y = {cg_y:+.2f} mm, pivot at Y = {p.pivot_offset_y:+.2f} mm, "
+         f"margin = {margin:+.2f} mm (need pivot >= 0.5 mm above CG for a "
+         f"stable pendulum; loaded mass ~ {mass_g:.1f} g)"),
+    )]
+
+
+def _cam_lever_arm(p: ExcavatorParams) -> float:
+    """Distance from the pivot pin to the outer corner of the rim lip.
+
+    The cam ramp pushes on the outer-top corner of one rim lip; the
+    moment arm for the cam reaction is the distance from that corner to
+    the pivot. Used for both the sensitivity and the rise-utilisation
+    checks below.
+    """
+    outer_r = p.trough_radius + p.trough_wall
+    lip_outer_x = outer_r + p.bumper_width
+    lip_outer_y = p.bumper_height
+    return math.hypot(lip_outer_x, lip_outer_y - p.pivot_offset_y)
+
+
+def check_cam_sensitivity(p: ExcavatorParams) -> list[CheckResult]:
+    """Cam tilt sensitivity d(theta)/d(X) must stay finite at the target tilt.
+
+    Modelling the lip's outer corner as a point on a rigid lever of
+    length ``R`` rotating about the pivot, the horizontal contact
+    point with the ramp moves like ``X(theta) = R * sin(theta + phi0)``
+    where ``phi0`` is the lever's initial angle from horizontal. So
+    ``dX/dtheta = R * cos(theta + phi0)`` and the sensitivity
+    ``dtheta/dX = 1 / (R * cos(theta + phi0))`` blows up to infinity
+    as the lever passes vertical. (Edison v3 sec. 1 "Cam Singularity".)
+    """
+    outer_r = p.trough_radius + p.trough_wall
+    lip_outer_x = outer_r + p.bumper_width
+    lip_outer_y = p.bumper_height
+    R = _cam_lever_arm(p)
+    phi0 = math.atan2(lip_outer_y - p.pivot_offset_y, lip_outer_x)
+    target = math.radians(p.cam_target_tilt_deg)
+    cos_term = math.cos(target + phi0)
+    if cos_term <= 0:
+        return [_check(
+            "physics.cam.sensitivity",
+            False,
+            (f"cam lever passes vertical before reaching target tilt "
+             f"{p.cam_target_tilt_deg:.0f} deg (lever R = {R:.1f} mm, "
+             f"initial phi0 = {math.degrees(phi0):.1f} deg); sensitivity is "
+             "infinite (snap-through singularity)"),
+        )]
+    sens_deg_per_mm = math.degrees(1.0 / (R * cos_term))
+    return [_check(
+        "physics.cam.sensitivity",
+        sens_deg_per_mm <= p.cam_sensitivity_ceiling_deg_per_mm,
+        (f"cam dtheta/dX at target tilt {p.cam_target_tilt_deg:.0f} deg = "
+         f"{sens_deg_per_mm:.2f} deg/mm (<= "
+         f"{p.cam_sensitivity_ceiling_deg_per_mm:.1f} deg/mm; lever R = "
+         f"{R:.1f} mm)"),
+    )]
+
+
+def check_cam_rise_utilisation(p: ExcavatorParams) -> list[CheckResult]:
+    """The configured ramp rise must not exceed what the lever can lift.
+
+    Over a 0->target_tilt sweep, the lip's outer corner rises by
+    ``R * (sin(target + phi0) - sin(phi0))``. If ``cam_ramp_rise``
+    exceeds this, the extra material is unreachable -- the ramp is
+    physically taller than the cam can ride up. (Edison v3 sec. 1 -- the
+    20 mm cam_ramp_rise was wasted because the lever could only lift
+    ~9.5 mm.)
+    """
+    outer_r = p.trough_radius + p.trough_wall
+    lip_outer_x = outer_r + p.bumper_width
+    lip_outer_y = p.bumper_height
+    R = _cam_lever_arm(p)
+    phi0 = math.atan2(lip_outer_y - p.pivot_offset_y, lip_outer_x)
+    target = math.radians(p.cam_target_tilt_deg)
+    max_rise = R * (math.sin(target + phi0) - math.sin(phi0))
+    if max_rise <= 0:
+        return [_check(
+            "physics.cam.rise_utilisation",
+            False,
+            (f"cam lever cannot lift over a 0 -> {p.cam_target_tilt_deg:.0f} deg "
+             f"sweep (R = {R:.1f} mm, phi0 = {math.degrees(phi0):.1f} deg)"),
+        )]
+    return [_check(
+        "physics.cam.rise_utilisation",
+        p.cam_ramp_rise <= max_rise + 0.5,
+        (f"cam_ramp_rise = {p.cam_ramp_rise:.1f} mm vs max achievable rise "
+         f"= {max_rise:.1f} mm at target tilt {p.cam_target_tilt_deg:.0f} deg "
+         "(extra ramp height above this is unreachable)"),
+        severity="warning",
+    )]
 
 
 # ---------------------------------------------------------------------------
@@ -255,6 +439,9 @@ def run_all(p: ExcavatorParams | None = None) -> list[CheckResult]:
         + check_printability(p)
         + check_gantry_only_cam_ramp(p)
         + check_gantry_only_slot_board(p)
+        + check_pendulum_stability(p)
+        + check_cam_sensitivity(p)
+        + check_cam_rise_utilisation(p)
     )
 
 

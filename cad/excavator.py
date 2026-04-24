@@ -65,9 +65,23 @@ class ExcavatorParams:
 
     # ----- pivot (a metal dowel pin running along L through both end caps) -
     pin_diameter: float = 3.0
-    pin_clearance: float = 0.2            # diametral clearance, sliding fit
+    # Diametral clearance for the printed pivot hole. 0.3 mm is the lower
+    # end of the standard FDM sliding-fit window (0.3-0.4 mm); 0.2 mm
+    # was found to fuse / bind in print (Edison v3 analysis, docs/edison/
+    # analysis-v3-longitudinal-tilt-cad.md sec. 3).
+    pin_clearance: float = 0.3
     pivot_boss_diameter: float = 8.0      # local boss around the pin hole
     pivot_boss_thickness: float = 4.0
+    # Y-coordinate of the pivot pin axis in trough-local coords (rim is at
+    # Y = 0, half-cylinder hangs into -Y). To keep the loaded trough as a
+    # *stable* pendulum, the pivot has to sit ABOVE the loaded centre of
+    # gravity. For a half-cylinder filled with powder, the powder centroid
+    # is at -4 r / (3 pi) ~ -5.5 mm for r = 13 mm; combined with the shell
+    # and small rim lips the loaded CG is around -5 mm. Putting the pivot
+    # at Y = -4 mm keeps it ~1 mm above the loaded CG (stable) while
+    # leaving the 8 mm pivot boss fully inscribed in the half-disk
+    # end-cap envelope. (Edison v3 sec. 1, "Inverted Pendulum" flaw.)
+    pivot_offset_y: float = -4.0
 
     # ----- arms (two parallel verticals dropping from the gantry) -----
     arm_thickness: float = 4.0            # in X (gantry-travel direction)
@@ -86,9 +100,14 @@ class ExcavatorParams:
     # a sharp geometric tip-over angle (better dose-vs-tilt repeatability),
     # and (c) provides a low-overhang printable surface for the cam to
     # ride on.
-    bumper_height: float = 6.0            # radial protrusion of the lip
-    bumper_chamfer: float = 2.0           # outside-edge chamfer dimension
-    bumper_width: float = 6.0             # lip thickness in X (cross-section)
+    #
+    # Lip cross-section is kept SMALL (2 x 2 mm with a 1 mm chamfer): the
+    # earlier 6 x 6 mm lips added ~7 g of PETG well above the rim and
+    # pushed the loaded CG above the pivot, ruining pendulum stability.
+    # (Edison v3 sec. 1 + sec. 3, lip geometry.)
+    bumper_height: float = 2.0            # radial protrusion of the lip
+    bumper_chamfer: float = 1.0           # outside-edge chamfer dimension
+    bumper_width: float = 2.0             # lip thickness in X (cross-section)
 
     # ----- fixed bed-edge strike-off bar -----
     strike_off_length: float = 100.0      # spans the bed edge
@@ -121,6 +140,28 @@ class ExcavatorParams:
     # ----- gantry working envelope (used by dfm.py's kinematic checks) -----
     gantry_x_travel: float = 250.0
     gantry_z_travel: float = 80.0
+
+    # ----- physics-of-mechanism feedback targets (used by dfm.py) -----
+    # Target useful tilt angle for the cam ramp (deg from horizontal). The
+    # cam ramp must be able to drive the trough this far before the
+    # tilt-vs-X sensitivity saturates (snap-through singularity).
+    cam_target_tilt_deg: float = 45.0
+    # Maximum acceptable d(theta)/d(X) sensitivity for the cam ramp at the
+    # target tilt, in deg per mm of gantry X travel. >15 deg/mm makes
+    # metered pouring uncontrollable. (Edison v3 sec. 1, "Cam Singularity"
+    # flaw and sec. 4, dfm.py shortfalls.)
+    cam_sensitivity_ceiling_deg_per_mm: float = 15.0
+    # Maximum acceptable change in slot direction at any waypoint, in
+    # degrees. Sharp corners spike the normal force on the peg and make
+    # the slot bind. (Edison v3 sec. 4, pin-slot friction.)
+    slot_max_corner_deg: float = 60.0
+    # Powder bulk density (g/cm^3) used for the loaded centre-of-gravity
+    # calculation in the pendulum-stability check. 1.0 g/cm^3 is a
+    # reasonable default for inorganic powders at packed bulk density.
+    powder_bulk_density: float = 1.0
+    # Print material density (g/cm^3) used for the loaded CG calculation.
+    # 1.27 g/cm^3 is PETG; PLA is 1.24, nylon 1.14.
+    print_material_density: float = 1.27
 
     # ----- FDM-printability targets (used by dfm.py's printability checks) -
     min_wall: float = 0.8                 # absolute minimum FDM wall (4-perimeter @ 0.2 mm)
@@ -165,10 +206,10 @@ def build_trough(p: ExcavatorParams) -> CQObject:
     body = outer.cut(cavity)
 
     # Pivot bosses sit on the OUTSIDE of each end cap. Their axis is along
-    # Z. We place them on the longitudinal centre line of the half-cylinder,
-    # which (since the half-disk hangs into -Y from the flat edge at Y=0)
-    # is at (X=0, Y=-radius/2) -- approximately the centroid.
-    pivot_centre_y = -p.trough_radius / 2
+    # Z. We place them on the longitudinal centre line of the half-cylinder
+    # at (X=0, Y=p.pivot_offset_y); ``pivot_offset_y`` is chosen above the
+    # loaded CG to give a stable pendulum (Edison v3 sec. 1).
+    pivot_centre_y = p.pivot_offset_y
     boss = (
         cq.Workplane("XY")
         .center(0, pivot_centre_y)
@@ -363,7 +404,7 @@ def build_assembly(p: ExcavatorParams | None = None) -> cq.Assembly:
     asm = cq.Assembly(name="powder_excavator")
     asm.add(trough, name="trough", color=cq.Color(0.7, 0.7, 0.75))
 
-    pivot_centre_y = -p.trough_radius / 2
+    pivot_centre_y = p.pivot_offset_y
     arm_outer_z0 = -p.pivot_boss_thickness - p.arm_gap - p.arm_thickness / 2
     arm_outer_z1 = (
         p.trough_length + p.pivot_boss_thickness + p.arm_gap + p.arm_thickness / 2

@@ -78,6 +78,42 @@ class DFMTests(unittest.TestCase):
         names = [r.name for r in results if not r.ok and r.severity == "error"]
         self.assertIn("kinematics.slot.waypoints_inside_board", names)
 
+    def test_inverted_pendulum_fails(self) -> None:
+        # Old defaults (pivot at -trough_radius/2 = -6.5 mm with the
+        # heavy 6x6 lips) put the loaded CG above the pivot. This is
+        # the Edison-v3 inverted-pendulum failure mode.
+        bad = replace(
+            ExcavatorParams(),
+            pivot_offset_y=-6.5,
+            bumper_height=6.0,
+            bumper_chamfer=2.0,
+            bumper_width=6.0,
+        )
+        results = run_all(bad)
+        names = [r.name for r in results if not r.ok and r.severity == "error"]
+        self.assertIn("physics.pendulum.cg_below_pivot", names)
+
+    def test_cam_sensitivity_singularity_fails(self) -> None:
+        # A short lever arm + a tilt target near the singularity must
+        # blow the d(theta)/d(X) ceiling.
+        bad = replace(
+            ExcavatorParams(),
+            cam_target_tilt_deg=80.0,
+            cam_sensitivity_ceiling_deg_per_mm=15.0,
+        )
+        results = run_all(bad)
+        names = [r.name for r in results if not r.ok and r.severity == "error"]
+        self.assertIn("physics.cam.sensitivity", names)
+
+    def test_sharp_slot_corner_fails(self) -> None:
+        bad = replace(
+            ExcavatorParams(),
+            slot_path=((20.0, 30.0), (100.0, 30.0), (100.0, 10.0), (180.0, 10.0)),
+        )
+        results = run_all(bad)
+        names = [r.name for r in results if not r.ok and r.severity == "error"]
+        self.assertIn("kinematics.slot.peg_friction.corner_angle", names)
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
