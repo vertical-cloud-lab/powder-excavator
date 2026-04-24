@@ -39,6 +39,11 @@
         "task_id": "6ca69e07-8838-44f7-b394-b5213ea38295",
         "submitted_at": "2026-04-24T04:52:47.226656Z",
         "reason": "Original task stuck at 99% (get_task returns HTTP 500). Per PR feedback, re-run just one query and don't wait."
+      },
+      {
+        "task_id": "ab9e026e-946d-4918-a0b6-49e09d7bc962",
+        "submitted_at": "2026-04-24T05:14:12.024984Z",
+        "reason": "API key rotated by user; resubmitting under new key."
       }
     ]
   },
@@ -46,30 +51,65 @@
     "tag": "mti-mixers-industrial-powder-handling",
     "task_id": "f12f854d-249c-48d7-a3c2-29ddd8c6787a",
     "query": "Survey MTI Mixers (mtimixer.com) and MTI Group industrial powder handling equipment used in food, chemical, pharmaceutical, and plastics processing. Include batch and continuous mixers, dispensing/dosing stations, IBC / bin handling, vacuum conveying, and weighing systems. For each named model or product line, give capacity (kg or L per batch, kg/h continuous), feeding/dispensing principle, accuracy where reported, integration with PLC/SCADA, containment level, and notable end-user industries or installations. Distinguish MTI Mixers from the unrelated MTI Corporation (materials lab equipment) and from Mischtechnik International (MTI) GmbH if applicable.",
-    "submitted_at": "2026-04-24T03:52:51.181405Z"
+    "submitted_at": "2026-04-24T03:52:51.181405Z",
+    "resubmissions": [
+      {
+        "task_id": "e2919d20-86cc-44eb-a1f0-d2fc5b2db4f3",
+        "submitted_at": "2026-04-24T05:14:12.024984Z",
+        "reason": "API key rotated by user; resubmitting under new key."
+      }
+    ]
   },
   {
     "tag": "industrial-bulk-vendors-acrison-hapman-azo-psl-matcon",
     "task_id": "525bc2a5-729d-4dc8-bdd6-8fabe4d6ed92",
     "query": "Provide model-level technical specifications for industrial powder handling and dispensing equipment from the following vendors, where evidence from datasheets or peer-reviewed/trade literature is available: (1) Acrison weight-loss differential and volumetric feeders (e.g., Models 105, 130, 140, 170, 270, 402, 403, 405, BDF, MBDF); (2) Hapman bulk-bag unloaders, tubular drag conveyors, helix flexible screw conveyors, PosiPortion feeders; (3) AZO (AZO GmbH + Co. KG) ingredient automation, DOSITAINER, SHIFTSIFTER, ROTAJET, FLEXSCREEN, COMPONENTER manual/automatic small- and micro-component weighing systems; (4) Powder Systems Limited (PSL) GFD, GFD Lab, PSL Vac-Tech containment systems and powder handling isolators; (5) Matcon IBC systems with cone valve technology, IBC blenders, and automated discharge stations. For each, capture throughput, accuracy/precision, dose or batch range, containment level (OEB), and integration features. Note any items where vendor-level evidence is not available rather than guessing.",
-    "submitted_at": "2026-04-24T03:52:51.181405Z"
+    "submitted_at": "2026-04-24T03:52:51.181405Z",
+    "resubmissions": [
+      {
+        "task_id": "a61e05d3-46bd-4439-a599-1a143995adcd",
+        "submitted_at": "2026-04-24T05:14:12.024984Z",
+        "reason": "API key rotated by user; resubmitting under new key."
+      }
+    ]
   },
   {
     "tag": "lab-liquid-handlers-with-powder-modules",
     "task_id": "7a5566eb-9ddb-4638-8ede-b3c14ae03083",
     "query": "Investigate which mainstream liquid-handling and lab-automation platforms offer optional powder / solid-dispensing modules or accessories, and what their actual specifications are. Cover at minimum: (1) Hamilton Microlab STAR / STARlet / Vantage with any solid-dispensing or 'powder head' option, and Hamilton's relationship to Mettler Toledo Quantos integrations on the deck; (2) Tecan Fluent / Freedom EVO with solid-dispensing accessories; (3) Zinsser Analytic Lissy and SpeedyDoser solid dispensers; (4) Gilson PIPETMAX / GX-271 with any solid-dispensing add-ons; (5) Sartorius arium / Cubis II MCA balances integrated with robotic solid dispensing; (6) Analytik Jena CyBio FeliX / Well with powder accessories; (7) Anton Paar accessories for solids in rheology / density platforms. For each give product/module name, dispensing principle, dose range, accuracy, and how it is exposed to scripting / API control.",
-    "submitted_at": "2026-04-24T03:52:51.181405Z"
+    "submitted_at": "2026-04-24T03:52:51.181405Z",
+    "resubmissions": [
+      {
+        "task_id": "d2f50d5d-4448-4ed7-80e9-8bb28ed60313",
+        "submitted_at": "2026-04-24T05:14:12.024984Z",
+        "reason": "API key rotated by user; resubmitting under new key."
+      }
+    ]
   },
   {
     "tag": "acoustic-piezo-capacitive-microdose-and-quantos-qx-chemspeed-powdernium",
     "task_id": "760c215f-5ebb-425c-acd4-ae653b8e6d13",
     "query": "Locate datasheet- or paper-grade evidence for: (a) acoustic, piezo, or capacitive *dry-powder* microdispensers, including EDC Biosystems ATS Gen5/Gen6 acoustic dispensers used for solid particles, Scienion sciDROP-PICO solid handling options, Labcyte/Beckman Echo dry-powder evaluations, and any academic prototypes for nanoparticle / microparticle acoustic ejection; (b) the specific Mettler Toledo Quantos QX1 and QX2 modules \u2014 minimum dose, accuracy, throughput, head types, balance compatibility (XPR/XPE), and integration options; (c) Chemspeed 'Powdernium' branding and the GDU family (GDU-V, GDU-Pfd, GDU-S/SWILE, GDU-P) \u2014 minimum dose, accuracy at sub-mg / mg / 10 mg / 100 mg targets, container volumes, supported powder cohesiveness, and dispense-time benchmarks. Be explicit where information is not retrievable.",
-    "submitted_at": "2026-04-24T03:52:51.181405Z"
+    "submitted_at": "2026-04-24T03:52:51.181405Z",
+    "resubmissions": [
+      {
+        "task_id": "78d179da-e724-4999-bb74-98a175944d6b",
+        "submitted_at": "2026-04-24T05:14:12.024984Z",
+        "reason": "API key rotated by user; resubmitting under new key."
+      }
+    ]
   },
   {
     "tag": "academic-and-open-source-powder-dispensing-robots",
     "task_id": "c12362fe-0971-45dd-85a8-a79fa7316622",
     "query": "Survey academic and open-source robotic powder dispensing systems published in the last ~10 years, especially those used in self-driving labs and high-throughput experimentation for chemistry, materials, and battery research. Include: dual-arm biomimetic dispensing (Cooper group, Liverpool, 2023); the Berkeley A-Lab and related autonomous labs; Coscientist / ChemOS / ARES style platforms with solid handling; FLIP-style flow-aware dosing using ML; Opentrons-based powder dispensing add-ons; any LEGO/Arduino/3D-printed open-hardware dispensers; integration of 6-axis cobots (UR3/UR5/Franka) with balances. For each, report mechanism (spatula, scoop, vibratory, screw, electrostatic), demonstrated dose range and accuracy, powder types tested, throughput, and code/CAD availability. Also identify what *hardware/software gaps* these works highlight relative to commercial Quantos/Chemspeed systems.",
-    "submitted_at": "2026-04-24T03:52:51.181405Z"
+    "submitted_at": "2026-04-24T03:52:51.181405Z",
+    "resubmissions": [
+      {
+        "task_id": "7b5e41fa-f5a9-4dba-bd79-75eaaca83ca3",
+        "submitted_at": "2026-04-24T05:14:12.024984Z",
+        "reason": "API key rotated by user; resubmitting under new key."
+      }
+    ]
   }
 ]
