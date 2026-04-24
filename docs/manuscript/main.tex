@@ -576,6 +576,77 @@ Carrying over from the original brainstorming, with the literature in mind:
 \end{itemize}
 
 % --------------------------------------------------------------------------
+\section{Open parametric CAD pipeline and design-for-manufacturing feedback}
+\label{sec:cad-pipeline}
+
+A central pragmatic constraint placed on this design by the project's
+requirements is that the dispenser must run on an \emph{existing} gantry
+(X / Y / Z) without any additional actuator on the bucket --- a ``no second
+axis'' constraint. To make this constraint enforceable as the design
+iterates, the same dimensions that drive Figures~\ref{fig:panels} and~\ref{fig:pinslot} and
+the prior-art arguments above also drive a small open-source parametric
+CAD pipeline shipped with this manuscript under \texttt{cad/} in the
+project repository.
+
+The choice of authoring tool was deliberately restricted to \emph{open,
+pip-installable} options so that anyone re-running this pipeline pays only
+the price of \texttt{pip install cadquery}. CadQuery
+(\url{https://github.com/CadQuery/cadquery}) was chosen over the
+commercial parametric / generative-CAD ecosystems (Rhino + Grasshopper,
+Fusion 360 Generative Design, nTop, Onshape FeatureScript) because it is
+pure Python, runs unattended on a CI runner, and emits standards-compliant
+STEP and STL output that any open-source slicer (PrusaSlicer, OrcaSlicer,
+Cura) can consume. Sister tools (\texttt{build123d} and OpenSCAD) fit the
+same niche and remain candidates as the design matures; a separate
+high-effort literature task on generative / computational CAD for
+mechanical hardware is in flight and will be folded into a future revision.
+
+The pipeline has three stages, all driven by a single
+\texttt{ExcavatorParams} dataclass that holds every dimension in
+millimetres:
+
+\begin{enumerate}
+  \item \textbf{Authoring} (\texttt{cad/excavator.py}). Each part --- the
+    half-cylinder trough with its closed end caps and pivot bosses, the
+    two vertical arms, the dowel pin, the bed-edge strike-off bar, the
+    smooth inclined cam ramp, and the routed slot board for the
+    pin-defined-path variant of \S\ref{sec:pinslot} --- is a plain Python
+    function that takes \texttt{ExcavatorParams} and returns a CadQuery
+    solid. Because every dimension lives in the dataclass, a design
+    iteration is a \texttt{git diff} on a single file.
+  \item \textbf{Build} (\texttt{cad/build.py}). Exports STEP and STL for
+    every part plus a STEP for the full assembly into \texttt{cad/build/}
+    (gitignored), along with a JSON manifest containing the parameter
+    snapshot used.
+  \item \textbf{Feedback} (\texttt{cad/dfm.py}). Runs an automated battery
+    of design-for-manufacturing and gantry-only-kinematics checks against
+    the current parameter set and exits non-zero on failure --- making it
+    suitable to drop into CI. Categories of checks include FDM
+    printability (minimum wall thickness, FDM overhang angle on the
+    cam-ramp underside, bumper chamfer presence, dowel-pin clearance);
+    cam-ramp kinematics (bumper engagement, ramp fits inside the gantry's
+    X travel, ramp angle in a 15--45\textdegree band); and, most
+    importantly for the no-second-axis constraint, slot-path kinematics
+    (every waypoint inside the routed board, the slot's X and Z spans
+    fitting inside the gantry's travel, and a flag on any X-direction
+    reversal in the slot path so that bidirectional gantry motion is
+    surfaced explicitly to the designer).
+\end{enumerate}
+
+Three small unit tests (\texttt{cad/tests/test\_excavator.py}) exercise (i)
+that every part builds at default parameters, (ii) that the DFM check
+passes at default parameters, and (iii) that two deliberate parameter
+regressions --- a sub-minimum trough wall and a slot path routed off the
+board --- are correctly caught by the DFM check. This is the start of a
+closed-loop generative-CAD workflow rather than the finished product;
+near-term extensions are to add a \emph{slicer-side} check
+(e.g.\ delegating support volume estimation to PrusaSlicer's CLI) and a
+\emph{print-then-measure} loop in which a successful print of the trough
+is photographed and analysed with classical CV to extract its as-built
+inner radius and wall thickness, closing the loop on the parametric
+inputs.
+
+% --------------------------------------------------------------------------
 \bibliographystyle{plainurl}
 \bibliography{refs}
 \label{sec:references}

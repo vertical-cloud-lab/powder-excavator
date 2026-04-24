@@ -88,6 +88,28 @@ is now a LaTeX manuscript with a proper BibTeX bibliography:
 `cd docs/manuscript && make` (requires `pdflatex`, `bibtex`, and
 `cairosvg`).
 
+## Parametric CAD pipeline ([`cad/`](cad/))
+
+The same dimensions used in the figures and the manuscript also drive an
+**open, scriptable parametric CAD model** built on
+[CadQuery](https://github.com/CadQuery/cadquery), so the design can be
+iterated as plain Python source and exported to STEP / STL for any
+open-source slicer. A small `cad/dfm.py` runs design-for-manufacturing and
+**gantry-only kinematics** checks (the explicit constraint from PR comment
+4166621470 — "we have a gantry system and would like to avoid installing a
+second axis"), so a parameter regression is caught the next time anyone
+edits `ExcavatorParams`. See [`cad/README.md`](cad/README.md) for the
+rationale (why CadQuery over Rhino / Grasshopper / Fusion / nTop) and the
+full feedback-loop description.
+
+```bash
+pip install cadquery
+python -m cad.build      # writes STEP + STL + manifest into cad/build/
+python -m cad.dfm        # design-for-manufacturing + gantry-only kinematics checks
+python -m unittest discover cad/tests -v
+```
+
+
 ## Design brainstorming
 
 ### Core idea
