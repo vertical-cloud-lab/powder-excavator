@@ -84,9 +84,15 @@ class ExcavatorParams:
     pivot_offset_y: float = -4.0
 
     # ----- arms (two parallel verticals dropping from the gantry) -----
-    arm_thickness: float = 4.0            # in X (gantry-travel direction)
-    arm_width: float = 8.0                # in Y, must clear pivot boss
-    arm_length: float = 60.0              # vertical drop from carriage
+    # Axis assignments below match :func:`build_arm`: the arm's wide face
+    # (``arm_width``) is along X (perpendicular to both Y and the pin
+    # axis), giving good bending stiffness against the cam reaction load.
+    # The arm is thin along Z (``arm_thickness``), which is the trough's
+    # longitudinal pin axis. ``arm_length`` is the vertical drop in Y
+    # from the carriage down to the pin-hole height.
+    arm_thickness: float = 4.0            # along Z (pin axis = along trough length L)
+    arm_width: float = 8.0                # along X (perpendicular face), must clear pivot boss
+    arm_length: float = 60.0              # vertical drop from carriage (Y)
     arm_gap: float = 1.0                  # gap between arm inside face and trough end cap
 
     # ----- chamfered rim lip on the trough (defines the pour edge AND
@@ -114,8 +120,16 @@ class ExcavatorParams:
     strike_off_section: float = 4.0       # square cross-section side
 
     # ----- smooth inclined cam ramp (baseline tilt actuator) -----
-    cam_ramp_length: float = 40.0         # along gantry X
-    cam_ramp_rise: float = 20.0           # vertical rise across the ramp
+    # NB Edison v3 sec. 1 flagged the cam ramp as kinematically marginal
+    # (snap-through singularity past ~40 deg, cam_ramp_rise was wasted
+    # above the lever's max reach). The pin-slot variant (Panel E) is
+    # therefore the recommended baseline; the cam ramp is kept here as
+    # a fallback option whose dimensions are clamped to the
+    # max-achievable lift (~R*(sin(target+phi0)-sin(phi0))) instead of
+    # an unreachable 20 mm. dfm.py's physics.cam.rise_utilisation check
+    # enforces this.
+    cam_ramp_length: float = 35.0         # along gantry X
+    cam_ramp_rise: float = 10.0           # vertical rise across the ramp (within lever's reach)
     cam_ramp_width: float = 10.0          # along gantry Y
     cam_ramp_thickness: float = 8.0       # below the running surface
 
@@ -352,13 +366,24 @@ def build_slot_board(p: ExcavatorParams) -> CQObject:
     """Routed slot board for the pin-defined-path actuation variant.
 
     The board is a rectangular slab with a slot routed along the polyline
-    given by ``params.slot_path``. The slot is a fixed-width channel; the peg
-    on the trough's stem rides inside it.
+    given by ``params.slot_path``. The slot is a fixed-width channel of
+    depth ``slot_depth`` routed in from the +Y face of the board (the
+    face the peg engages). The peg on the trough's stem rides inside it.
+    If ``slot_depth >= slot_board_thickness`` the slot becomes a
+    through-slot.
     """
     board = (
         cq.Workplane("XZ")
         .box(p.slot_board_length, p.slot_board_height, p.slot_board_thickness)
     )
+    # Cut depth is clamped at the board thickness (a routed slot deeper
+    # than the board itself just becomes a through-slot, not a cut into
+    # both faces).
+    cut_depth = min(p.slot_depth, p.slot_board_thickness)
+    # Y-centre of the cut so it removes material from the +Y face inward
+    # by exactly ``cut_depth`` (board is centred on Y=0 with thickness
+    # ``slot_board_thickness``, so its +Y face is at +thickness/2).
+    cut_y_centre = p.slot_board_thickness / 2 - cut_depth / 2
     # Build the slot as the union of "fat segments" (one per polyline edge),
     # avoiding CadQuery's arbitrary-path sweep which is brittle across
     # versions.
@@ -377,12 +402,12 @@ def build_slot_board(p: ExcavatorParams) -> CQObject:
             .box(
                 seg_len + p.slot_width,
                 p.slot_width,
-                p.slot_depth * 2,
+                cut_depth,
                 centered=(True, True, True),
             )
         )
         seg = seg.rotate((0, 0, 0), (0, 1, 0), -ang_deg)
-        seg = seg.translate(((wx0 + wx1) / 2, 0, (wz0 + wz1) / 2))
+        seg = seg.translate(((wx0 + wx1) / 2, cut_y_centre, (wz0 + wz1) / 2))
         slot_solid = seg if slot_solid is None else slot_solid.union(seg)
     if slot_solid is not None:
         board = board.cut(slot_solid)

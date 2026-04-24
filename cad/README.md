@@ -42,9 +42,13 @@ Sister tools that fit the same niche and are worth considering as the design
 matures are [`build123d`](https://github.com/gumyr/build123d) (a re-imagined
 CadQuery API by the same community) and
 [OpenSCAD](https://openscad.org/) (a constructive solid geometry DSL).
-The Edison Scientific generative-CAD literature task (`task_id`
-`524e7e92-a326-440a-b6fd-f6eb220d9019`, still pending at the time of this
-commit) is intended to widen this comparison.
+The Edison Scientific generative-CAD literature task (initial submission
+`task_id` `524e7e92-a326-440a-b6fd-f6eb220d9019` was sent to the wrong
+endpoint and cancelled; resubmitted as
+`f5a27ed3-8530-4102-9e31-5af9bbe9b0e0` against the correct
+`api.platform.edisonscientific.com` endpoint, see
+[`docs/edison/README.md`](../docs/edison/README.md)) is intended to widen
+this comparison.
 
 ## Files
 

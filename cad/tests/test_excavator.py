@@ -114,6 +114,19 @@ class DFMTests(unittest.TestCase):
         names = [r.name for r in results if not r.ok and r.severity == "error"]
         self.assertIn("kinematics.slot.peg_friction.corner_angle", names)
 
+    def test_slot_x_reversal_warns(self) -> None:
+        # Path that goes +X then -X requires a gantry-X reversal; this
+        # should be flagged (not-ok at warning severity) by
+        # kinematics.slot.gantry_x_only.
+        bad = replace(
+            ExcavatorParams(),
+            slot_path=((20.0, 30.0), (180.0, 30.0), (50.0, 30.0)),
+        )
+        results = run_all(bad)
+        match = next(r for r in results if r.name == "kinematics.slot.gantry_x_only")
+        self.assertFalse(match.ok)
+        self.assertEqual(match.severity, "warning")
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()

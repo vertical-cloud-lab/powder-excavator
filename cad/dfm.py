@@ -224,7 +224,7 @@ def check_gantry_only_slot_board(p: ExcavatorParams) -> list[CheckResult]:
             last_dx_sign = sign
     rs.append(_check(
         "kinematics.slot.gantry_x_only",
-        True,
+        not non_monotonic,
         ("slot path requires only gantry-X motion to traverse"
          + (f" (with {len(non_monotonic)} reversal(s) at segment indices {non_monotonic})"
             if non_monotonic else "")),

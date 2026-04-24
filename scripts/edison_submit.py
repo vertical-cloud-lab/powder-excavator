@@ -184,6 +184,27 @@ def make_client() -> FutureHouseClient:
     return FutureHouseClient(service_uri=EDISON_SERVICE_URI, api_key=api_key)
 
 
+def _fence_for(content: str) -> str:
+    """Return a backtick fence longer than any run of backticks in ``content``.
+
+    Markdown fenced code blocks terminate on the first line that starts
+    with a fence of equal or greater length than the opener, so to safely
+    embed arbitrary content (including content that itself contains
+    triple-backtick fences) we pick a fence one longer than the longest
+    backtick run in the content (with a floor of 3).
+    """
+    longest = 0
+    run = 0
+    for ch in content:
+        if ch == "`":
+            run += 1
+            if run > longest:
+                longest = run
+        else:
+            run = 0
+    return "`" * max(3, longest + 1)
+
+
 def _embed_context() -> str:
     """Return the design-context files joined as fenced text blocks."""
     parts: list[str] = []
@@ -192,7 +213,13 @@ def _embed_context() -> str:
             continue
         rel = fp.relative_to(REPO_ROOT)
         ext = fp.suffix.lstrip(".") or "text"
-        parts.append(f"\n=== file: {rel} ===\n```{ext}\n{fp.read_text()}\n```")
+        # Read with explicit UTF-8 (avoid locale-dependent decode errors)
+        # and pick a fence longer than any backtick run in the file so
+        # embedded ``` fences (e.g. inside README.md) can't prematurely
+        # terminate the wrapper.
+        text = fp.read_text(encoding="utf-8")
+        fence = _fence_for(text)
+        parts.append(f"\n=== file: {rel} ===\n{fence}{ext}\n{text}\n{fence}")
     return "\n".join(parts)
 
 
