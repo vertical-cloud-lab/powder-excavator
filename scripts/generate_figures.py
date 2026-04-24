@@ -175,43 +175,71 @@ def panel_A() -> str:
     s.append(f'<text x="{cx}" y="{cy + R + 50}" text-anchor="middle" font-size="13">D ≈ 27 mm</text>')
     s.append('</g>')
 
-    # Side view (looking perpendicular to L, from the long side) — middle
+    # Side view (looking perpendicular to L, from the long side) — middle.
+    # Arms are drawn slightly OUTBOARD of the trough body (not flush with its
+    # end walls) so the eye reads them as "the pin sticks out of each end cap
+    # into a bushing on the arm" rather than "the arms are bolted onto the
+    # end walls".  The pin is shown as a solid red line where it's exposed
+    # (between body and arms) and a dashed red line for the segment hidden
+    # inside the body.
     g_side_x, g_side_y = 430, 110
     s.append(f'<g transform="translate({g_side_x},{g_side_y})">')
-    s.append('<text x="200" y="0" text-anchor="middle" font-size="16" font-weight="600">Side view (looking at long side)</text>')
-    L_px = 320
+    s.append('<text x="200" y="0" text-anchor="middle" font-size="16" font-weight="600">Side view (along pin axis)</text>')
+    L_px = 280
+    body_x0 = 60
+    body_x1 = body_x0 + L_px
+    arm_gap = 22                 # how far each arm is offset outboard of the body
     arm_h = 140
     arm_top = 20
-    for ax in (40, 40 + L_px):
+    arm_xL = body_x0 - arm_gap
+    arm_xR = body_x1 + arm_gap
+    for ax in (arm_xL, arm_xR):
         s.append(f'<rect x="{ax - 6}" y="{arm_top}" width="12" height="{arm_h}" fill="url(#metal)" stroke="#333"/>')
     body_top = arm_top + arm_h - 20
     body_h = 60
+    # Trough body (semicircle bottom + top edge)
     s.append(
-        f'<path d="M 40 {body_top} '
-        f'L {40 + L_px} {body_top} '
-        f'L {40 + L_px} {body_top + 10} '
-        f'Q {40 + L_px / 2} {body_top + body_h} '
-        f'40 {body_top + 10} Z" '
+        f'<path d="M {body_x0} {body_top} '
+        f'L {body_x1} {body_top} '
+        f'L {body_x1} {body_top + 10} '
+        f'Q {(body_x0 + body_x1) / 2} {body_top + body_h} '
+        f'{body_x0} {body_top + 10} Z" '
         f'fill="url(#metalH)" stroke="#222" stroke-width="2"/>'
     )
+    # Powder fill
     s.append(
-        f'<path d="M 50 {body_top + 4} L {30 + L_px} {body_top + 4} '
-        f'L {30 + L_px} {body_top + 12} Q {40 + L_px / 2} {body_top + body_h - 6} '
-        f'50 {body_top + 12} Z" fill="url(#powder)" opacity="0.95"/>'
+        f'<path d="M {body_x0 + 10} {body_top + 4} L {body_x1 - 10} {body_top + 4} '
+        f'L {body_x1 - 10} {body_top + 12} Q {(body_x0 + body_x1) / 2} {body_top + body_h - 6} '
+        f'{body_x0 + 10} {body_top + 12} Z" fill="url(#powder)" opacity="0.95"/>'
     )
+    # Longitudinal pin: dashed (hidden) inside the body, solid where exposed
     pin_y = body_top + 8
-    s.append(f'<line x1="28" y1="{pin_y}" x2="{40 + L_px + 12}" y2="{pin_y}" '
-             'stroke="#c0392b" stroke-width="3"/>')
-    s.append(f'<text x="{40 + L_px / 2}" y="{pin_y - 6}" text-anchor="middle" font-size="11" fill="#c0392b">'
-             'longitudinal pivot pin (axis ∥ L, runs through both end caps)</text>')
-    s.append(f'<line x1="40" y1="{body_top + body_h + 30}" x2="{40 + L_px}" y2="{body_top + body_h + 30}" '
+    s.append(f'<line x1="{arm_xL - 8}" y1="{pin_y}" x2="{body_x0}" y2="{pin_y}" '
+             'stroke="#c0392b" stroke-width="3"/>')                                          # left exposed stub
+    s.append(f'<line x1="{body_x0}" y1="{pin_y}" x2="{body_x1}" y2="{pin_y}" '
+             'stroke="#c0392b" stroke-width="2.2" stroke-dasharray="6 4" opacity="0.7"/>')   # hidden inside body
+    s.append(f'<line x1="{body_x1}" y1="{pin_y}" x2="{arm_xR + 8}" y2="{pin_y}" '
+             'stroke="#c0392b" stroke-width="3"/>')                                          # right exposed stub
+    # Pin-stub indicator dots where the pin enters each arm
+    for sx in (arm_xL, arm_xR):
+        s.append(f'<circle cx="{sx}" cy="{pin_y}" r="4" fill="#c0392b" stroke="#7a1f15" stroke-width="1.2"/>')
+    s.append(f'<text x="{(body_x0 + body_x1) / 2}" y="{pin_y - 6}" text-anchor="middle" font-size="11" fill="#c0392b">'
+             'pin stubs (red dots) sit in bushings on each arm — pin axis runs ALONG L</text>')
+    s.append(f'<text x="{(body_x0 + body_x1) / 2}" y="{pin_y + 26}" text-anchor="middle" font-size="10" fill="#c0392b" font-style="italic">'
+             '(dashed segment = pin hidden inside trough body)</text>')
+    # L-dimension (along the trough body, between end caps)
+    s.append(f'<line x1="{body_x0}" y1="{body_top + body_h + 30}" x2="{body_x1}" y2="{body_top + body_h + 30}" '
              'stroke="#222" stroke-width="1.2" marker-start="url(#arrowK)" marker-end="url(#arrowK)"/>')
-    s.append(f'<text x="{40 + L_px / 2}" y="{body_top + body_h + 50}" text-anchor="middle" font-size="13">L ≈ 3 D ≈ 80 mm</text>')
-    for bx in (52, 28 + L_px):
+    s.append(f'<text x="{(body_x0 + body_x1) / 2}" y="{body_top + body_h + 50}" text-anchor="middle" font-size="13">L ≈ 3 D ≈ 80 mm</text>')
+    # Bumpers on the long-side rim (top edge), one per end
+    for bx in (body_x0 + 12, body_x1 - 28):
         s.append(f'<path d="M {bx} {body_top} L {bx + 16} {body_top - 5} L {bx + 16} {body_top + 4} L {bx} {body_top + 4} Z" '
                  'fill="#7e8794" stroke="#222" stroke-width="1.2"/>')
-    s.append(f'<text x="{40 + L_px / 2}" y="{body_top - 12}" text-anchor="middle" font-size="11" fill="#444">'
+    s.append(f'<text x="{(body_x0 + body_x1) / 2}" y="{body_top - 12}" text-anchor="middle" font-size="11" fill="#444">'
              'chamfered bumper (one per end) — slides up the cam track</text>')
+    # Arm labels
+    s.append(f'<text x="{arm_xL - 8}" y="{arm_top - 6}" text-anchor="middle" font-size="10" fill="#444">arm L</text>')
+    s.append(f'<text x="{arm_xR + 8}" y="{arm_top - 6}" text-anchor="middle" font-size="10" fill="#444">arm R</text>')
     s.append('</g>')
 
     # Top view — rightmost
@@ -309,7 +337,7 @@ def panel_B() -> str:
 # ---------------------------------------------------------------------------
 
 def panel_C() -> str:
-    W, H = 1000, 640
+    W, H = 1000, 680
     s = [_svg_open(W, H)]
     s.append(
         f'<text x="{W//2}" y="34" text-anchor="middle" font-size="22" font-weight="700">'
@@ -318,47 +346,96 @@ def panel_C() -> str:
     )
     s.append(
         f'<text x="{W//2}" y="56" text-anchor="middle" font-size="13" fill="#555" font-style="italic">'
-        "two arms grip the two end caps; longitudinal pin (red) along L; cam track on a fixed post for sideways tilt"
+        "two arms grip the two end caps via pin stubs (red dots); cam track on a fixed post drives the sideways tilt"
         "</text>"
     )
+    # Gantry carriage rail (drawn perpendicular to L; carriage travels in/out
+    # of the page in true X, but we project it as a horizontal bar with
+    # an axes inset clarifying the convention).
     s.append('<rect x="180" y="80" width="640" height="22" fill="url(#metalH)" stroke="#222" stroke-width="1.5"/>')
-    s.append('<text x="500" y="76" text-anchor="middle" font-size="12" fill="#444">gantry carriage (X / Z stage)</text>')
-    s.append('<polygon points="270,102 290,102 290,300 270,300" fill="url(#metal)" stroke="#333"/>')
-    s.append('<polygon points="640,102 660,102 670,290 650,290" fill="url(#metal)" stroke="#333"/>')
+    s.append('<text x="500" y="76" text-anchor="middle" font-size="12" fill="#444">gantry carriage (carries the two arms; X / Z stage)</text>')
+    # Two arms — moved outboard of the trough body so they read as end-cap
+    # mounts, not as side-of-body grips.
+    arm_left_x = 250
+    arm_right_x = 690
+    s.append(f'<polygon points="{arm_left_x},102 {arm_left_x + 18},102 {arm_left_x + 18},308 {arm_left_x},308" fill="url(#metal)" stroke="#333"/>')
+    s.append(f'<polygon points="{arm_right_x},102 {arm_right_x + 18},102 {arm_right_x + 28},298 {arm_right_x + 10},298" fill="url(#metal)" stroke="#333"/>')
+    s.append(f'<text x="{arm_left_x - 4}" y="98" text-anchor="end" font-size="11" fill="#444">arm L</text>')
+    s.append(f'<text x="{arm_right_x + 32}" y="98" text-anchor="start" font-size="11" fill="#444">arm R</text>')
+    # Trough body (sits between the two arms; its end caps face the arms)
+    body_x0 = arm_left_x + 30
+    body_x1 = arm_right_x - 4
     s.append(
-        '<polygon points="290,300 660,290 660,260 290,270" '
+        f'<polygon points="{body_x0},300 {body_x1},290 {body_x1},260 {body_x0},270" '
         'fill="#dfe4ea" stroke="#222" stroke-width="2"/>'
     )
     s.append(
-        '<path d="M 290,270 '
-        'C 360,420 590,410 660,260 '
-        'L 660,290 '
-        'C 590,440 360,450 290,300 Z" '
+        f'<path d="M {body_x0},270 '
+        f'C {body_x0 + 70},420 {body_x1 - 70},410 {body_x1},260 '
+        f'L {body_x1},290 '
+        f'C {body_x1 - 70},440 {body_x0 + 70},450 {body_x0},300 Z" '
         'fill="url(#metalH)" stroke="#222" stroke-width="2"/>'
     )
     s.append(
-        '<polygon points="296,295 654,287 654,265 296,275" '
+        f'<polygon points="{body_x0 + 6},295 {body_x1 - 6},287 {body_x1 - 6},265 {body_x0 + 6},275" '
         'fill="url(#powder)" opacity="0.95"/>'
     )
-    s.append('<line x1="266" y1="285" x2="676" y2="275" stroke="#c0392b" stroke-width="4"/>')
-    s.append('<circle cx="266" cy="285" r="6" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>')
-    s.append('<circle cx="676" cy="275" r="6" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>')
-    s.append('<text x="200" y="298" font-size="12" fill="#c0392b">pivot pin (along L)</text>')
-    s.append('<polygon points="320,272 340,266 340,258 320,264" fill="#7e8794" stroke="#222" stroke-width="1.2"/>')
-    s.append('<polygon points="610,266 630,260 630,252 610,258" fill="#7e8794" stroke="#222" stroke-width="1.2"/>')
-    s.append('<text x="475" y="248" text-anchor="middle" font-size="11" fill="#444">'
+    # Longitudinal pin: solid stubs in the air gaps between arm and body,
+    # dashed (hidden) inside the body.
+    pin_y0 = 285   # at left arm end
+    pin_y1 = 275   # at right arm end (skewed for iso)
+    # Left exposed stub (arm to body)
+    s.append(f'<line x1="{arm_left_x + 18}" y1="{pin_y0}" x2="{body_x0}" y2="{pin_y0 - 1}" '
+             'stroke="#c0392b" stroke-width="5"/>')
+    # Hidden segment inside body (dashed)
+    s.append(f'<line x1="{body_x0}" y1="{pin_y0 - 1}" x2="{body_x1}" y2="{pin_y1 + 1}" '
+             'stroke="#c0392b" stroke-width="3" stroke-dasharray="7 4" opacity="0.65"/>')
+    # Right exposed stub (body to arm)
+    s.append(f'<line x1="{body_x1}" y1="{pin_y1 + 1}" x2="{arm_right_x + 12}" y2="{pin_y1}" '
+             'stroke="#c0392b" stroke-width="5"/>')
+    # Pin-stub indicator dots at both arms
+    s.append(f'<circle cx="{arm_left_x + 9}" cy="{pin_y0 + 1}" r="6" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>')
+    s.append(f'<circle cx="{arm_right_x + 19}" cy="{pin_y1 - 1}" r="6" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>')
+    # Leader lines / labels for end-cap connection points
+    s.append(f'<line x1="{arm_left_x + 9}" y1="{pin_y0 + 12}" x2="{arm_left_x - 30}" y2="{pin_y0 + 60}" '
+             'stroke="#c0392b" stroke-width="1"/>')
+    s.append(f'<text x="{arm_left_x - 36}" y="{pin_y0 + 72}" text-anchor="end" font-size="11" fill="#c0392b">'
+             'pin stub through end cap → bushing on arm L</text>')
+    s.append(f'<line x1="{arm_right_x + 19}" y1="{pin_y1 + 12}" x2="{arm_right_x + 60}" y2="{pin_y1 + 60}" '
+             'stroke="#c0392b" stroke-width="1"/>')
+    s.append(f'<text x="{arm_right_x + 64}" y="{pin_y1 + 72}" text-anchor="start" font-size="11" fill="#c0392b">'
+             'pin stub through end cap → bushing on arm R</text>')
+    s.append(f'<text x="{(body_x0 + body_x1) // 2}" y="248" text-anchor="middle" font-size="11" fill="#c0392b" font-style="italic">'
+             '(dashed segment = pin hidden inside trough body)</text>')
+    # Bumpers on the long-side rim (one per end)
+    s.append(f'<polygon points="{body_x0 + 30},272 {body_x0 + 50},266 {body_x0 + 50},258 {body_x0 + 30},264" fill="#7e8794" stroke="#222" stroke-width="1.2"/>')
+    s.append(f'<polygon points="{body_x1 - 50},266 {body_x1 - 30},260 {body_x1 - 30},252 {body_x1 - 50},258" fill="#7e8794" stroke="#222" stroke-width="1.2"/>')
+    s.append(f'<text x="{(body_x0 + body_x1) // 2}" y="232" text-anchor="middle" font-size="11" fill="#444">'
              'chamfered bumpers (rim of long side) — slide up the cam track</text>')
+    # Cam post + ramp (unchanged)
     s.append('<rect x="850" y="180" width="18" height="320" fill="#8a7a5e" stroke="#444"/>')
     s.append('<text x="858" y="510" text-anchor="middle" font-size="11" fill="#5a4a30">fixed post</text>')
     s.append('<polygon points="730,300 850,300 850,250 730,300" fill="#8a7a5e" stroke="#444" stroke-width="1.5"/>')
     s.append('<text x="780" y="320" text-anchor="middle" font-size="12" fill="#5a4a30">smooth inclined cam track</text>')
     s.append('<text x="780" y="336" text-anchor="middle" font-size="11" fill="#7a6a4a">'
              '(replaces sawtooth; bumper slides up its hypotenuse)</text>')
+    # Strike-off bar
     s.append('<rect x="220" y="510" width="350" height="10" fill="#5a4a30" stroke="#222"/>')
     s.append('<text x="395" y="535" text-anchor="middle" font-size="11" fill="#5a4a30">'
              'fixed strike-off bar (bed-edge mounted; trough wipes under during the lift-out)</text>')
     s.append('<rect x="180" y="555" width="430" height="55" fill="url(#powder)" stroke="#7a5a1a"/>')
     s.append('<text x="395" y="595" text-anchor="middle" font-size="12" fill="#7a5a1a">powder bed</text>')
+    # Axes inset (top right) clarifying L vs gantry-X convention
+    ax0, ay0 = 880, 590
+    s.append(f'<g transform="translate({ax0},{ay0})">')
+    s.append('<rect x="-6" y="-46" width="100" height="64" fill="#fff" stroke="#aaa" stroke-width="1" rx="3"/>')
+    s.append('<line x1="0" y1="0" x2="40" y2="0" stroke="#222" stroke-width="2" marker-end="url(#arrowK)"/>')
+    s.append('<text x="44" y="4" font-size="10" fill="#222">L (pin axis)</text>')
+    s.append('<line x1="0" y1="0" x2="0" y2="-30" stroke="#1f5fbf" stroke-width="2" marker-end="url(#arrowB)"/>')
+    s.append('<text x="4" y="-32" font-size="10" fill="#1f5fbf">Z gantry</text>')
+    s.append('<circle cx="0" cy="0" r="3" fill="#c0392b"/><circle cx="0" cy="0" r="6" fill="none" stroke="#c0392b"/>')
+    s.append('<text x="-10" y="14" font-size="10" fill="#c0392b" text-anchor="end">X (out of page)</text>')
+    s.append('</g>')
     s.append(_svg_close())
     return "".join(s)
 
@@ -621,59 +698,145 @@ def panel_D() -> str:
 def _frame_svg(t: float) -> str:
     """Render a single GIF frame at parameter ``t`` in [0, 1].
 
-    The parameter linearly maps to "time" through the animation:
+    The motion is parameterised so the trough's right-side bumper actually
+    rides on the cam ramp's hypotenuse throughout the rotation phase, instead
+    of tilting in mid-air far away from the cam (PR review r3134723829).
 
-    * ``0.00`` – ``0.35``: the trough translates in X (still horizontal)
-      towards the cam ramp; no roll yet.
-    * ``0.35`` – ``0.75``: the bumper rides up the cam's hypotenuse and
-      the trough rolls 0° → 60° about its longitudinal pin.
-    * ``0.75`` – ``1.00``: powder pours over the lowered long edge while
-      the trough holds the maximum tilt.
+    Phases:
+
+    * ``0.00`` – ``0.30``  Approach: the trough translates horizontally in
+      ``+X``; trough still level (``roll = 0``).
+    * ``0.30`` – ``0.75``  Cam engagement: the trough's right bumper rides up
+      and over the smooth cam apex; ``roll`` increases linearly with X-travel
+      so contact is maintained.  The trough's pivot continues to translate
+      ``+X`` (gantry-driven), and the bumper traces the cam's hypotenuse.
+    * ``0.75`` – ``1.00``  Pour: trough holds maximum tilt at the deposit
+      pose while powder drains over the lowered long edge.
 
     Returns the SVG markup for the single frame as a ``str``.
     """
-    W, H = 700, 460
-    R = 50
-    pivot_y = 240
-    if t < 0.35:
-        pivot_x = 100 + (t / 0.35) * 130
-        roll = 0.0
-    elif t < 0.75:
-        pivot_x = 230 + ((t - 0.35) / 0.4) * 30
-        roll = ((t - 0.35) / 0.4) * 60.0
-    else:
-        pivot_x = 260
-        roll = 60.0
+    import math
 
-    s = [_svg_open(W, H, font_size=12)]
-    s.append('<rect x="40" y="20" width="620" height="14" fill="url(#metalH)" stroke="#222"/>')
-    s.append(f'<rect x="{pivot_x - 8}" y="34" width="16" height="{pivot_y - 34}" fill="url(#metal)" stroke="#333"/>')
-    s.append('<rect x="40" y="400" width="380" height="40" fill="url(#powder)" stroke="#7a5a1a"/>')
-    s.append('<rect x="370" y="386" width="60" height="6" fill="#5a4a30" stroke="#222"/>')
-    s.append('<rect x="500" y="180" width="14" height="240" fill="#8a7a5e" stroke="#444"/>')
-    s.append('<polygon points="380,300 500,300 500,220 380,300" fill="#8a7a5e" stroke="#444"/>')
-    s.append(f'<circle cx="{pivot_x}" cy="{pivot_y}" r="7" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>')
-    s.append(trough_cross_section(pivot_x, pivot_y, R, rotate_deg=roll, powder_fill_frac=0.85))
+    W, H = 760, 460
+    R = 50
+    pivot_y = 230
+    max_roll_deg = 55.0
+
+    # --- Cam geometry (fixed in world frame) ---------------------------------
+    # Cam apex sits at the right-rim height of the level trough; the cam's
+    # vertical drop is capped at R·sin(max_roll) so the bumper can physically
+    # reach the cam base without the asin saturating.  Cam horizontal run is
+    # picked so the slope is roughly 45 ° (visually readable).
+    cam_apex_x = 380
+    cam_apex_y = pivot_y
+    cam_drop = R * math.sin(math.radians(max_roll_deg))     # ~41 px
+    cam_run = cam_drop                                      # 45 ° ramp
+    cam_base_x = cam_apex_x + cam_run
+    cam_base_y = cam_apex_y + cam_drop
+
+    # --- Pivot / roll schedule ----------------------------------------------
+    if t < 0.30:
+        # Approach: rim travels from x=120 to where it just touches cam apex
+        # (rim x = pivot_x + R, so pivot_x ends at cam_apex_x - R)
+        u = t / 0.30
+        pivot_x = 120 + u * ((cam_apex_x - R) - 120)
+        roll_deg = 0.0
+    else:
+        # Rotation phase (and pour phase, which just holds at max).  Roll
+        # increases linearly with normalised progress through the contact
+        # phase, capped at max_roll_deg.  Pivot_x is then derived so the
+        # bumper stays on the cam hypotenuse.
+        if t < 0.75:
+            u = (t - 0.30) / 0.45
+        else:
+            u = 1.0
+        roll_deg = u * max_roll_deg
+        roll_rad = math.radians(roll_deg)
+        # Bumper world Y is fixed by the roll angle:
+        by = pivot_y + R * math.sin(roll_rad)
+        # Find bumper world X by intersecting that Y with the cam hypotenuse:
+        if cam_base_y == cam_apex_y:
+            bx = cam_apex_x
+        else:
+            f = (by - cam_apex_y) / (cam_base_y - cam_apex_y)
+            f = max(0.0, min(1.0, f))
+            bx = cam_apex_x + f * (cam_base_x - cam_apex_x)
+        pivot_x = bx - R * math.cos(roll_rad)
+
+    # --- Render --------------------------------------------------------------
+    s_out = [_svg_open(W, H, font_size=12)]
+    # Gantry rail
+    s_out.append('<rect x="40" y="20" width="680" height="14" fill="url(#metalH)" stroke="#222"/>')
+    # Arm
+    s_out.append(
+        f'<rect x="{pivot_x - 8}" y="34" width="16" height="{pivot_y - 34}" '
+        'fill="url(#metal)" stroke="#333"/>'
+    )
+    # Powder bed (left half)
+    s_out.append('<rect x="40" y="400" width="320" height="40" fill="url(#powder)" stroke="#7a5a1a"/>')
+    # Strike-off bar at the bed's right edge
+    s_out.append('<rect x="320" y="386" width="50" height="6" fill="#5a4a30" stroke="#222"/>')
+    # Cam: post + ramp.  The ramp is drawn as a triangle whose hypotenuse
+    # exactly coincides with the bumper trajectory line above.
+    cam_post_x = cam_base_x + 6
+    s_out.append(
+        f'<rect x="{cam_post_x}" y="{cam_apex_y - 10}" width="14" '
+        f'height="{440 - cam_apex_y + 10}" fill="#8a7a5e" stroke="#444"/>'
+    )
+    s_out.append(
+        f'<polygon points="{cam_apex_x},{cam_apex_y} '
+        f'{cam_base_x},{cam_base_y} '
+        f'{cam_post_x},{cam_base_y} '
+        f'{cam_post_x},{cam_apex_y}" '
+        'fill="#8a7a5e" stroke="#444" stroke-width="1.5"/>'
+    )
+    # Pivot pin
+    s_out.append(
+        f'<circle cx="{pivot_x:.1f}" cy="{pivot_y}" r="7" '
+        'fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>'
+    )
+    # Trough cross-section, rolled
+    s_out.append(trough_cross_section(pivot_x, pivot_y, R, rotate_deg=roll_deg, powder_fill_frac=0.85))
+    # If we are in/past the cam-engagement phase, draw a small contact dot at
+    # the cam-bumper contact point so the eye registers the contact.
+    if t >= 0.30:
+        bx = pivot_x + R * math.cos(math.radians(roll_deg))
+        by = pivot_y + R * math.sin(math.radians(roll_deg))
+        s_out.append(
+            f'<circle cx="{bx:.1f}" cy="{by:.1f}" r="5" fill="#c0392b" '
+            'stroke="#7a1f15" stroke-width="1.2" opacity="0.95"/>'
+        )
+        s_out.append(
+            f'<text x="{bx + 8:.1f}" y="{by - 8:.1f}" font-size="10" fill="#c0392b">'
+            'rim ⨉ cam contact</text>'
+        )
+    # Pour stream during pour phase, anchored at the rotated rim
     if t > 0.75:
         a = (t - 0.75) / 0.25
-        s.append(
+        pour_top_x = pivot_x + R * math.cos(math.radians(roll_deg))
+        pour_top_y = pivot_y + R * math.sin(math.radians(roll_deg))
+        pour_bot_y = 440
+        s_out.append(
             f'<g fill="url(#powder)" opacity="{0.6 + 0.35 * a:.2f}">'
-            f'<path d="M {pivot_x + 30} {pivot_y + 18} '
-            f'Q {pivot_x + 50} {pivot_y + 80} {pivot_x + 70} {pivot_y + 160} '
-            f'L {pivot_x + 110} {pivot_y + 160} '
-            f'Q {pivot_x + 130} {pivot_y + 80} {pivot_x + 95} {pivot_y + 18} Z"/>'
+            f'<path d="M {pour_top_x - 6:.1f} {pour_top_y - 4:.1f} '
+            f'Q {pour_top_x + 4:.1f} {(pour_top_y + pour_bot_y) / 2:.1f} '
+            f'{pour_top_x + 16:.1f} {pour_bot_y:.1f} '
+            f'L {pour_top_x + 36:.1f} {pour_bot_y:.1f} '
+            f'Q {pour_top_x + 30:.1f} {(pour_top_y + pour_bot_y) / 2:.1f} '
+            f'{pour_top_x + 18:.1f} {pour_top_y - 6:.1f} Z"/>'
             f'</g>'
         )
-    s.append(
-        '<text x="350" y="50" text-anchor="middle" font-size="13" font-weight="600">'
+    # Headings
+    s_out.append(
+        '<text x="380" y="50" text-anchor="middle" font-size="13" font-weight="600">'
         'Sideways tilt against a smooth cam (corrected geometry)</text>'
     )
-    s.append(
-        '<text x="350" y="68" text-anchor="middle" font-size="11" fill="#555" font-style="italic">'
-        'pivot axis runs ALONG the trough length L; trough rolls sideways and pours over the full long edge</text>'
+    s_out.append(
+        '<text x="380" y="68" text-anchor="middle" font-size="11" fill="#555" font-style="italic">'
+        'rim stays in contact with cam ramp throughout rotation; pours over full long edge</text>'
     )
-    s.append(_svg_close())
-    return "".join(s)
+    s_out.append(_svg_close())
+    return "".join(s_out)
 
 
 def panel_E() -> str:
