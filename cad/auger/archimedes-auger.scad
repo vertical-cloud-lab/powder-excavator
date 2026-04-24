@@ -35,13 +35,14 @@
 //               above the funnel cavity (floating bridge anchor); top
 //               cap also bridges the boss-to-wall annulus at z=94.
 //          After printing: tap M3 boss hole with M3 hand tap.
-//          Ultimaker note: standard Ultimaker filament is 2.85mm
-//          (not 2.4mm); this file slices fine for 2.85mm with the
-//          PrusaSlicer settings documented in the PR.
+//          Printer / filament: this is a 1.75 mm PLA part, sliced for
+//          BOTH printers in the project's hardware list (PR #7 §6) —
+//          Original Prusa MK3S+ and Creality Ender-3. See
+//          `cad/auger/slices/README.md` for per-printer metrics.
 //
 // Render:  Paste into https://openscad.org/demo/ → F6 (Render)
 // Export:  File → Export → Export as STL
-// Headless STL + STEP + checks (CI/local):
+// Headless STL + STEP + slices + checks (CI/local):
 //   bash cad/auger/render_print.sh
 // One-shot STL only:
 //   xvfb-run -a openscad -o archimedes-auger.stl \
@@ -50,13 +51,6 @@
 // One-shot STEP from STL (FreeCAD OCCT bindings):
 //   freecadcmd cad/auger/stl_to_step.py \
 //       cad/auger/archimedes-auger.stl cad/auger/archimedes-auger.stp
-// Headless slice for Ultimaker (PrusaSlicer 2.7+):
-//   prusa-slicer --export-gcode -o auger.gcode \
-//       --filament-diameter 2.85 --nozzle-diameter 0.4 \
-//       --filament-type PLA --layer-height 0.2 \
-//       --perimeters 3 --fill-density 40% --fill-pattern gyroid \
-//       --brim-width 4 --support-material --support-material-auto \
-//       --support-material-threshold 50 archimedes-auger.stl
 //
 // ================================================================
 

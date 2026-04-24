@@ -13,7 +13,8 @@
 #   archimedes-auger-cutaway.png         half-cutaway preview (rendered from SCAD)
 #   archimedes-auger-stp-iso.png         iso preview rendered FROM the STEP file
 #   archimedes-auger-stp-cutaway.png     half-cutaway rendered FROM the STEP file
-#   /tmp/auger/archimedes-auger.gcode    Ultimaker-class slice (PrusaSlicer CLI)
+#   slices/archimedes-auger.MK3S.gcode   PrusaSlicer slice — Original Prusa MK3S+
+#   slices/archimedes-auger.Ender3.gcode PrusaSlicer slice — Creality Ender-3
 #
 # Pre-reqs: openscad, admesh, prusa-slicer, freecadcmd, xvfb-run.
 #   sudo apt-get install -y openscad admesh prusa-slicer freecad xvfb
@@ -33,9 +34,9 @@ CUT_PNG="${HERE}/archimedes-auger-cutaway.png"
 STP_ISO_PNG="${HERE}/archimedes-auger-stp-iso.png"
 STP_CUT_PNG="${HERE}/archimedes-auger-stp-cutaway.png"
 SLICE_DIR="${SLICE_DIR:-/tmp/auger}"
-GCODE="${SLICE_DIR}/archimedes-auger.gcode"
 
-FILAMENT_DIAMETER="${FILAMENT_DIAMETER:-2.85}"   # Ultimaker default
+# Slicer knobs (override via env). Filament diameter is hardcoded 1.75 mm in
+# the slice step below — both target rigs (MK3S+, Ender-3) are 1.75 mm.
 NOZZLE_DIAMETER="${NOZZLE_DIAMETER:-0.4}"
 LAYER_HEIGHT="${LAYER_HEIGHT:-0.2}"
 FILAMENT_TYPE="${FILAMENT_TYPE:-PLA}"
@@ -128,23 +129,51 @@ xvfb-run -a openscad -o "${STP_CUT_PNG}" --imgsize=500,900 \
     --camera=0,0,50,75,0,30,90 --colorscheme=Tomorrow "${STP_CUT_SCAD}"
 rm -f "${STP_ISO_SCAD}" "${STP_CUT_SCAD}"
 
-echo "==> [5/5] PrusaSlicer slice for Ultimaker-class FDM"
-echo "    filament=${FILAMENT_DIAMETER}mm nozzle=${NOZZLE_DIAMETER}mm" \
-     "layer=${LAYER_HEIGHT}mm material=${FILAMENT_TYPE}"
-prusa-slicer --export-gcode --output "${GCODE}" \
-    --filament-diameter "${FILAMENT_DIAMETER}" \
-    --nozzle-diameter   "${NOZZLE_DIAMETER}" \
-    --filament-type     "${FILAMENT_TYPE}" \
-    --temperature 205 --bed-temperature 60 \
-    --first-layer-temperature 210 --first-layer-bed-temperature 60 \
-    --layer-height "${LAYER_HEIGHT}" --first-layer-height "${LAYER_HEIGHT}" \
-    --perimeters 3 --top-solid-layers 4 --bottom-solid-layers 4 \
-    --fill-density 40% --fill-pattern gyroid \
-    --skirts 1 --skirt-distance 5 \
-    --brim-width 4 \
-    --support-material --support-material-auto \
-    --support-material-threshold 50 \
-    "${STL}" 2>&1 | tail -15
+echo "==> [5/5] PrusaSlicer slices for the project's actual hardware"
+# PR #7 §6 nails the canonical FDM stack as **Prusa MK3 / MK3S+ + Creality Ender-3**,
+# sliced headless via **PrusaSlicer CLI** (in-box vendor profiles for both).
+# We emit one g-code per printer so reviewers can pick whichever rig is free,
+# and we get two independent slicer reports as DFM signal (any divergence in
+# support volume / overhang count between MK3S and Ender-3 is a useful flag).
+SLICES_REPO_DIR="${HERE}/slices"
+mkdir -p "${SLICES_REPO_DIR}"
+
+slice_one () {
+    local label="$1" out="$2" bed="$3" temp="$4" first_temp="$5" extra_start="$6"
+    echo "  -> ${label}: nozzle=${NOZZLE_DIAMETER}mm filament=1.75mm" \
+         "PLA layer=${LAYER_HEIGHT}mm bed=${bed}"
+    prusa-slicer --export-gcode --output "${out}" \
+        --filament-diameter 1.75 \
+        --nozzle-diameter   "${NOZZLE_DIAMETER}" \
+        --filament-type     "${FILAMENT_TYPE}" \
+        --temperature ${temp} --bed-temperature 60 \
+        --first-layer-temperature ${first_temp} --first-layer-bed-temperature 60 \
+        --bed-shape "${bed}" \
+        --layer-height "${LAYER_HEIGHT}" --first-layer-height "${LAYER_HEIGHT}" \
+        --perimeters 3 --top-solid-layers 5 --bottom-solid-layers 4 \
+        --fill-density 40% --fill-pattern gyroid \
+        --skirts 1 --skirt-distance 5 --brim-width 4 \
+        --support-material --support-material-auto \
+        --support-material-threshold 50 \
+        --start-gcode "${extra_start}" \
+        --end-gcode "M104 S0\nM140 S0\nG28 X\nM84\n" \
+        "${STL}" 2>&1 | tail -3
+    echo "     metrics:"
+    grep -E '^; (estimated printing time|filament used \[(mm|cm3)\])' "${out}" \
+        | sed 's/^/       /'
+}
+
+# 1.75 mm filament for both (MK3 and Ender-3 are 1.75 mm machines —
+# the Ultimaker default 2.85 mm value is not used here).
+slice_one "Prusa MK3S+ (0.4 mm)" \
+    "${SLICES_REPO_DIR}/archimedes-auger.MK3S.gcode" \
+    "0x0,250x0,250x210,0x210" 215 215 \
+    "M201 X1000 Y1000 Z200 E5000\nM862.3 P\"MK3S\"\nG28\nG1 Z5 F5000\n"
+
+slice_one "Creality Ender-3 (0.4 mm)" \
+    "${SLICES_REPO_DIR}/archimedes-auger.Ender3.gcode" \
+    "0x0,220x0,220x220,0x220" 200 205 \
+    "G28\nG1 Z5 F5000\n"
 
 echo
 echo "==> Done."
@@ -154,5 +183,4 @@ echo "    Iso (SCAD): ${ISO_PNG}"
 echo "    Cut (SCAD): ${CUT_PNG}"
 echo "    Iso (STEP): ${STP_ISO_PNG}"
 echo "    Cut (STEP): ${STP_CUT_PNG}"
-echo "    G-code:     ${GCODE}"
-grep -E '^; (estimated|filament used|total)' "${GCODE}" | head -6 || true
+echo "    G-code:     ${SLICES_REPO_DIR}/archimedes-auger.{MK3S,Ender3}.gcode"
