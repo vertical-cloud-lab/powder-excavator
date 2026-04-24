@@ -158,18 +158,28 @@ def panel_A() -> str:
         "longitudinal pivot axis along L; arms grip the two short end caps; trough rolls SIDEWAYS to pour</text>"
     )
 
-    # End view (looking down the long axis L) — leftmost
+    # End view (looking down the long axis L) — leftmost.
+    # Looking down L, both arms project to the same X; we draw the near arm
+    # solid and a faint dashed ghost of the far arm directly behind it so the
+    # viewer registers that there are *two* arms (one per end cap).
     g_end_x, g_end_y = 60, 110
     s.append(f'<g transform="translate({g_end_x},{g_end_y})">')
     s.append('<text x="160" y="0" text-anchor="middle" font-size="16" font-weight="600">End view (along L)</text>')
     s.append('<rect x="155" y="20" width="10" height="160" fill="url(#metal)" stroke="#333"/>')
-    s.append('<text x="170" y="35" font-size="11" fill="#444">arm (one of two,</text>')
-    s.append('<text x="170" y="49" font-size="11" fill="#444">on the end cap)</text>')
+    # Ghost of the far arm (hidden behind the near arm, drawn slightly offset)
+    s.append('<rect x="158" y="22" width="10" height="160" fill="none" stroke="#888" '
+             'stroke-width="1" stroke-dasharray="3 3"/>')
+    s.append('<text x="170" y="35" font-size="11" fill="#444">arms (TWO, one per end cap;</text>')
+    s.append('<text x="170" y="49" font-size="11" fill="#444">far arm shown dashed/hidden)</text>')
     R = 60
     cx, cy = 160, 180
     s.append(trough_cross_section(cx, cy, R, rotate_deg=0, powder_fill_frac=0.85))
-    s.append(f'<circle cx="{cx}" cy="{cy}" r="6" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>')
-    s.append(f'<text x="{cx + 12}" y="{cy + 4}" font-size="11" fill="#c0392b">pivot pin (end-on)</text>')
+    # Pin appears END-ON: draw as red circle with crosshair (⊕) so the viewer
+    # reads it as "axis pointing into the page", not just a generic dot.
+    s.append(f'<circle cx="{cx}" cy="{cy}" r="7" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>')
+    s.append(f'<line x1="{cx - 5}" y1="{cy}" x2="{cx + 5}" y2="{cy}" stroke="#fff" stroke-width="1.4"/>')
+    s.append(f'<line x1="{cx}" y1="{cy - 5}" x2="{cx}" y2="{cy + 5}" stroke="#fff" stroke-width="1.4"/>')
+    s.append(f'<text x="{cx + 14}" y="{cy + 4}" font-size="11" fill="#c0392b">pivot pin (axis ⊥ page = along L)</text>')
     s.append(f'<line x1="{cx - R}" y1="{cy + R + 30}" x2="{cx + R}" y2="{cy + R + 30}" '
              'stroke="#222" stroke-width="1.2" marker-start="url(#arrowK)" marker-end="url(#arrowK)"/>')
     s.append(f'<text x="{cx}" y="{cy + R + 50}" text-anchor="middle" font-size="13">D ≈ 27 mm</text>')
@@ -242,24 +252,37 @@ def panel_A() -> str:
     s.append(f'<text x="{arm_xR + 8}" y="{arm_top - 6}" text-anchor="middle" font-size="10" fill="#444">arm R</text>')
     s.append('</g>')
 
-    # Top view — rightmost
+    # Top view — rightmost.  Pin shown as dashed red line through the body
+    # with red stub circles at each arm so the longitudinal extent is
+    # unambiguous.
     g_top_x, g_top_y = 880, 110
     s.append(f'<g transform="translate({g_top_x},{g_top_y})">')
     s.append('<text x="130" y="0" text-anchor="middle" font-size="16" font-weight="600">Top view</text>')
     L_top = 220
     W_top = 50
-    s.append(f'<rect x="20" y="40" width="{L_top}" height="{W_top}" fill="url(#metalH)" stroke="#222" stroke-width="2"/>')
-    s.append(f'<rect x="26" y="46" width="{L_top - 12}" height="{W_top - 12}" fill="url(#powder)" opacity="0.95"/>')
-    s.append(f'<line x1="8" y1="{40 + W_top / 2}" x2="{20 + L_top + 12}" y2="{40 + W_top / 2}" '
-             'stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6 4"/>')
-    s.append(f'<text x="{20 + L_top / 2}" y="{40 + W_top + 18}" text-anchor="middle" font-size="11" fill="#c0392b">'
+    body_x0_t = 20
+    body_x1_t = body_x0_t + L_top
+    arm_off = 14            # arms sit slightly outboard of body
+    s.append(f'<rect x="{body_x0_t}" y="40" width="{L_top}" height="{W_top}" fill="url(#metalH)" stroke="#222" stroke-width="2"/>')
+    s.append(f'<rect x="{body_x0_t + 6}" y="46" width="{L_top - 12}" height="{W_top - 12}" fill="url(#powder)" opacity="0.95"/>')
+    pin_y_t = 40 + W_top / 2
+    # Pin: solid stub on each side (between arm and body), dashed inside body.
+    s.append(f'<line x1="{body_x0_t - arm_off - 6}" y1="{pin_y_t}" x2="{body_x0_t}" y2="{pin_y_t}" '
+             'stroke="#c0392b" stroke-width="3"/>')
+    s.append(f'<line x1="{body_x0_t}" y1="{pin_y_t}" x2="{body_x1_t}" y2="{pin_y_t}" '
+             'stroke="#c0392b" stroke-width="2.2" stroke-dasharray="6 4" opacity="0.7"/>')
+    s.append(f'<line x1="{body_x1_t}" y1="{pin_y_t}" x2="{body_x1_t + arm_off + 6}" y2="{pin_y_t}" '
+             'stroke="#c0392b" stroke-width="3"/>')
+    s.append(f'<text x="{body_x0_t + L_top / 2}" y="{40 + W_top + 18}" text-anchor="middle" font-size="11" fill="#c0392b">'
              'pivot pin axis (along centre line of trough length)</text>')
-    for ax in (8, 20 + L_top):
+    # Arms shown outboard, with pin-stub dots on their inboard face
+    for ax, sx in ((body_x0_t - arm_off, body_x0_t - arm_off), (body_x1_t + arm_off, body_x1_t + arm_off)):
         s.append(f'<rect x="{ax - 6}" y="{40 - 6}" width="12" height="{W_top + 12}" fill="url(#metal)" stroke="#333"/>')
-    s.append(f'<text x="-4" y="32" font-size="11" fill="#444">arms grip the two end caps</text>')
-    s.append(f'<line x1="{20 + L_top / 2 - 50}" y1="{40 + W_top + 50}" '
-             f'x2="{20 + L_top / 2 + 50}" y2="{40 + W_top + 50}" stroke="#5a4a30" stroke-width="6"/>')
-    s.append(f'<text x="{20 + L_top / 2}" y="{40 + W_top + 70}" text-anchor="middle" font-size="11" fill="#5a4a30">'
+        s.append(f'<circle cx="{sx}" cy="{pin_y_t}" r="4" fill="#c0392b" stroke="#7a1f15" stroke-width="1.2"/>')
+    s.append(f'<text x="-8" y="32" font-size="11" fill="#444">arms grip the two end caps via pin stubs</text>')
+    s.append(f'<line x1="{body_x0_t + L_top / 2 - 50}" y1="{40 + W_top + 50}" '
+             f'x2="{body_x0_t + L_top / 2 + 50}" y2="{40 + W_top + 50}" stroke="#5a4a30" stroke-width="6"/>')
+    s.append(f'<text x="{body_x0_t + L_top / 2}" y="{40 + W_top + 70}" text-anchor="middle" font-size="11" fill="#5a4a30">'
              'fixed strike-off bar (bed-edge mounted)</text>')
     s.append('</g>')
 
@@ -511,25 +534,37 @@ def _draw_step_frame(
             'text-anchor="middle" font-size="10" fill="#5a4a30">strike-off bar</text>'
         )
     if show_cam:
-        # Cam ramp anchored on the bed line; the ramp's apex meets the
-        # trough's bumper at the (rotated) rim — i.e. the contact point is
-        # actually drawn touching, not floating off to the side.
-        cam_base_x = px + R + 30
-        cam_top_x = px + R - 4         # apex meets bumper
-        cam_top_y = py - 4
+        # Position the cam ramp so its apex actually meets the rotated rim.
+        # Bumper world position (in frame coords) given current trough roll:
+        import math
+        rad = math.radians(trough_rotate)
+        bumper_x = px + R * math.cos(rad)
+        bumper_y = py + R * math.sin(rad)
+        # Ramp: hypotenuse from (bumper_x, bumper_y) at the apex, sloping
+        # down-right to a vertical post that drops to the bed line.
+        cam_run = 70
+        cam_base_x = bumper_x + cam_run
+        cam_base_y = PANEL_D_BED_Y
+        post_x = cam_base_x + 6
         parts.append(
-            f'<rect x="{cam_base_x + 30}" y="{cam_top_y - 30}" width="14" '
-            f'height="{PANEL_D_BED_Y - (cam_top_y - 30)}" fill="#8a7a5e" stroke="#444"/>'
+            f'<rect x="{post_x:.1f}" y="{bumper_y - 8:.1f}" width="14" '
+            f'height="{cam_base_y - (bumper_y - 8):.1f}" fill="#8a7a5e" stroke="#444"/>'
         )
         parts.append(
-            f'<polygon points="{cam_base_x + 44},{cam_top_y - 30} '
-            f'{cam_top_x},{cam_top_y} '
-            f'{cam_base_x + 44},{PANEL_D_BED_Y}" '
-            'fill="#8a7a5e" stroke="#444"/>'
+            f'<polygon points="{bumper_x:.1f},{bumper_y:.1f} '
+            f'{cam_base_x:.1f},{cam_base_y} '
+            f'{post_x:.1f},{cam_base_y} '
+            f'{post_x:.1f},{bumper_y - 8:.1f}" '
+            'fill="#8a7a5e" stroke="#444" stroke-width="1.5"/>'
         )
         parts.append(
-            f'<text x="{cam_base_x + 60}" y="{PANEL_D_BED_Y + 14}" '
+            f'<text x="{(bumper_x + cam_base_x) / 2:.1f}" y="{cam_base_y + 14}" '
             'text-anchor="middle" font-size="10" fill="#5a4a30">smooth cam ramp</text>'
+        )
+        # Contact dot at the rim/cam touch point
+        parts.append(
+            f'<circle cx="{bumper_x:.1f}" cy="{bumper_y:.1f}" r="4" '
+            'fill="#c0392b" stroke="#7a1f15" stroke-width="1.2"/>'
         )
     # Arm — top anchored to PANEL_D_ARM_TOP so all arms line up vertically
     arm_h = py - PANEL_D_ARM_TOP
@@ -854,7 +889,7 @@ def panel_E() -> str:
     against a single fixed slot board, so the slot's "program" for tilt-vs-X
     is visible at a glance.
     """
-    W, H = 760, 520
+    W, H = 760, 560
     s: list[str] = [_svg_open(W, H)]
     # Title
     s.append(
@@ -881,15 +916,15 @@ def panel_E() -> str:
     # Routed slot path: flat over the bed (left), flat over transport
     # (middle), then rising over the deposit station (right) — encoding the
     # tilt schedule. Drawn as a darker channel inside the board.
-    slot_y_flat = board_y + board_h / 2
-    slot_y_top = board_y + 14            # rises this much over deposit
-    slot_w = 14                          # slot width (peg diameter ~slot)
+    slot_y_flat = board_y + board_h - 12     # near the BOTTOM edge of the board
+    slot_y_top = board_y + 12                # rises near the TOP edge — bigger excursion
+    slot_w = 14                              # slot width (peg diameter ~slot)
     # Centerline polyline for the slot path:
     pts = [
         (90,  slot_y_flat),     # leftmost: scoop X
         (260, slot_y_flat),     # transport
         (430, slot_y_flat),     # transport
-        (520, slot_y_flat - 6), # start to rise
+        (520, slot_y_flat - 12),# start to rise
         (600, slot_y_top),      # tilt-hold detent at deposit
         (680, slot_y_top),
     ]
@@ -905,12 +940,14 @@ def panel_E() -> str:
     )
 
     # Carriage pivot Y (the pin on the gantry that the stem hangs from)
-    carriage_y = 250
-    # Trough centre Y (below the carriage, hanging on the stem)
-    trough_y = 380
-    stem_len = trough_y - carriage_y     # stem length (carriage pivot -> trough)
+    carriage_y = 240
+    # Trough centre Y (below the carriage, hanging on the stem) — moved up so
+    # the trough is large relative to the stem (was dwarfed previously).
+    trough_y = 340
+    trough_radius = 38                       # bigger trough so it actually reads
+    stem_len = trough_y - carriage_y         # stem length (carriage pivot -> trough)
     # Distance from the carriage pivot up to where the peg sits in the slot
-    # when the slot is at its flat Y. Must be larger than the slot's
+    # when the slot is at its flat Y.  Must be larger than the slot's
     # maximum vertical excursion so the peg can always reach the slot.
     peg_offset_above_pivot = carriage_y - slot_y_flat
 
@@ -987,13 +1024,13 @@ def panel_E() -> str:
         )
         # Trough cross-section, rotated by the stem tilt.  At "pour" pose we
         # tilt the trough further to make pouring visually clear.
-        extra = 25.0 if label == "Pour" else 0.0
+        extra = 45.0 if label == "Pour" else 0.0
         # The trough is rigid with the stem, so it rotates with the stem; the
         # ``transform`` group above already handles that. We pass extra tilt
         # only to show the pour reveal.
         s.append(
             "  " + trough_cross_section(
-                cx=0, cy=stem_len, radius=22,
+                cx=0, cy=stem_len, radius=trough_radius,
                 rotate_deg=extra,
                 powder_fill_frac=0.7 if label != "Pour" else 0.25,
                 bumper=False,
@@ -1002,11 +1039,11 @@ def panel_E() -> str:
         s.append("</g>")
         # Pose label
         s.append(
-            f'<text x="{px}" y="{trough_y + 70}" text-anchor="middle" '
+            f'<text x="{px}" y="{trough_y + trough_radius + 60}" text-anchor="middle" '
             f'font-size="12" font-weight="600">{label}</text>'
         )
         s.append(
-            f'<text x="{px}" y="{trough_y + 86}" text-anchor="middle" '
+            f'<text x="{px}" y="{trough_y + trough_radius + 76}" text-anchor="middle" '
             f'font-size="10" fill="#555">{sub}</text>'
         )
 
@@ -1019,27 +1056,30 @@ def panel_E() -> str:
         '<text x="555" y="86" text-anchor="middle" font-size="10" '
         'fill="#3a342a">rising slot section -> stem leans -> trough tilts</text>'
     )
-    # Bed and target plate as scenery:
+    # Bed and target plate as scenery — anchored so the trough RIM sits ON
+    # them in the scoop / pour poses.
+    bed_top_y = trough_y + trough_radius - 4    # rim just dips into bed
     s.append(
-        f'<rect x="100" y="{trough_y + 28}" width="80" height="34" '
+        f'<rect x="80" y="{bed_top_y}" width="130" height="34" '
         'fill="url(#powder)" stroke="#7a6a3a" stroke-width="1.2"/>'
     )
     s.append(
-        f'<text x="140" y="{trough_y + 78}" text-anchor="middle" font-size="10" '
+        f'<text x="145" y="{bed_top_y + 50}" text-anchor="middle" font-size="10" '
         'fill="#7a6a3a">stock powder bed</text>'
     )
+    plate_y = trough_y + trough_radius + 16
     s.append(
-        f'<rect x="600" y="{trough_y + 38}" width="80" height="6" '
+        f'<rect x="580" y="{plate_y}" width="120" height="6" '
         'fill="#cfd8dc" stroke="#37474f" stroke-width="1"/>'
     )
     s.append(
-        f'<text x="640" y="{trough_y + 78}" text-anchor="middle" font-size="10" '
+        f'<text x="640" y="{plate_y + 22}" text-anchor="middle" font-size="10" '
         'fill="#555">deposit / target plate</text>'
     )
 
     # Footer pointer to corresponding section
     s.append(
-        '<text x="380" y="500" text-anchor="middle" font-size="10" fill="#555" '
+        '<text x="380" y="540" text-anchor="middle" font-size="10" fill="#555" '
         'font-style="italic">See manuscript Sec. "Pin-defined-path actuation" for the trade-off vs. the smooth cam ramp.</text>'
     )
     s.append(_svg_close())

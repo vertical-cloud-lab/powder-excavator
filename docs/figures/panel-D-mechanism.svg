@@ -65,9 +65,10 @@
 </g>
 <line x1="120" y1="120" x2="280" y2="120" stroke="#1f5fbf" stroke-width="3" marker-end="url(#arrowB)"/><text x="200" y="110" font-size="12" fill="#1f5fbf" text-anchor="middle">X →</text><text x="200" y="338" font-size="10" fill="#444" text-anchor="middle">trough hangs level under gravity</text></g><g transform="translate(1420,80)"><text x="200" y="0" text-anchor="middle" font-size="17" font-weight="600">4. Sideways tilt → deposit</text>
 <line x1="0" y1="360" x2="400" y2="360" stroke="#bdb085" stroke-width="1" stroke-dasharray="4 3"/>
-<rect x="298" y="236" width="14" height="124" fill="#8a7a5e" stroke="#444"/>
-<polygon points="312,236 234,266 312,360" fill="#8a7a5e" stroke="#444"/>
-<text x="328" y="374" text-anchor="middle" font-size="10" fill="#5a4a30">smooth cam ramp</text>
+<rect x="297.8" y="293.1" width="14" height="66.9" fill="#8a7a5e" stroke="#444"/>
+<polygon points="221.8,301.1 291.8,360 297.8,360 297.8,293.1" fill="#8a7a5e" stroke="#444" stroke-width="1.5"/>
+<text x="256.8" y="374" text-anchor="middle" font-size="10" fill="#5a4a30">smooth cam ramp</text>
+<circle cx="221.8" cy="301.1" r="4" fill="#c0392b" stroke="#7a1f15" stroke-width="1.2"/>
 <rect x="192" y="40" width="16" height="230" fill="url(#metal)" stroke="#333"/>
 <circle cx="200" cy="270" r="7" fill="#c0392b" stroke="#7a1f15" stroke-width="1.5"/>
 <g transform="translate(200,270) rotate(55)">
