@@ -99,8 +99,10 @@ open-source slicer. A small `cad/dfm.py` runs design-for-manufacturing and
 4166621470 — "we have a gantry system and would like to avoid installing a
 second axis"), so a parameter regression is caught the next time anyone
 edits `ExcavatorParams`. See [`cad/README.md`](cad/README.md) for the
-rationale (why CadQuery over Rhino / Grasshopper / Fusion / nTop) and the
-full feedback-loop description.
+rationale (why CadQuery over Rhino / Grasshopper / Fusion / nTop), the
+**target-hardware-matched toolchain** for the **Genmitsu 3018-Pro V2**
+(GRBL CNC) and **Prusa MK3 / Ender** (FDM) printers we plan to use, and
+the full feedback-loop description.
 
 ```bash
 pip install cadquery
