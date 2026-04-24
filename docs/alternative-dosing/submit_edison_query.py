@@ -153,6 +153,14 @@ def main() -> int:
             task_id = task.get("id") or task.get("task_id")
         task_id = str(task_id) if task_id is not None else None
 
+    if not task_id:
+        sys.stderr.write(
+            "ERROR: could not extract a task id from EdisonClient.create_task() "
+            f"return value (got: {task!r}). Refusing to write edison_query.json "
+            "with a null id; please re-run once the SDK return shape is known.\n"
+        )
+        return 2
+
     record = {
         "tag": QUERY_TAG,
         "task_id": task_id,

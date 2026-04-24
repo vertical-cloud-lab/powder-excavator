@@ -4,11 +4,10 @@ Used to generate the preview GIFs of the alternative-dosing top-ranked
 designs (cad/sieve_cup.scad and cad/tap_anvil.scad) that accompany
 docs/preliminary-design-sieve-cup.md.
 
-Mirrors scripts/render_trough_spin.py from PR #5: invokes OpenSCAD's
-headless PNG renderer at a sequence of azimuth angles, then stitches
-the frames together with Pillow into a GIF. Wraps OpenSCAD in
-``xvfb-run`` automatically when no ``$DISPLAY`` is set so it works on
-headless CI runners.
+Invokes OpenSCAD's headless PNG renderer at a sequence of azimuth
+angles, then stitches the frames together with Pillow into a GIF.
+Wraps OpenSCAD in ``xvfb-run`` automatically when no ``$DISPLAY``
+is set so it works on headless CI runners.
 
 Run from the repository root::
 
@@ -119,7 +118,10 @@ def render_spin(
                 azimuth_deg=az,
                 imgsize=imgsize,
             )
-            frames.append(Image.open(png).convert("P", palette=Image.ADAPTIVE))
+            with Image.open(png) as frame:
+                frames.append(
+                    frame.convert("P", palette=Image.ADAPTIVE).copy()
+                )
         out.parent.mkdir(parents=True, exist_ok=True)
         frames[0].save(
             out,
@@ -150,6 +152,15 @@ def main(argv: list[str] | None = None) -> int:
     if not shutil.which("openscad"):
         sys.stderr.write("openscad not found on PATH; install it first.\n")
         return 1
+    if args.frames < 1:
+        sys.stderr.write("--frames must be >= 1\n")
+        return 2
+    if args.fps < 1:
+        sys.stderr.write("--fps must be >= 1\n")
+        return 2
+    if args.width < 1 or args.height < 1:
+        sys.stderr.write("--width and --height must be >= 1\n")
+        return 2
 
     out = render_spin(
         variant=args.variant,

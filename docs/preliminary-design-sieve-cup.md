@@ -116,17 +116,18 @@ preliminary-design starting point; adjust and re-render to retune.
 | `boss_h` | 18.0 mm | Boss length the clamp grips |
 | `boss_flat_w` | 6.0 mm | Wrench-flat width on the boss |
 | `retainer_pocket_d` | 32.0 mm | Mesh-retainer ring pocket OD |
-| `strike_pad_d` | 14.0 mm | Strike pad OD (matches anvil pad) |
+| `strike_pad_d` | 14.0 mm | Inner reference dia. for the strike-pad annulus; the cup's strike-pad OD is `strike_pad_d + 6 mm` = **20 mm** to match the anvil strike face |
 | `erm_motor_pocket` | `false` | **Concept selector** — `true` for G, `false` for A |
 | `erm_pocket_d` | 10.4 mm | Coin-ERM pocket dia. (with print clearance) |
 | `cell_pocket_d` | 5.5 mm | CR2032-holder pocket depth into wall |
 
 For the anvil ([`cad/tap_anvil.scad`](../cad/tap_anvil.scad)): the
 strike-face geometry (`strike_face_od = 20 mm`, `strike_face_id =
-12 mm`) is matched to the cup's `strike_pad_d + 6 mm` and to a
-standard 15 mm OD vial collar (`vial_collar_d = 16.5 mm`). The base
-plate is 60 × 50 × 5 mm with four counterbored M3 holes on a
-30 × 30 mm pattern, fitting the standard 3018-Pro V2 T-slot bed.
+12 mm`) is matched to the cup's strike-pad outer diameter
+(`strike_pad_d + 6 mm` = **20 mm**) and to a standard 15 mm OD vial
+collar (`vial_collar_d = 16.5 mm`). The base plate is 60 × 50 × 5 mm
+with four counterbored M3 holes on a 30 × 30 mm pattern, fitting the
+standard 3018-Pro V2 T-slot bed.
 
 ## Recommended print settings
 
@@ -216,7 +217,7 @@ Mirrors the half-day breakdown in PR #5 / PR #2:
 | 0:00 – 0:30 | Print 4 × cup (G variant) + 1 × anvil + 1 × spare cup (A variant) overnight (or in parallel on two printers; ~2 h total for one Prusa MK3). |
 | 0:30 – 1:00 | Cut four mesh discs (e.g. 25 / 38 / 53 / 80 µm polyester) using a sharp Ø 30 mm steel punch. |
 | 1:00 – 2:00 | Glue ERM + CR2032 holder + SPST switch into one G cup; solder; bench-test the buzz. |
-| 2:00 – 4:00 | Mount cup in 3018 clamp; bolt anvil to bed; write the G-code peck cycle (`scripts/peck.gcode`); homing + dry-run on empty cup. |
+| 2:00 – 4:00 | Mount cup in 3018 clamp; bolt anvil to bed; write a simple G-code peck cycle inline (rapid above the anvil, feed down to strike, retract, dwell, repeat); homing + dry-run on empty cup. |
 | 4:00 – 6:00 | Loaded characterisation against external 0.1 mg balance: vary `T` (G) or `N` (A), build (`time → mass`) calibration. |
 | 6:00 – 8:00 | Cycle test (200 dispenses); record RSD; identify the no-flow / spillage thresholds for the as-built unit; pick the operating point for actual use. |
 
@@ -243,7 +244,7 @@ electronics) is always available.
 | [`cad/sieve-cup.stl`](../cad/sieve-cup.stl) | Concept-A printable mesh. |
 | [`cad/sieve-cup-erm.stl`](../cad/sieve-cup-erm.stl) | Concept-G printable mesh. |
 | [`cad/tap-anvil.stl`](../cad/tap-anvil.stl) | Anvil printable mesh. |
-| [`cad/sieve-cup{,-erm,-tap-anvil}-iso.png`](../cad/) | Static iso renders. |
+| [`cad/sieve-cup{,-erm}-iso.png`](../cad/), [`cad/tap-anvil-iso.png`](../cad/tap-anvil-iso.png) | Static iso renders. |
 | [`cad/sieve-cup{,-erm}-spin.gif`](../cad/), [`cad/tap-anvil-spin.gif`](../cad/tap-anvil-spin.gif) | 360° turntable spins (re-run via `python -m scripts.render_sieve_cup --variant {passive,erm,anvil}`). |
 | [`scripts/render_sieve_cup.py`](../scripts/render_sieve_cup.py) | Companion render script (mirrors `scripts/render_trough_spin.py` from PR #5). |
 | [`cad/README.md`](../cad/README.md) | Per-folder quickstart + render commands. |

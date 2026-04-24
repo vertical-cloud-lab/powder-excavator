@@ -86,7 +86,12 @@ retainer_pocket_h =  3.5;   // depth of the retainer pocket             [mm]
 // pecks the cup against cad/tap_anvil.scad. Annular (not solid) so
 // the mesh window stays free; the shock travels through the cup wall
 // rather than the mesh disc.
-strike_pad_d      = 14.0;   // strike pad outer diameter                [mm]
+//
+// NOTE: ``strike_pad_d`` is the *inner reference* diameter of the
+// annulus; the actual strike-pad OD is ``strike_pad_d + 6.0`` (so
+// 20 mm with the default 14 mm), matched to the 20 mm anvil strike
+// face in cad/tap_anvil.scad (``strike_face_od = 20``).
+strike_pad_d      = 14.0;   // inner reference dia. (OD = +6 mm)        [mm]
 strike_pad_h      =  1.5;   // strike pad standoff below the floor      [mm]
 
 // ---------- ERM motor pocket (concept G only) ------------------------
