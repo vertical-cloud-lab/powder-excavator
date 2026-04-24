@@ -33,7 +33,6 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import List, Tuple
 
 import numpy as np
 
@@ -89,7 +88,7 @@ NALL, {dT:.3e}
 
 def run_sweep(p: FlexureParams = FlexureParams(),
               n_steps: int = 64,
-              y_max_factor: float = 1.6) -> Tuple[List[float], List[float]]:
+              y_max_factor: float = 1.6) -> tuple[list[float], list[float]]:
     """Sweep apex displacement and return ``(positions, forces)`` from CalculiX."""
     if shutil.which("ccx") is None:
         raise RuntimeError(
@@ -108,8 +107,8 @@ def run_sweep(p: FlexureParams = FlexureParams(),
         p.initial_rise * (y_max_factor - 2.0 * y_max_factor * i / (n_steps - 1))
         for i in range(n_steps)
     ]
-    positions: List[float] = []
-    forces: List[float] = []
+    positions: list[float] = []
+    forces: list[float] = []
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
@@ -140,7 +139,7 @@ def run_sweep(p: FlexureParams = FlexureParams(),
     return positions, forces
 
 
-def render_comparison(positions: List[float], forces: List[float],
+def render_comparison(positions: list[float], forces: list[float],
                       out_path: Path,
                       p: FlexureParams = FlexureParams()) -> Path:
     import matplotlib

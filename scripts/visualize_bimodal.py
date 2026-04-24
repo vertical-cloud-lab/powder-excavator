@@ -20,7 +20,6 @@ Run from the repository root::
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Tuple
 
 import matplotlib
 matplotlib.use("Agg")  # noqa: E402
@@ -62,7 +61,7 @@ def _flexure_color(strain: float) -> str:
 
 
 def _draw_mechanism(ax: plt.Axes, y: float, p: FlexureParams = PARAMS,
-                    show_axes: bool = False, label: str | None = None) -> None:
+                    show_axes: bool = False, label: "str | None" = None) -> None:
     """Draw the bistable trough mechanism with its apex at height ``y``."""
     b = p.half_span
     L0 = p.effective_natural_length()

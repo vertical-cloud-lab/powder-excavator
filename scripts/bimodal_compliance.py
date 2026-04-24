@@ -24,7 +24,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
 
 import numpy as np
 from scipy.optimize import brentq
@@ -46,7 +45,7 @@ class FlexureParams:
     # Geometry of the inverted-V truss in its as-fabricated (unloaded) state.
     half_span: float = 20.0e-3        # b: horizontal distance from apex to foot [m]
     initial_rise: float = 4.0e-3      # h0: initial vertical rise of apex above feet [m]
-    natural_length: Optional[float] = None  # L0: natural (stress-free) flexure length [m]
+    natural_length: float | None = None  # L0: natural (stress-free) flexure length [m]
 
     # Material / cross-section (rectangular flexure beam).
     youngs_modulus: float = 2.0e9     # E (PETG) [Pa]
@@ -90,11 +89,11 @@ class AnalysisResult:
     y: np.ndarray
     energy: np.ndarray            # U(y) [J]
     force: np.ndarray             # -dU/dy [N]
-    equilibria: List[Tuple[float, str]] = field(default_factory=list)
-    stable_wells: List[float] = field(default_factory=list)
+    equilibria: list[tuple[float, str]] = field(default_factory=list)
+    stable_wells: list[float] = field(default_factory=list)
     barrier_height: float = 0.0   # [J]
     snap_through_force: float = 0.0  # peak |F| between wells [N]
-    params: Optional[FlexureParams] = None
+    params: "FlexureParams | None" = None
 
     @property
     def is_bimodal(self) -> bool:
@@ -122,7 +121,7 @@ class AnalysisResult:
 # Energy model (von Mises truss with two symmetric axial-spring flexures)
 # ---------------------------------------------------------------------------
 
-ArrayLike = Union[np.ndarray, float]
+ArrayLike = np.ndarray | float
 
 
 def strain_energy(y: ArrayLike, p: FlexureParams) -> ArrayLike:
@@ -144,8 +143,8 @@ def force(y: ArrayLike, p: FlexureParams, dy: float = 1e-7) -> ArrayLike:
     return -(strain_energy(y_arr + dy, p) - strain_energy(y_arr - dy, p)) / (2.0 * dy)
 
 
-def _find_roots(y: np.ndarray, f: np.ndarray, fn) -> List[float]:
-    roots: List[float] = []
+def _find_roots(y: np.ndarray, f: np.ndarray, fn) -> list[float]:
+    roots: list[float] = []
     for i in range(len(y) - 1):
         if f[i] == 0.0:
             roots.append(float(y[i]))
@@ -154,15 +153,15 @@ def _find_roots(y: np.ndarray, f: np.ndarray, fn) -> List[float]:
                 roots.append(float(brentq(fn, y[i], y[i + 1])))
             except ValueError:
                 continue
-    out: List[float] = []
+    out: list[float] = []
     for r in roots:
         if not out or abs(r - out[-1]) > 1e-9:
             out.append(r)
     return out
 
 
-def analyze(p: Optional[FlexureParams] = None,
-            y_range: Optional[Tuple[float, float]] = None,
+def analyze(p: FlexureParams | None = None,
+            y_range: tuple[float, float] | None = None,
             n_samples: int = 4001) -> AnalysisResult:
     """Sample ``U(y)`` and ``F(y)``, locate equilibria, classify them, and
     measure the snap-through barrier between stable wells.
@@ -180,8 +179,8 @@ def analyze(p: Optional[FlexureParams] = None,
     fn = lambda yy: float(force(yy, p))
     eq_points = _find_roots(y, F, fn)
 
-    classified: List[Tuple[float, str]] = []
-    stable_wells: List[float] = []
+    classified: list[tuple[float, str]] = []
+    stable_wells: list[float] = []
     h = 1e-6
     for y_eq in eq_points:
         d2U = (float(strain_energy(y_eq + h, p))
