@@ -19,6 +19,11 @@ replaced, please open an issue.
 
 Total images: **40**.
 
+A composite figure of all 40 panels (with (a)–(an) labels and a caption
+keyed to the table below) is available at
+[`mosaic.png`](./mosaic.png) and [`mosaic_caption.md`](./mosaic_caption.md).
+
+
 ## Bench-top automated lab dispensers (well-evidenced)
 
 | Platform | Image | Source page | Image URL |

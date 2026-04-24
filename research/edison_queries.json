@@ -33,7 +33,14 @@
     "tag": "mti-corporation-lab-powder-equipment",
     "task_id": "d4898516-11c0-4382-9827-6da52e7ca988",
     "query": "Provide a detailed catalog of MTI Corporation (mtixtl.com) products related to powder handling, dispensing, dosing, weighing, mixing, and transfer for laboratory and pilot-scale materials research (especially battery, ceramics, and additive-manufacturing R&D). For each relevant MTI product line (e.g., automatic powder weighing/dispensing stations, glovebox-compatible powder feeders, vibratory sieve shakers, rotary tablet/pellet presses, planetary ball mills with powder loading, slurry mixers, tape casters with powder hoppers, and any robotic/automation accessories) list the model number, dispensing or feeding mechanism, dose / capacity range, accuracy or repeatability, supported powder types (free-flowing vs cohesive, particle size), automation/control interfaces (RS-232, USB, Modbus, Ethernet, API), glovebox / inert-atmosphere compatibility, and approximate price tier where stated. Cite MTI datasheets, manuals, and any peer-reviewed papers using MTI powder equipment.",
-    "submitted_at": "2026-04-24T03:52:51.181405Z"
+    "submitted_at": "2026-04-24T03:52:51.181405Z",
+    "resubmissions": [
+      {
+        "task_id": "6ca69e07-8838-44f7-b394-b5213ea38295",
+        "submitted_at": "2026-04-24T04:52:47.226656Z",
+        "reason": "Original task stuck at 99% (get_task returns HTTP 500). Per PR feedback, re-run just one query and don't wait."
+      }
+    ]
   },
   {
     "tag": "mti-mixers-industrial-powder-handling",

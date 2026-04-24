@@ -3,6 +3,14 @@
 This document collects the commercial company / product landscape for powder
 dispensing solutions, motivating the design of `powder-excavator`.
 
+> A visual mosaic of representative product photos for every platform
+> mentioned below is available in [`images/mosaic.png`](./images/mosaic.png)
+> with a panel-by-panel caption in
+> [`images/mosaic_caption.md`](./images/mosaic_caption.md); per-image
+> source URLs are tracked in [`images/README.md`](./images/README.md) and
+> [`images/_manifest.json`](./images/_manifest.json).
+
+
 ## Status
 
 Five Edison Scientific literature queries were submitted in a prior session
