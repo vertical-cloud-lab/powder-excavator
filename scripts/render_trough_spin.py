@@ -126,8 +126,9 @@ def build_gif(
                 distance=distance,
             )
             # Quantise to a 256-colour palette so the GIF stays small while
-            # keeping smooth shading. ``ADAPTIVE`` picks an optimal palette
-            # per frame; ``Image.Dither.FLOYDSTEINBERG`` smooths the gradient.
+            # keeping smooth shading. ``MEDIANCUT`` picks a palette that
+            # minimises perceived error on this kind of low-saturation render;
+            # ``Image.Dither.FLOYDSTEINBERG`` smooths the gradients.
             img = Image.open(frame_path).convert("RGB")
             images.append(
                 img.quantize(
