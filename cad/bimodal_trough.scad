@@ -153,7 +153,7 @@ module flexure(side = +1) {
         rotate([90, 0, 0])
         rotate([0, 0, 0])
         linear_extrude(height = flexure_width)
-        // the arch is laid out in (x, z); build it directly
+        // the arch is laid out in (x, y); build it directly
         arched_beam(x_root, x_apex, 0, initial_rise,
                     flex_arch_kick, flexure_thick, flex_segments);
 }
