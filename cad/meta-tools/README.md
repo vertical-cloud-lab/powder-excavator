@@ -39,6 +39,60 @@ maintainer is willing to add a vendor account and put the credentials in
 `Settings → Secrets`. That's a different conversation than I had in PR #2 and
 the dismissal was wrong. Details below per tool.
 
+## Independent corroboration — Edison literature synthesis
+
+After this evaluation was already drafted, the high-effort PaperQA3 literature
+search we kicked off in PR #2 returned (Edison task
+[`c0f412d3-d85d-466a-abd1-db6614a2db70`](https://platform.edisonscientific.com/tasks/c0f412d3-d85d-466a-abd1-db6614a2db70),
+archived verbatim in
+[`edison-c0f412d3-literature-synthesis.md`](edison-c0f412d3-literature-synthesis.md)
+— ~72 KB, 60+ peer-reviewed citations, mostly 2020+).
+The two answers were produced independently and they agree on the big calls,
+but the literature surfaces a few concrete additions worth folding into the
+recommendation:
+
+* **Code-CAD primary pick is corroborated.** The synthesis explicitly recommends
+  *"CadQuery or build123d"* as the parametric authoring layer, with OpenSCAD or
+  Grasshopper as alternatives — same shape as the table above. CAD-Coder
+  (Doris 2026) reports 100 % valid-syntax fine-tuned generation specifically of
+  CadQuery code, which makes it a slightly better target than build123d for
+  any future LLM-assisted geometry step.
+* **`build123d` is missing from my scoreboard.** It deserves a row alongside
+  CadQuery: same Apache-2.0 OCP/OpenCascade kernel, Python-first, ~2 yr old,
+  pure-Python wheels available — i.e. exactly the same fresh-runner story as
+  CadQuery. We should treat it as a sibling, not a competitor.
+* **Will It Print** (Budinoff 2021, MATLAB, GitHub) is the closest thing to a
+  validated open-source AM-DFM checker in the literature: five explicit
+  checks (overhang/support, surface-roughness Ra, small-feature, toppling
+  risk, warping). A Python port is planned. This is a more credible
+  open-source DFM source to lean on than what I have in `cad/dfm.py` today and
+  is worth wrapping or reimplementing for the closed-loop side of #6.
+* **Closed-loop testing target = Jubilee + balance + OpenCV + Ax/BoTorch.**
+  The synthesis lands on this as the canonical open-hardware/open-software
+  stack for "design → print → measure → re-design", with concrete prior art
+  (Deneault 2021 "AM ARES" Bayesian-opt of FDM params; Pelkie 2025
+  Science-Jubilee SDL paper). That's the natural physical-feedback companion
+  to the parametric CadQuery model and the right thing to point at when
+  resolving the "feedback mechanisms" half of the original PR-2 ask.
+* **Generative-CAD fields beyond my scoreboard.** Topology-optimisation
+  commercial tools (nTop, Altair Inspire, Ansys Discovery, Fusion GD, NX) are
+  reviewed as a class: the literature finding is that they all "fall short in
+  supporting AM-specific constraints" and produce density fields or Pareto
+  populations that still need human filtering. That's consistent with my hard
+  conclusion that Fusion GD doesn't belong in the CI loop, and softens (but
+  doesn't reverse) the case for nTop — even with secrets, the output still
+  needs interpretation, not just ingestion.
+* **Digital-twin spectrum.** Kritzinger 2018 / Tao 2019 / Lattanzi 2021
+  taxonomy (digital model → digital shadow → digital twin); useful framing if
+  this work ever turns into a manuscript section.
+
+The synthesis does **not** change the per-tool verdicts in the scoreboard
+above. It does add **build123d** as a sibling pick to CadQuery, points at
+**Will It Print** as a better DFM target than what I have, and names
+**Jubilee + Ax/BoTorch** as the right physical-feedback rig to wire to the
+parametric model. Those are the concrete follow-ups; everything else in the
+synthesis is supporting evidence rather than a course correction.
+
 ---
 
 ## 1. Rhino / Grasshopper / Rhino Compute
@@ -302,4 +356,5 @@ say which one(s) and I'll do the secrets wiring + workflow in a follow-up PR.
 | [`excavator_trough.fs`](excavator_trough.fs) | Real Onshape FeatureScript Custom Feature for the trough |
 | [`onshape_rest_probe.py`](onshape_rest_probe.py) | Probe of the Onshape REST API showing 401 anonymous response |
 | [`excavator_trough.scad`](excavator_trough.scad) | OpenSCAD model that builds an STL on this runner |
+| [`edison-c0f412d3-literature-synthesis.md`](edison-c0f412d3-literature-synthesis.md) | Verbatim Edison/PaperQA3 high-effort lit synthesis used in §"Independent corroboration" |
 | [`logs/`](logs/) | Captured install / build / runtime output for every claim above |
