@@ -79,8 +79,13 @@ def test_report_warns_when_fea_loses_bistability() -> None:
 def test_b32_sweep_runs_and_produces_points() -> None:
     """Smoke-test the full pipeline at reduced fidelity to keep CI fast."""
     # 9 displacement points × 6 elements per half ≈ 10 s on a stock runner.
-    results = run_sweep(FlexureParams(), n_steps=9, n_seg_per_half=6)
-    assert len(results) == 9
+    n_steps = 9
+    results = run_sweep(FlexureParams(), n_steps=n_steps, n_seg_per_half=6)
+    # ``run_sweep`` is documented to silently skip diverged points, so don't
+    # require an exact count — just that we covered "most" of the requested
+    # sweep and that the surviving points still bracket both wells.
+    assert len(results) >= int(0.8 * n_steps), (
+        f"FEA only converged on {len(results)}/{n_steps} requested points")
     ys = np.array([r.y for r in results])
     Fs = np.array([r.force for r in results])
     # Sweep covers both wells worth of range.

@@ -81,8 +81,8 @@ class InputRanges:
     """±-half-widths for each manufacturing input around its nominal value.
 
     The default values reflect realistic FDM-PETG print-to-print variation
-    measured on small-nozzle (0.4 mm) prints. Override on the command line
-    with ``--thick-tol`` etc. for what-if sweeps.
+    measured on small-nozzle (0.4 mm) prints and are used as the sweep's
+    manufacturing-tolerance ranges.
     """
 
     thick_tol: float = 0.05e-3       # m, half-width
@@ -370,7 +370,7 @@ def render_violin(samples: list[Sample], out_path: Path) -> Path:
     else:
         F = np.array([s.peak_force for s in bistable])
         fig, axes = plt.subplots(1, 4, figsize=(13.0, 4.4), sharey=True)
-        for ax, key, label, scale in zip(axes, INPUT_KEYS, INPUT_LABELS, INPUT_SCALE):
+        for ax, key, label in zip(axes, INPUT_KEYS, INPUT_LABELS):
             x = np.array([getattr(s, key) for s in bistable])
             qs = np.quantile(x, [0.25, 0.5, 0.75])
             buckets = [F[x < qs[0]],

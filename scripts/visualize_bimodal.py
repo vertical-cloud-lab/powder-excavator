@@ -142,11 +142,30 @@ def _draw_mechanism(ax: plt.Axes, y: float, p: FlexureParams = PARAMS,
 # Static four-panel figure
 # ---------------------------------------------------------------------------
 
+def _require_bimodal(result: AnalysisResult) -> tuple[float, float]:
+    """Return ``(y_lo, y_hi)`` for a bimodal result or raise a clear error.
+
+    The visualization renders inherently rely on two stable wells (one
+    "scoop" pose, one "dump" pose). If the design has been re-tuned to a
+    mono-stable regime, fail with an actionable message instead of an
+    obscure ``IndexError`` when indexing ``wells[0]`` / ``wells[-1]``.
+    """
+    wells = sorted(result.stable_wells)
+    if len(wells) < 2:
+        raise ValueError(
+            "Visualization requires a bimodal design with at least two stable "
+            "wells, but the analyser returned "
+            f"{len(wells)} stable well(s). Re-tune the flexure parameters "
+            "(e.g. increase pre-compression or initial rise) before "
+            "rendering. Analyser summary:\n" + result.summary()
+        )
+    return wells[0], wells[-1]
+
+
 def render_static(out_path: Path, result: AnalysisResult | None = None) -> Path:
     if result is None:
         result = analyze(PARAMS)
-    wells = sorted(result.stable_wells)
-    y_lo, y_hi = wells[0], wells[-1]
+    y_lo, y_hi = _require_bimodal(result)
     unstable = [y for y, kind in result.equilibria if kind == "unstable"]
 
     fig = plt.figure(figsize=(10.5, 7.0))
@@ -257,8 +276,7 @@ def render_static(out_path: Path, result: AnalysisResult | None = None) -> Path:
 def _snap_trajectory(result: AnalysisResult,
                      n_frames: int = ANIMATION_FRAMES) -> np.ndarray:
     """A smooth back-and-forth y(t) that visits both wells via the saddle."""
-    wells = sorted(result.stable_wells)
-    y_lo, y_hi = wells[0], wells[-1]
+    y_lo, y_hi = _require_bimodal(result)
     # half cycle: lo -> hi via raised cosine, then mirror
     t = np.linspace(0.0, 1.0, n_frames // 2, endpoint=False)
     half = y_lo + (y_hi - y_lo) * 0.5 * (1.0 - np.cos(np.pi * t))
