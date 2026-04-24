@@ -80,7 +80,36 @@ Two independent open-source tools are checked in here:
 Both are wired into a [GitHub Actions
 workflow](../.github/workflows/bimodal-compliance.yml) that runs on every
 push touching the analyser, so we'll catch a non-bimodal design before it
-gets prototyped.
+gets prototyped. The workflow also installs CalculiX, runs a smoke test of
+the higher-end B32-beam cross-check, and runs the robustness
+(uncertainty-quantification) sweep documented in the next section, so the
+print-tolerance robustness of any parameter change gets reported in CI as
+well.
+
+### Higher-end FEA and uncertainty quantification
+
+Three orthogonal layers of analysis live under `scripts/`, each catching
+problems the previous layer misses *before* burning a print:
+
+| Layer | Script | What it adds | What it costs |
+| ----- | ------ | ------------ | ------------- |
+| 1. PRBM | `bimodal_compliance.py` | Closed-form bistability check, well location, peak axial snap force. | <100 ms |
+| 2. Truss FEA | `calculix_crosscheck.py` | Independent NLGEOM truss-element FEA confirming the PRBM math. | ~30 s |
+| 3. Beam FEA | `beam_fea_crosscheck.py` | Adds **bending stiffness** (B32 Timoshenko beams). Surfaces the contribution PRBM/truss miss — typically 10–25 % of peak force on a slender flexure, can be much larger if the as-printed flexure ends up too straight. | ~60 s |
+| 4. Robustness sweep | `robustness_sweep.py` | Latin-hypercube sweep over the four manufacturing tolerances (`flexure_thick`, `youngs_modulus`, `initial_rise`, `pre_compression`). Reports `P(bistable)`, percentile peak forces, first-order sensitivities, and a robust-design recommendation on a (`thickness`, `initial_rise`) grid. | ~15 s for 256+7744 PRBM solves |
+
+The robustness sweep is the single biggest reduction in print-and-tweak
+cycles: it asks "if my printer adds the realistic ±0.05 mm of thickness
+scatter and ±15 % of Young's-modulus batch variation, will the design
+still snap?" — *before* slicing. The recommendation it emits is the cell of
+the (`thickness`, `initial_rise`) grid that maximises `P(bistable)` after
+re-sampling the un-controllable inputs over their tolerances.
+
+```bash
+# uncertainty-quantification + robust-design recommendation (no FEA needed)
+python -m scripts.robustness_sweep                    # 256 LHS + 11×11×64 grid
+python -m scripts.robustness_sweep --samples 64       # quicker variant
+```
 
 ### Why PRBM as the primary tool (and what we did try)
 
@@ -94,32 +123,40 @@ replace it.
 | ----------- | -------------------------------------------- | ------------- | ---------- |
 | `numpy`+`scipy` PRBM    | `pip install -r requirements.txt`            | works in seconds, runs in CI | **primary** (`scripts/bimodal_compliance.py`) |
 | **SfePy**   | `pip install sfepy`                          | installed cleanly (v 2026.1, ~30 s, pure pip) | available; not yet wired up |
-| **CalculiX**| `sudo apt-get install -y calculix-ccx`       | installed cleanly (v 2.21, single deb, ~50 MB) | **cross-check**: `scripts/calculix_crosscheck.py` re-solves the truss with NLGEOM; agrees with PRBM end-to-end ([figure](figures/bimodal-fea-crosscheck.svg)) |
+| **CalculiX**| `sudo apt-get install -y calculix-ccx`       | installed cleanly (v 2.21, single deb, ~50 MB) | **two cross-checks**: T3D2 truss in `scripts/calculix_crosscheck.py` (axial-only, confirms PRBM math) and B32 Timoshenko beams in `scripts/beam_fea_crosscheck.py` (adds bending stiffness; ([figure](figures/bimodal-beam-fea-crosscheck.svg))) |
 | code_aster  | not packaged for Ubuntu 24.04; no published Docker image on Docker Hub or quay.io that we could pull anonymously; `pip install code_aster` returns nothing | **could not install in this environment** | n/a |
 
 PRBM is still the *primary* tool because (a) it's pure-Python so it runs in
 CI on every push without apt, (b) the bistability question is purely
 topological in `U(y)` and PRBM captures that exactly for this geometry, and
 (c) it returns a clean Python data structure (`AnalysisResult`) the tests
-can assert against. CalculiX is now wired in as a one-shot cross-check
-(see [`scripts/calculix_crosscheck.py`](../scripts/calculix_crosscheck.py))
-so we have an independent FEA confirmation of the snap-through curve, and
-we can graduate to it (or to SfePy) the moment we need flexure-bending
-stress, fatigue, or buckling results that PRBM can't give.
+can assert against. The two CalculiX paths are now wired in as
+complementary cross-checks: the truss script confirms the PRBM math, and
+the beam script (`scripts/beam_fea_crosscheck.py`) is the *higher-end*
+pass that exposes the bending stiffness contribution PRBM ignores. The
+robustness sweep (`scripts/robustness_sweep.py`) wraps all of this in
+manufacturing-tolerance Monte Carlo so the design's print-to-print
+robustness is reported in CI.
 
 ## Running the check locally
 
 ```bash
 pip install -r requirements.txt
 python scripts/bimodal_compliance.py        # prints summary, writes plot
-pytest tests/test_bimodal_compliance.py     # regression test
+pytest tests/                               # full regression suite
 
 # optional: regenerate the four-panel figure + snap-through GIF
 python -m scripts.visualize_bimodal
 
-# optional: independent CalculiX FEA cross-check
+# optional: independent CalculiX truss-FEA cross-check
 sudo apt-get install -y calculix-ccx        # one-time, ~50 MB
 python -m scripts.calculix_crosscheck       # writes docs/figures/bimodal-fea-crosscheck.svg
+
+# optional: higher-end B32 beam-FEA cross-check (adds bending stiffness)
+python -m scripts.beam_fea_crosscheck       # writes docs/figures/bimodal-beam-fea-crosscheck.svg
+
+# optional: 256-sample robustness sweep + grid scan
+python -m scripts.robustness_sweep          # writes docs/figures/bimodal-robustness-*.{svg,json}
 ```
 
 The default parameters give two stable wells at apex displacements of
@@ -130,15 +167,21 @@ point for sizing the prototype.
 
 ## Visualisations
 
-Generated by `scripts/visualize_bimodal.py` and `scripts/calculix_crosscheck.py`
+Generated by `scripts/visualize_bimodal.py`, `scripts/calculix_crosscheck.py`,
+`scripts/beam_fea_crosscheck.py`, and `scripts/robustness_sweep.py`
 and committed under `docs/figures/`:
 
 | File | Description |
 | ---- | ----------- |
 | [`bimodal-mechanism.svg`](figures/bimodal-mechanism.svg) / `.png` | Four-panel figure: (A) the mechanism in its two stable poses with powder grains visualised, (B) the double-well energy landscape with stable / unstable equilibria and barrier height annotated, (C) the force-displacement curve including the negative-stiffness snap-through region, (D) trough tilt vs apex displacement. |
 | [`bimodal-mechanism.gif`](figures/bimodal-mechanism.gif) | Animation of the trough snapping between the scoop and dump poses, with the corresponding point on the energy curve tracked alongside. |
-| [`bimodal-fea-crosscheck.svg`](figures/bimodal-fea-crosscheck.svg) / `.png` | PRBM analytical force-displacement curve overlaid on 64 points from a CalculiX 2.21 NLGEOM truss solve. The two methods agree across the full snap-through range. |
-| [`bimodal-fea-crosscheck.json`](figures/bimodal-fea-crosscheck.json) | Raw `(y, F)` points returned by CalculiX, for downstream regression checks. |
+| [`bimodal-fea-crosscheck.svg`](figures/bimodal-fea-crosscheck.svg) / `.png` | PRBM analytical force-displacement curve overlaid on 64 points from a CalculiX 2.21 NLGEOM truss solve. The two methods agree across the full snap-through range (axial-only physics on both sides). |
+| [`bimodal-fea-crosscheck.json`](figures/bimodal-fea-crosscheck.json) | Raw `(y, F)` points returned by the truss CalculiX run, for downstream regression checks. |
+| [`bimodal-beam-fea-crosscheck.svg`](figures/bimodal-beam-fea-crosscheck.svg) / `.png` | Higher-end cross-check: PRBM (axial), PRBM + closed-form linear bending estimate, and CalculiX 2.21 with B32 Timoshenko beam elements (NLGEOM, displacement-controlled). The bending-FEA curve makes visible the bending-stiffness contribution that the axial-only PRBM and truss-FEA paths cannot see. |
+| [`bimodal-beam-fea-crosscheck.json`](figures/bimodal-beam-fea-crosscheck.json) | Raw `(y, F)` points returned by the B32-beam CalculiX run. |
+| [`bimodal-robustness-violin.svg`](figures/bimodal-robustness-violin.svg) / `.png` | Violin plot of peak snap-through force across 256 Latin-hypercube samples drawn from the four manufacturing tolerances, broken out by quartile of each input. |
+| [`bimodal-robustness-heatmap.svg`](figures/bimodal-robustness-heatmap.svg) / `.png` | 2-D heatmap of `P(bistable)` and median peak snap force over a (`flexure_thick`, `initial_rise`) grid, with the nominal and recommended-robust cells marked. |
+| [`bimodal-robustness-summary.json`](figures/bimodal-robustness-summary.json) | Machine-readable summary: percentile peak forces, first-order sensitivities, and the recommended robust parameter set. |
 | [`bimodal-energy.svg`](figures/bimodal-energy.svg) | Minimal energy/force plot emitted by `scripts/bimodal_compliance.py` itself. |
 
 ## 3D-printable prototype
@@ -159,9 +202,15 @@ parametric OpenSCAD source, and a full PETG print/test guide:
 - [ ] Sweep `(half_span, initial_rise, pre_compression, thickness)` to find
       a parameter set that puts the dump-pose tilt in the 25–35° range
       called for by the trough-pour kinematics from #2.
-- [ ] Add a flexural (PRBM-`γ`/`K_Θ`) correction to capture the bending
+- [x] Add a flexural (PRBM-`γ`/`K_Θ`) correction to capture the bending
       contribution alongside the axial-only von Mises term, so we can size
-      the flexures against yield/fatigue rather than just stiffness.
+      the flexures against yield/fatigue rather than just stiffness. *(Done
+      via `scripts/beam_fea_crosscheck.py` — see the
+      [bending-FEA figure](figures/bimodal-beam-fea-crosscheck.svg).)*
+- [x] Quantify print-tolerance robustness so we don't have to iterate on
+      flexure thickness every time the printer drifts. *(Done via
+      `scripts/robustness_sweep.py` — see the
+      [robustness heatmap](figures/bimodal-robustness-heatmap.svg).)*
 - [ ] Hand off the chosen parameter set to `scripts/generate_figures.py`
       (currently being added in #2) for a Panel-F figure in the manuscript.
 - [ ] Compare side-by-side with the smooth cam-ramp baseline (#2) and the
