@@ -85,9 +85,9 @@ Categories of checks (each prints `[OK]` / `[WARN]` / `[FAIL]`):
 
 * **`sanity.*`** — every dimension must be positive.
 * **`fdm.*`** — printability for FDM (min wall thickness ≥ `min_wall`,
-  cam-ramp underside overhang ≤ `max_overhang_deg`, bumper chamfer present,
+  cam-ramp underside overhang ≤ `max_overhang_deg`, rim-lip chamfer present,
   pin clearance positive).
-* **`kinematics.cam.*`** — bumper engages the smooth cam ramp; ramp fits
+* **`kinematics.cam.*`** — rim lip engages the smooth cam ramp; ramp fits
   inside the gantry's X travel; ramp angle is in the 15–45° band.
 * **`kinematics.slot.*`** — the **gantry-only constraint** from PR comment
   4166621470 ("we have a gantry system and would like to avoid installing

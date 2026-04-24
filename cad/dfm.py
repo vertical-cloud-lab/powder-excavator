@@ -14,15 +14,15 @@ Run from the repo root::
 Categories of checks:
 
 * **FDM printability** -- min wall thickness, FDM overhang angles
-  (cam-ramp slope, bumper chamfer), dowel-pin clearance.
+  (cam-ramp slope, rim-lip chamfer), dowel-pin clearance.
 
 * **Gantry-only kinematics** (per the user's hard constraint that the rig
   has only the existing gantry X / Y / Z axes; no second axis on the
   bucket). The dispense cycle has to be achievable with pure carriage
   motion. The two actuator variants are checked separately:
 
-  - **Smooth cam ramp:** (a) the bumper must be tall enough to engage the
-    ramp before the bumper's mounting face would clash with the ramp's
+  - **Smooth cam ramp:** (a) the rim lip must be tall enough to engage the
+    ramp before the trough body would clash with the ramp's
     base; (b) the cam ramp's angle has to be shallow enough to avoid
     lift-off, but not so shallow that it doesn't fit in the gantry's X
     travel.
@@ -121,7 +121,7 @@ def check_printability(p: ExcavatorParams) -> list[CheckResult]:
         "fdm.overhang.bumper_chamfer",
         p.bumper_chamfer > 0,
         f"bumper_chamfer = {p.bumper_chamfer:.2f} mm "
-        "(must be > 0 to avoid a sharp 90 deg overhang on the bumper)",
+        "(must be > 0 to avoid a sharp 90 deg overhang on the rim lip)",
     ))
     rs.append(_check(
         "fdm.pin_clearance.positive",
@@ -134,13 +134,14 @@ def check_printability(p: ExcavatorParams) -> list[CheckResult]:
 
 def check_gantry_only_cam_ramp(p: ExcavatorParams) -> list[CheckResult]:
     rs: list[CheckResult] = []
-    # The bumper must be at least as tall as the ramp's first ~1 mm, otherwise
-    # the trough rim will hit the ramp's base before the bumper engages.
+    # The chamfered rim lip must be at least as tall as the ramp's first
+    # ~1 mm, otherwise the trough body will hit the ramp's base before the
+    # lip engages.
     rs.append(_check(
         "kinematics.cam.bumper_engages_ramp",
         p.bumper_height >= 2.0,
         f"bumper_height = {p.bumper_height:.2f} mm "
-        "(must be >= 2 mm to reliably engage the ramp's leading edge)",
+        "(rim lip must be >= 2 mm tall to reliably engage the ramp's leading edge)",
     ))
     # Whole cam stroke must fit inside the gantry's X travel.
     rs.append(_check(

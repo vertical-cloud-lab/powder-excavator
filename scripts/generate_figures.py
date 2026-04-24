@@ -96,9 +96,13 @@ def _svg_close() -> str:
 # ---------------------------------------------------------------------------
 #
 # The trough cross-section (looking along its long axis L) is a half-cylinder
-# with a smooth chamfered bumper on the outside of the rim.  When the trough
-# rolls about its longitudinal pivot pin (the corrected v2 geometry), this is
-# the cross-section that visually rotates in the side / end view.
+# with a continuous chamfered lip on the OUTSIDE of each long-side rim.  The
+# lips run the full trough length L (this primitive shows their cross-section
+# only); a localised "spout" is deliberately avoided because it would
+# reintroduce a powder-arching bottleneck at the pour edge (Edison v2 §3).
+# The chamfer (a) detaches the powder stream cleanly, (b) defines a sharp
+# geometric tip-over angle, and (c) doubles as the cam-engagement surface
+# when the trough rolls about its longitudinal pivot pin.
 
 def trough_cross_section(
     cx: float,
@@ -114,7 +118,9 @@ def trough_cross_section(
 
     The semicircle's flat (open) edge runs across the top when ``rotate_deg=0``;
     positive ``rotate_deg`` rolls the trough so its right rim drops (pouring
-    direction).
+    direction).  When ``bumper`` is true, a chamfered lip is drawn on EACH
+    long-side rim (left and right) — the trough is symmetric, so either rim
+    can be the pour edge / cam-engagement surface depending on roll direction.
     """
     r = radius
     shell = (
@@ -132,10 +138,20 @@ def trough_cross_section(
         f'  <path d="{powder_path}" fill="url(#powder)" opacity="0.95"/>',
     ]
     if bumper:
-        # Smooth chamfered "bumper" / rounded lip on the right rim — the
-        # surface that slides up the cam track.
+        # Continuous chamfered lip on each long-side rim.  The lip extends
+        # OUTWARD (away from the trough centre line) and UPWARD, with a
+        # chamfer on its outside-upper corner — this is the surface that
+        # both rides the cam ramp and detaches the powder stream cleanly
+        # at the pour edge.  Drawn symmetrically on both rims because the
+        # trough is symmetric and may dump in either direction.
         parts.append(
+            # right rim lip
             f'  <path d="M {r} 0 L {r + 6} -2 L {r + 6} 4 L {r} 6 Z" '
+            f'fill="#7e8794" stroke="#222" stroke-width="1.2"/>'
+        )
+        parts.append(
+            # left rim lip (mirror of the right)
+            f'  <path d="M {-r} 0 L {-(r + 6)} -2 L {-(r + 6)} 4 L {-r} 6 Z" '
             f'fill="#7e8794" stroke="#222" stroke-width="1.2"/>'
         )
     parts.append("</g>")
@@ -241,12 +257,19 @@ def panel_A() -> str:
     s.append(f'<line x1="{body_x0}" y1="{body_top + body_h + 30}" x2="{body_x1}" y2="{body_top + body_h + 30}" '
              'stroke="#222" stroke-width="1.2" marker-start="url(#arrowK)" marker-end="url(#arrowK)"/>')
     s.append(f'<text x="{(body_x0 + body_x1) / 2}" y="{body_top + body_h + 50}" text-anchor="middle" font-size="13">L ≈ 3 D ≈ 80 mm</text>')
-    # Bumpers on the long-side rim (top edge), one per end
-    for bx in (body_x0 + 12, body_x1 - 28):
-        s.append(f'<path d="M {bx} {body_top} L {bx + 16} {body_top - 5} L {bx + 16} {body_top + 4} L {bx} {body_top + 4} Z" '
-                 'fill="#7e8794" stroke="#222" stroke-width="1.2"/>')
+    # Continuous chamfered lip running the FULL length L on the long-side
+    # rim (in this side view, only the near rim is visible; the far rim
+    # carries an identical lip, since the trough is symmetric).  Drawn as
+    # one continuous strip — explicitly NOT a localised spout, to avoid
+    # reintroducing a powder-arching bottleneck at the pour edge.
+    lip_top_y = body_top - 5
+    s.append(
+        f'<path d="M {body_x0} {body_top} L {body_x1} {body_top} '
+        f'L {body_x1} {lip_top_y} L {body_x0} {lip_top_y} Z" '
+        'fill="#7e8794" stroke="#222" stroke-width="1.2"/>'
+    )
     s.append(f'<text x="{(body_x0 + body_x1) / 2}" y="{body_top - 12}" text-anchor="middle" font-size="11" fill="#444">'
-             'chamfered bumper (one per end) — slides up the cam track</text>')
+             'continuous chamfered lip (full length L; both long sides) — also rides cam ramp</text>')
     # Arm labels
     s.append(f'<text x="{arm_xL - 8}" y="{arm_top - 6}" text-anchor="middle" font-size="10" fill="#444">arm L</text>')
     s.append(f'<text x="{arm_xR + 8}" y="{arm_top - 6}" text-anchor="middle" font-size="10" fill="#444">arm R</text>')
@@ -430,18 +453,23 @@ def panel_C() -> str:
              'pin stub through end cap → bushing on arm R</text>')
     s.append(f'<text x="{(body_x0 + body_x1) // 2}" y="248" text-anchor="middle" font-size="11" fill="#c0392b" font-style="italic">'
              '(dashed segment = pin hidden inside trough body)</text>')
-    # Bumpers on the long-side rim (one per end)
-    s.append(f'<polygon points="{body_x0 + 30},272 {body_x0 + 50},266 {body_x0 + 50},258 {body_x0 + 30},264" fill="#7e8794" stroke="#222" stroke-width="1.2"/>')
-    s.append(f'<polygon points="{body_x1 - 50},266 {body_x1 - 30},260 {body_x1 - 30},252 {body_x1 - 50},258" fill="#7e8794" stroke="#222" stroke-width="1.2"/>')
-    s.append(f'<text x="{(body_x0 + body_x1) // 2}" y="232" text-anchor="middle" font-size="11" fill="#444">'
-             'chamfered bumpers (rim of long side) — slide up the cam track</text>')
+    # Continuous chamfered lip running the full length L on the long-side
+    # rim (drawn here for the near rim; the far rim carries an identical
+    # lip, since the trough is symmetric and may dump in either direction).
+    s.append(
+        f'<polygon points="{body_x0 + 6},272 {body_x1 - 6},262 '
+        f'{body_x1 - 6},254 {body_x0 + 6},264" '
+        'fill="#7e8794" stroke="#222" stroke-width="1.2"/>'
+    )
+    s.append(f'<text x="{(body_x0 + body_x1) // 2}" y="{232}" text-anchor="middle" font-size="11" fill="#444">'
+             'continuous chamfered lip (full length L; both long sides) — also rides the cam ramp</text>')
     # Cam post + ramp (unchanged)
     s.append('<rect x="850" y="180" width="18" height="320" fill="#8a7a5e" stroke="#444"/>')
     s.append('<text x="858" y="510" text-anchor="middle" font-size="11" fill="#5a4a30">fixed post</text>')
     s.append('<polygon points="730,300 850,300 850,250 730,300" fill="#8a7a5e" stroke="#444" stroke-width="1.5"/>')
     s.append('<text x="780" y="320" text-anchor="middle" font-size="12" fill="#5a4a30">smooth inclined cam track</text>')
     s.append('<text x="780" y="336" text-anchor="middle" font-size="11" fill="#7a6a4a">'
-             '(replaces sawtooth; bumper slides up its hypotenuse)</text>')
+             '(replaces sawtooth; rim lip slides up its hypotenuse)</text>')
     # Strike-off bar
     s.append('<rect x="220" y="510" width="350" height="10" fill="#5a4a30" stroke="#222"/>')
     s.append('<text x="395" y="535" text-anchor="middle" font-size="11" fill="#5a4a30">'
@@ -698,7 +726,7 @@ def panel_D() -> str:
             f'<text x="{PANEL_D_PIVOT_X - 50}" y="{py + 46}" font-size="10" fill="#1f5fbf">'
             'about its long axis</text>'
             f'<text x="{PANEL_D_PIVOT_X + R + 4}" y="{py - R - 6}" font-size="10" fill="#c0392b">'
-            'bumper rides up cam</text>'
+            'rim lip rides up cam</text>'
         ),
     ))
     s.append('</g>')

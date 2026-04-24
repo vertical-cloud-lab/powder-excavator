@@ -75,10 +75,20 @@ class ExcavatorParams:
     arm_length: float = 60.0              # vertical drop from carriage
     arm_gap: float = 1.0                  # gap between arm inside face and trough end cap
 
-    # ----- chamfered bumper on the trough (engages the cam ramp) -----
-    bumper_height: float = 6.0            # how far the bumper protrudes radially
-    bumper_chamfer: float = 2.0
-    bumper_width: float = 6.0             # along L
+    # ----- chamfered rim lip on the trough (defines the pour edge AND
+    #       engages the cam ramp) -----
+    # The lip runs continuously along the full trough length L on BOTH
+    # long-side rims (the trough is symmetric, so it can dump in either
+    # direction; whichever rim is on the cam-side becomes the "bumper" for
+    # that stroke). A continuous lip — rather than a localised spout —
+    # avoids reintroducing a powder-arching bottleneck at the pour edge,
+    # while the chamfer (a) detaches the powder stream cleanly, (b) defines
+    # a sharp geometric tip-over angle (better dose-vs-tilt repeatability),
+    # and (c) provides a low-overhang printable surface for the cam to
+    # ride on.
+    bumper_height: float = 6.0            # radial protrusion of the lip
+    bumper_chamfer: float = 2.0           # outside-edge chamfer dimension
+    bumper_width: float = 6.0             # lip thickness in X (cross-section)
 
     # ----- fixed bed-edge strike-off bar -----
     strike_off_length: float = 100.0      # spans the bed edge
@@ -178,22 +188,39 @@ def build_trough(p: ExcavatorParams) -> CQObject:
         .translate((0, 0, -p.pivot_boss_thickness - 1.0))
     )
 
-    # Chamfered bumper on the rim's outside, near mid-length.
-    bumper_z_centre = p.trough_length / 2
-    bumper = (
-        cq.Workplane("XY")
-        .center(0, p.trough_radius + p.trough_wall + p.bumper_height / 2)
-        .box(
-            p.bumper_width,        # X
-            p.bumper_height,       # Y
-            p.bumper_width,        # Z
-            centered=(True, True, True),
-        )
-        .translate((0, 0, bumper_z_centre))
-        .edges("|Z").chamfer(p.bumper_chamfer)
-    )
+    # Continuous chamfered lip on each long-side rim, running the full
+    # trough length L. Replaces the localised mid-length "bumper": a
+    # localised spout would reintroduce a powder-arching bottleneck at the
+    # pour edge (cf. Edison v2 §3 on the 90° V-pocket retention problem).
+    # The lip is symmetric (one per long side) so the trough can dump
+    # either way and either rim can be the cam-engagement surface; the
+    # outside chamfer on each lip is what actually rides up the cam ramp
+    # and what defines the pour edge's tip-over angle.
+    outer_r = p.trough_radius + p.trough_wall
+    lip_x_centre = outer_r - p.bumper_width / 2
 
-    return body.union(boss0).union(boss1).union(bumper).cut(pin_hole)
+    def _make_lip(sign: int) -> CQObject:
+        # ``sign`` is +1 for the right rim, -1 for the left rim.  The
+        # chamfered edge is the OUTER top edge (the one furthest from the
+        # trough centre line, on the +Y side), since that is what the cam
+        # ramp rides on and what the powder stream detaches from.
+        lip = (
+            cq.Workplane("XY")
+            .box(
+                p.bumper_width,        # X (lip thickness, sits on the rim wall)
+                p.bumper_height,       # Y (radial protrusion above the rim)
+                p.trough_length,       # Z (runs the full length L)
+                centered=(True, False, False),
+            )
+        )
+        outer_edge = ">X and >Y" if sign > 0 else "<X and >Y"
+        lip = lip.edges(outer_edge).chamfer(p.bumper_chamfer)
+        return lip.translate((sign * lip_x_centre, 0, 0))
+
+    lip_right = _make_lip(+1)
+    lip_left = _make_lip(-1)
+
+    return body.union(boss0).union(boss1).union(lip_right).union(lip_left).cut(pin_hole)
 
 
 def build_arm(p: ExcavatorParams) -> CQObject:
