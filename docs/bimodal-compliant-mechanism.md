@@ -141,6 +141,19 @@ and committed under `docs/figures/`:
 | [`bimodal-fea-crosscheck.json`](figures/bimodal-fea-crosscheck.json) | Raw `(y, F)` points returned by CalculiX, for downstream regression checks. |
 | [`bimodal-energy.svg`](figures/bimodal-energy.svg) | Minimal energy/force plot emitted by `scripts/bimodal_compliance.py` itself. |
 
+## 3D-printable prototype
+
+A monolithic, fastener-free, support-free print of this design lives under
+[`cad/`](../cad/), with an isometric preview, a sliced-and-ready STL, the
+parametric OpenSCAD source, and a full PETG print/test guide:
+
+| File | What it is |
+| ---- | ---------- |
+| [`cad/bimodal_trough.scad`](../cad/bimodal_trough.scad) | Parametric source — variables mirror `FlexureParams`. |
+| [`cad/bimodal-trough.stl`](../cad/bimodal-trough.stl) | 76 × 26 × 20 mm mesh, 1 264 triangles, manifold. ~45 min / ~6 g of PETG. |
+| [`cad/bimodal-trough-iso.png`](../cad/bimodal-trough-iso.png) | Render. |
+| [`cad/README.md`](../cad/README.md) | Print settings, mounting, and the snap-force / cycle / powder test procedure. |
+
 ## Open questions / next steps
 
 - [ ] Sweep `(half_span, initial_rise, pre_compression, thickness)` to find
