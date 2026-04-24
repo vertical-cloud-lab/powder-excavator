@@ -5,3 +5,8 @@
 Alternative dosing-style brainstorm (issue
 [#12](https://github.com/vertical-cloud-lab/powder-excavator/issues/12)):
 [`docs/alternative-dosing/brainstorm.md`](docs/alternative-dosing/brainstorm.md).
+
+Preliminary design for the top-ranked alternative-dosing concepts
+(tap-driven sieve cup + ERM-augmented variant, with bed-mounted
+anvil): [`docs/preliminary-design-sieve-cup.md`](docs/preliminary-design-sieve-cup.md)
+— printable parts in [`cad/`](cad/).

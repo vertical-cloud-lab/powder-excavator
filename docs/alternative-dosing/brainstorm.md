@@ -245,6 +245,11 @@ candidate — going from a single tap to continuous-but-bounded vibration
 is what gives access to the documented sub-mg vibratory-sieve operating
 window.
 
+> **Preliminary design** for both A and G (single parametric SCAD
+> source, printable today, with a bed-mounted anvil for A) is at
+> [`../preliminary-design-sieve-cup.md`](../preliminary-design-sieve-cup.md);
+> printable parts live in [`../../cad/`](../../cad/).
+
 ## Build mitigations carried over from the Edison citations
 
 These come directly from the failure modes the cited papers attribute to
