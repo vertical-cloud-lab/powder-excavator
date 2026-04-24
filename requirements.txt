@@ -1,0 +1,8 @@
+# Open-source Python tooling used to numerically test the bimodal-compliance
+# (bistability) of the secondary, compliant-mechanism design for the
+# powder-excavator. Pinned to >= versions known to work with the analyzer in
+# scripts/bimodal_compliance.py.
+numpy>=1.24
+scipy>=1.10
+matplotlib>=3.7
+pytest>=7.4

@@ -1,0 +1,86 @@
+# Vendor-Specific Model Level Specifications For Industrial Powder Handling Equipment
+
+- **Trajectory ID:** `a61e05d3-46bd-4439-a599-1a143995adcd`
+- **Crow / job:** `job-futurehouse-paperqa3` (literature (PaperQA3))
+- **Source:** Edison Scientific (`api.platform.edisonscientific.com`)
+
+## Prompt
+
+```
+Provide model-level technical specifications for industrial powder handling and dispensing equipment from the following vendors, where evidence from datasheets or peer-reviewed/trade literature is available: (1) Acrison weight-loss differential and volumetric feeders (e.g., Models 105, 130, 140, 170, 270, 402, 403, 405, BDF, MBDF); (2) Hapman bulk-bag unloaders, tubular drag conveyors, helix flexible screw conveyors, PosiPortion feeders; (3) AZO (AZO GmbH + Co. KG) ingredient automation, DOSITAINER, SHIFTSIFTER, ROTAJET, FLEXSCREEN, COMPONENTER manual/automatic small- and micro-component weighing systems; (4) Powder Systems Limited (PSL) GFD, GFD Lab, PSL Vac-Tech containment systems and powder handling isolators; (5) Matcon IBC systems with cone valve technology, IBC blenders, and automated discharge stations. For each, capture throughput, accuracy/precision, dose or batch range, containment level (OEB), and integration features. Note any items where vendor-level evidence is not available rather than guessing.
+```
+
+## Answer
+
+Question: Provide model-level technical specifications for industrial powder handling and dispensing equipment from the following vendors, where evidence from datasheets or peer-reviewed/trade literature is available: (1) Acrison weight-loss differential and volumetric feeders (e.g., Models 105, 130, 140, 170, 270, 402, 403, 405, BDF, MBDF); (2) Hapman bulk-bag unloaders, tubular drag conveyors, helix flexible screw conveyors, PosiPortion feeders; (3) AZO (AZO GmbH + Co. KG) ingredient automation, DOSITAINER, SHIFTSIFTER, ROTAJET, FLEXSCREEN, COMPONENTER manual/automatic small- and micro-component weighing systems; (4) Powder Systems Limited (PSL) GFD, GFD Lab, PSL Vac-Tech containment systems and powder handling isolators; (5) Matcon IBC systems with cone valve technology, IBC blenders, and automated discharge stations. For each, capture throughput, accuracy/precision, dose or batch range, containment level (OEB), and integration features. Note any items where vendor-level evidence is not available rather than guessing.
+
+## Evidence-based model-level specifications located
+
+The tool-based search retrieved citable numeric specifications for (i) an Acrison-compatible volumetric auger feeder as defined in a procurement/project specification (not an Acrison datasheet) and (ii) Matcon IBC cone-valve/discharge-station technology from patents. For the other requested vendors/models (Acrison models beyond the 105-class reference, Hapman, AZO, and Powder Systems Limited/PSL), no vendor datasheets or trade/peer-reviewed documents with explicit throughput/accuracy/dose range/OEB/integration specs were retrievable in this run; these are therefore explicitly reported as unavailable rather than inferred.
+
+### Consolidated specification table (evidence-derived)
+| Vendor | Model/Product | Throughput | Accuracy/Precision | Dose/Batch range | Containment/OEB | Integration/Controls | Evidence note |
+|---|---|---|---|---|---|---|---|
+| Acrison | Volumetric auger-type feeder for PAC dry feeder system (project specification listing Acrison as acceptable manufacturer; not an Acrison datasheet) | Volumetric capacity 0.03-0.9 ft³/hr; equivalent mass rate 0.56-16.6 lb/hr | Feed accuracy 2% of full scale | Hopper minimum capacity 3 ft³; feed auger 1 1/8 in; conditioning auger 10 in; VFD turndown 30:1 | No OEB/OEL stated | 1.0 HP AC induction motor; VFD (PowerFlex 40 or equal); local VFD speed adjustment; controller programmable for constant lb/hr feed or to follow 4-20 mA analog input representing 0-100% of max feed rate; low hopper level switch; air fluidization or vibrator option; removable drop tube; enclosed drive (designUnknownyearsection4633 pages 4-7) | Evidence is from a project specification (Section 46 33 00) that names Acrison as an acceptable manufacturer, so values should be treated as procurement/specification targets rather than confirmed Acrison model-datasheet values (designUnknownyearsection4633 pages 4-7) |
+| Matcon | IBC cone valve discharge apparatus / cone valve body (WO2021099805A1 family) | No explicit mass or volumetric throughput stated | Metered flow enabled by lockable lever position; no numeric dosing accuracy stated | Cone valve/body diameter about 200-500 mm, preferably ~250 mm; lever can lock at any position along travel for metered discharge | Containment described qualitatively via multiple seals; no OEB/OEL stated | Manual lever actuation; full lift/open-close in <1 s; guide rod with slot, optional bearing wheel; pivot blocks integral or detachable; loose flange bolted to IBC outlet flange; single support arm to maximize flow path (WO2021099805A1 pages 1-4, WO2021099805A1 pages 4-7, WO2021099805A1 pages 10-12) | Patent evidence gives mechanical dimensions and actuation details but not validated throughput or dosing accuracy (WO2021099805A1 pages 1-4, WO2021099805A1 pages 4-7, WO2021099805A1 pages 10-12) |
+| Matcon | IBC cone valve sealing/securement and levelling system (WO2000006469A1) | No throughput stated | Level detection/securement only; no numeric precision stated | No explicit batch range stated | Inflatable annular seal or lip seal; vacuum beneath cone to draw onto annular plate; designed to improve sealing/containment; no OEB/OEL stated | Rigid probe plate with feathered perimeter; compression spring or pneumatic/hydraulic piston-cylinder actuation; vacuum generator and vacuum line; vacuum detection switch; micro-switch sensors for levelling/monitoring; flow-restricted piston/cylinder option for slow lift and pull-down seating (WO2000006469A1 pages 1-4, WO2000006469A1 pages 4-6) | Patent evidence supports containment-oriented seal and control architecture, but no vendor datasheet rates or containment class values were found (WO2000006469A1 pages 1-4, WO2000006469A1 pages 4-6) |
+| Matcon | Gravity discharge apparatus with hollow cone valve actuator (AU765868B2) | Gravity discharge; no numeric throughput stated | No numeric precision stated | Example use references transfer of batches of 1000 kg or less | Containment via inflatable ring member and passive seal device; vacuum levelling means; no OEB/OEL stated | Spring return; bellows means and/or piston-cylinder means; vacuum levelling; cleaning by air wash and/or water wash, operable independently or sequentially (AU765868B2 pages 1-4) | Useful for batch-size context and actuator/cleaning options; not a commercial datasheet and does not provide discharge-rate validation (AU765868B2 pages 1-4) |
+| Matcon | Discharge station for material handling system (WO2023152466A1) | No explicit throughput stated | No numeric precision stated | No explicit batch/container size stated | Minimal dust emissions claimed; elastomeric circular seal ring with circumferential lip; resilient connection wall prevents ingress of material and isolates actuator from vibration; no OEB/OEL stated | Lifting device with actuator + probe; integrated vibrator in probe; connection part transfers load while isolating vibration; chute on three arms to circular support plate; earthing integrity noted (WO2023152466A1 pages 1-4) | Patent evidence supports discharge-station integration and dust-control features, but not certified containment levels or throughput (WO2023152466A1 pages 1-4) |
+| Matcon | Cone-valve outlet seal concept for IBC/hopper outlet (WO1997008080A1) | No throughput stated | No numeric precision stated | No explicit batch range stated | Conical seal at outlet edge; rubber moulding with metal backing; positive sealing nest/cup profile; removable securing means to allow washing; intended to resist ingress/egress due to pressure/vacuum changes; no OEB/OEL stated (WO1997008080A1 pages 1-4) | Requires accurately centered lifting apparatus; removable cover to prevent accidental cone removal; internal detents to retain cone (WO1997008080A1 pages 1-4) | Early patent evidence for Matcon-style cone-valve sealing architecture; no commercial performance ratings located (WO1997008080A1 pages 1-4) |
+
+
+*Table: This table compiles the extractable technical specifications found for one Acrison-compatible feeder procurement specification and Matcon cone-valve/discharge technologies from patent evidence. It highlights where numeric data are available and explicitly flags where no vendor datasheet-level throughput, accuracy, or containment class was found.*
+
+## Vendor-by-vendor notes and gaps (no guessing)
+
+### 1) Acrison weight-loss differential and volumetric feeders (Models 105, 130, 140, 170, 270, 402, 403, 405, BDF, MBDF)
+
+* **Acrison Model 105-class volumetric screw feeder (procurement spec evidence, not a datasheet):** A project specification for a powdered activated carbon (PAC) dry feeder system lists Acrison as an acceptable manufacturer and specifies performance targets/requirements including volumetric capacity 0.03–0.9 ft³/hr (0.56–16.6 lb/hr), feed accuracy 2% of full scale, minimum hopper 3 ft³, 1.0 HP motor with VFD (30:1 turndown), and controls supporting constant lb/hr operation or 4–20 mA analog follower (0–100% of max rate), plus low level switch and air fluidization/vibrator provision. These numbers are reportable only as procurement/specification targets associated with an Acrison-suppliable solution, not as confirmed factory specs for a named Acrison model variant. (designUnknownyearsection4633 pages 4-7)
+* **Acrison Models 130/140/170/270/402/403/405/BDF/MBDF:** No vendor datasheets or peer/trade literature with model-level throughput/accuracy/dose range/containment/integration specs were retrieved in this run; therefore these items cannot be populated with evidenced numeric specifications.
+
+### 2) Hapman (bulk-bag unloaders, tubular drag conveyors, Helix flexible screw conveyors, PosiPortion feeders)
+
+No Hapman datasheets or trade/peer-reviewed documents with explicit numeric model-level specifications were retrieved. Mentions of Hapman as a manufacturer in unrelated technical documents did not include usable equipment specifications; consequently, throughput/accuracy/dose range/OEB/integration fields are **not evidenced** for these items in the current corpus.
+
+### 3) AZO (ingredient automation, DOSITAINER, SHIFTSIFTER, ROTAJET, FLEXSCREEN, COMPONENTER manual/automatic small- and micro-component weighing)
+
+No AZO equipment datasheets/trade/peer-reviewed sources containing the requested numeric specifications were retrieved; searches predominantly returned unrelated uses of “AZO” (e.g., aluminum-doped zinc oxide; azo dyes). Therefore, AZO items are **not evidenced** for throughput/accuracy/batch range/OEB/integration in the current corpus.
+
+### 4) Powder Systems Limited (PSL) (GFD, GFD Lab, PSL Vac-Tech containment systems and powder handling isolators)
+
+No PSL datasheets or trade/peer-reviewed sources with explicit numeric model-level specs (e.g., OEB/OEL, airflow, filtration class, throughput/dose range) were retrieved. Patent material located in this run mentions PSL isolators qualitatively (glove-access contained enclosure for dispensing potent compounds) but did not yield extractable numeric specifications; thus PSL GFD/GFD Lab/Vac-Tech specifications are **not evidenced** here.
+
+### 5) Matcon IBC systems (cone valve technology, IBC blenders, automated discharge stations)
+
+Patents provide citable, design-level technical parameters and integration/containment features for Matcon-style IBC cone-valve discharge and discharge-station subsystems:
+
+* **Cone valve discharge apparatus dimensions and actuation:** Cone valve/body diameters (bore) approximately 200–500 mm, preferably ~250 mm, and manual lever actuation open/close in less than a second; lever can be locked at positions along travel to enable metered flow. (WO2021099805A1 pages 1-4, WO2021099805A1 pages 4-7, WO2021099805A1 pages 10-12)
+* **Sealing/containment (qualitative; no OEB/OEL):** Multiple seals (seal rings, scraper seals, sealing discs), loose flange bolting to IBC outlet, and features to reduce contaminant ingress/egress are described, but no OEB/OEL numerical performance is provided. (WO2021099805A1 pages 1-4, WO2021099805A1 pages 4-7, WO2000006469A1 pages 1-4, WO2000006469A1 pages 4-6, WO1997008080A1 pages 1-4)
+* **Integration features:** Vacuum levelling means; sensors such as micro-switches and vacuum detection; pneumatic/hydraulic piston-cylinder or spring assemblies; probe vibrator for discharge stations; air/water wash options for cleaning in certain embodiments. (AU765868B2 pages 1-4, WO2000006469A1 pages 1-4, WO2000006469A1 pages 4-6, WO2023152466A1 pages 1-4)
+* **Batch/dose range:** An example context of “batches of 1000 kg or less” is referenced in one patent excerpt; no general commercial batch-size range or blender capacity range is provided. (AU765868B2 pages 1-4)
+
+## Limitations
+
+* A figure/table image extraction was attempted for the Acrison-related procurement specification but failed due to document image retrieval limitations in the tool environment; all reported values are therefore taken from text-extracted evidence. (designUnknownyearsection4633 pages 4-7)
+* For Hapman, AZO, PSL, and most Acrison models requested, the limiting factor is absence of retrievable vendor datasheets or equivalent sources containing numeric model-level specifications in the current run; this response intentionally avoids filling gaps with typical industry values.
+
+
+References
+
+1. (designUnknownyearsection4633 pages 4-7): CG Design. Section 46 33 00 powdered activated carbon dry feeder system. Unknown journal, Unknown year.
+
+2. (WO2021099805A1 pages 1-4): David Bowles. Material discharge apparatus and related methods. Patent (WO,GB), 2021.
+
+3. (WO2021099805A1 pages 4-7): David Bowles. Material discharge apparatus and related methods. Patent (WO,GB), 2021.
+
+4. (WO2021099805A1 pages 10-12): David Bowles. Material discharge apparatus and related methods. Patent (WO,GB), 2021.
+
+5. (WO2000006469A1 pages 1-4): Edward Piepereit. Bulk material handling apparatus. Patent (WO,EP,JP,AR,AT,AU,BR,DE,GB), 2000.
+
+6. (WO2000006469A1 pages 4-6): Edward Piepereit. Bulk material handling apparatus. Patent (WO,EP,JP,AR,AT,AU,BR,DE,GB), 2000.
+
+7. (AU765868B2 pages 1-4): Charles Lee. Material handling apparatus. Patent (WO,EP,US,JP,AR,AT,AU,BR,DE,GB,TW), 2003.
+
+8. (WO2023152466A1 pages 1-4): Ian Williams. Discharge station for material handling system. Patent (WO,GB), 2023.
+
+9. (WO1997008080A1 pages 1-4): Ivan Semenenko. Material handling apparatus. Patent (WO,AU), 1997.
