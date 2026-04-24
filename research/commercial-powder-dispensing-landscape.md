@@ -12,6 +12,17 @@ per query, plus the raw JSON response. The synthesis below references those
 files and pulls out the most useful evidence-backed findings; consult the
 per-query files for full tables and citations.
 
+A **second batch of six follow-up queries** has now been submitted (not
+yet awaited; to be fetched in a follow-up session) to fill the gaps
+identified in the first synthesis — in particular **MTI** (both MTI
+Corporation lab equipment and MTI Mixers industrial), Acrison / Hapman /
+AZO / PSL / Matcon, mainstream liquid-handler powder modules (Hamilton,
+Tecan, Zinsser, Gilson, Sartorius, CyBio, Anton Paar), acoustic / piezo
+dry-powder microdispensers and the specific Quantos QX1/QX2 and Chemspeed
+Powdernium product lines, and academic / open-source robotic dispensers.
+See the [Submitted Edison queries](#submitted-edison-queries) section for
+the full list and task IDs.
+
 | Tag (file) | Focus |
 | --- | --- |
 | [`commercial-powder-dispensers-overview`](./edison_results/commercial-powder-dispensers-overview.md) | Cross-cutting landscape (lab + industrial) |
@@ -171,7 +182,9 @@ commercial offerings that motivate this project:
 
 See [`edison_queries.json`](./edison_queries.json) for the full prompts and
 task IDs, and [`edison_results/`](./edison_results/) for the fetched
-answers (Markdown + JSON, one pair per tag). Brief tags:
+answers (Markdown + JSON, one pair per tag).
+
+**First batch** (fetched, in `edison_results/`):
 
 | Tag | Focus |
 | --- | --- |
@@ -180,6 +193,17 @@ answers (Markdown + JSON, one pair per tag). Brief tags:
 | `powder-dosing-technology-comparison` | Technology comparison table |
 | `industrial-powder-feeders-bulk-handling` | Industrial / bulk vendors |
 | `micro-dose-mg-precision-dispensers` | mg / sub-mg precision instruments |
+
+**Second batch** (submitted, *not* yet fetched — pull in next session):
+
+| Tag | Focus |
+| --- | --- |
+| `mti-corporation-lab-powder-equipment` | MTI Corporation (mtixtl.com) lab/materials-research powder equipment |
+| `mti-mixers-industrial-powder-handling` | MTI Mixers / MTI Group industrial powder mixing & handling |
+| `industrial-bulk-vendors-acrison-hapman-azo-psl-matcon` | Acrison, Hapman, AZO, PSL, Matcon model-level specs |
+| `lab-liquid-handlers-with-powder-modules` | Hamilton, Tecan, Zinsser, Gilson, Sartorius, CyBio, Anton Paar solid-dispensing modules |
+| `acoustic-piezo-capacitive-microdose-and-quantos-qx-chemspeed-powdernium` | Acoustic/piezo dry-powder dispensers + Quantos QX1/QX2 + Chemspeed Powdernium / GDU specifics |
+| `academic-and-open-source-powder-dispensing-robots` | Academic / open-source / self-driving-lab powder dispensing robots |
 
 ## Reproducing the fetch
 
