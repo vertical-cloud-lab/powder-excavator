@@ -33,7 +33,9 @@
 
 /* [Main Dimensions — keep in sync with auger-shaft.scad] */
 outer_diameter   = 20;    // mm — outer tube OD
-total_height     = 100;   // mm — total tube height
+total_height     = 30;    // mm — total tube height
+                          // v3.1: shortened from 100 mm → 30 mm — see
+                          // matching note in auger-shaft.scad.
 wall_thickness   = 2;     // mm — outer tube wall
 
 /* [Clearance / fit] */

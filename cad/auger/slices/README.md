@@ -1,11 +1,13 @@
-# Auger slices (v3 — two-part design)
+# Auger slices (v3.1 — two-part design, short workshop variant)
 
-The auger is now **two printable parts** (per PR review): a FIXED inner
+The auger is **two printable parts** (per PR review): a FIXED inner
 shaft carrying the helical fin, and a ROTATING outer tube driven by the
-spindle. Each part is sliced independently for the project's two FDM
-rigs from PR #7 §6 (Original Prusa MK3S+ + Creality Ender-3) on 1.75 mm
-PLA at 0.4 mm nozzle / 0.2 mm layers / 3 perimeters / 40 % gyroid infill
-/ 4 mm brim / supports at 50°.
+spindle. v3.1 shrinks `total_height` from 100 mm → **30 mm** so the full
+assembly prints in well under an hour and a half — small enough for an
+end-of-workshop functional test. Each part is sliced independently for
+the project's two FDM rigs from PR #7 §6 (Original Prusa MK3S+ +
+Creality Ender-3) on 1.75 mm PLA at 0.4 mm nozzle / 0.2 mm layers /
+3 perimeters / 40 % gyroid infill / 4 mm brim / supports at 50°.
 
 ## Files
 
@@ -13,14 +15,14 @@ PLA at 0.4 mm nozzle / 0.2 mm layers / 3 perimeters / 40 % gyroid infill
 
 | Part | Printer | G-code | Time | Material |
 |---|---|---|---|---|
-| FIXED shaft | MK3S+    | [`auger-shaft.MK3S.gcode`](auger-shaft.MK3S.gcode)       | ≈ 1 h 42 m | 11.12 cm³ |
-| FIXED shaft | Ender-3  | [`auger-shaft.Ender3.gcode`](auger-shaft.Ender3.gcode)   | ≈ 1 h 35 m | 11.12 cm³ |
-| ROTATING tube | MK3S+   | [`auger-housing.MK3S.gcode`](auger-housing.MK3S.gcode)     | ≈ 2 h 23 m | 25.25 cm³ |
-| ROTATING tube | Ender-3 | [`auger-housing.Ender3.gcode`](auger-housing.Ender3.gcode) | ≈ 2 h 17 m | 25.25 cm³ |
-| FIXED shaft (USB short-name) | Ender-3 | [`SHAFT.gcode`](SHAFT.gcode) | same as Ender-3 above | 11.12 cm³ |
-| ROTATING tube (USB short-name) | Ender-3 | [`HOUSING.gcode`](HOUSING.gcode) | same as Ender-3 above | 25.25 cm³ |
+| FIXED shaft | MK3S+    | [`auger-shaft.MK3S.gcode`](auger-shaft.MK3S.gcode)       | ≈ 24 m | 2.31 cm³ |
+| FIXED shaft | Ender-3  | [`auger-shaft.Ender3.gcode`](auger-shaft.Ender3.gcode)   | ≈ 23 m | 2.31 cm³ |
+| ROTATING tube | MK3S+   | [`auger-housing.MK3S.gcode`](auger-housing.MK3S.gcode)     | ≈ 1 h 1 m | 9.24 cm³ |
+| ROTATING tube | Ender-3 | [`auger-housing.Ender3.gcode`](auger-housing.Ender3.gcode) | ≈ 59 m | 9.24 cm³ |
+| FIXED shaft (USB short-name) | Ender-3 | [`SHAFT.gcode`](SHAFT.gcode) | same as Ender-3 above | 2.31 cm³ |
+| ROTATING tube (USB short-name) | Ender-3 | [`HOUSING.gcode`](HOUSING.gcode) | same as Ender-3 above | 9.24 cm³ |
 
-Total per assembly on the Ender-3: ≈ 3 h 52 m, 36.4 cm³ (~46 g) of PLA.
+Total per assembly on the Ender-3: ≈ 1 h 22 m, 11.55 cm³ (~14 g) of PLA.
 Print the two parts separately (back-to-back is fine — same filament,
 same bed/nozzle temps).
 

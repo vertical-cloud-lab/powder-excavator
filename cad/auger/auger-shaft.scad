@@ -35,7 +35,14 @@
 
 /* [Main Dimensions — keep in sync with auger-housing.scad] */
 outer_diameter   = 20;    // mm — outer tube OD (informational; sets fin OD)
-total_height     = 100;   // mm — total tube height (informational)
+total_height     = 30;    // mm — total tube height (informational)
+                          // v3.1: shortened from 100 mm → 30 mm at PR-review
+                          // request ("very very short, easy to print
+                          // quickly, almost done with the workshop"). The
+                          // helix region is now ~1 turn instead of ~8;
+                          // every other dimension (OD, wall, pitch, fin
+                          // thickness, fits) is unchanged so the kinematics
+                          // and assembly fits are identical.
 wall_thickness   = 2;     // mm — outer tube wall
 
 /* [Clearance / fit] */
