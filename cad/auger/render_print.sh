@@ -184,6 +184,20 @@ cp "${SLICES_REPO_DIR}/archimedes-auger.Ender3.gcode" \
    "${SLICES_REPO_DIR}/AUGER.gcode"
 
 echo
+echo "==> [bonus] CuraEngine slices (Ultimaker Cura toolchain)"
+# In addition to the canonical PrusaSlicer outputs above, run CuraEngine for
+# parity with what most Ender-3 / MK3 users have on their desktop. The
+# CuraEngine binary is shipped via the `cura-slicer` snap (apt has no
+# `cura-engine` package on the runner). Soft-fail if the snap isn't
+# installed — the PrusaSlicer outputs are still the primary deliverable.
+if bash "${HERE}/slice_cura.sh"; then
+    echo "    Cura MK3S+:  ${SLICES_REPO_DIR}/archimedes-auger.MK3S.cura.gcode"
+    echo "    Cura Ender3: ${SLICES_REPO_DIR}/archimedes-auger.Ender3.cura.gcode"
+else
+    echo "    (CuraEngine slice skipped — install with 'sudo snap install cura-slicer')" >&2
+fi
+
+echo
 echo "==> Done."
 echo "    STL:        ${STL}"
 echo "    STEP:       ${STP}"
