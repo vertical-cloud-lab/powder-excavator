@@ -1,61 +1,133 @@
-% Bare-bones LaTeX template for a Digital Discovery (RSC) submission.
-% Uses the standard `article` class so it compiles with a minimal TeX Live
-% installation, while following the structure expected by the journal:
-%   https://www.rsc.org/journals-books-databases/author-and-reviewer-hub/authors-information/prepare-and-format/
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bare-bones manuscript template for Digital Discovery (Royal Society of
+% Chemistry).  Built on the official RSC "Article" / "Paper" LaTeX template
+% (Copyright The Royal Society of Chemistry 2010), distributed by the RSC for
+% authors preparing submissions and mirrored verbatim under paper/ in this
+% repository (rsc.bst, headers/, mhchem.sty, balance.sty, etc.).
 %
-% Build with:
-%   latexmk -pdf main.tex
-% or:
-%   pdflatex main.tex
+% Body text is filled with lorem ipsum (\lipsum) so the file is a placeholder
+% only.  Replace each section's content with your manuscript text.
+%
+% Build:
+%   cd paper && latexmk -pdf main.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[11pt,a4paper]{article}
-
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage[margin=2.5cm]{geometry}
+\documentclass[8.5pt,twoside,twocolumn]{article}
+\oddsidemargin -1.2cm
+\evensidemargin -1.2cm
+\textwidth 18cm
+\headheight 1.0in
+\topmargin -3.5cm
+\textheight 22cm
+\usepackage[super,sort&compress,comma]{natbib}
+\usepackage{mhchem}
+\usepackage{times,mathptmx}
+\usepackage{sectsty}
+\usepackage{balance}
 \usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{authblk}
-\usepackage{lipsum} % placeholder lorem ipsum text
-
-\title{A Bare-Bones Digital Discovery Submission Template}
-
-\author[1]{Jane Doe}
-\author[1,2]{John Smith}
-\affil[1]{Department of Powder Science, University of Example, City, Country}
-\affil[2]{Vertical Cloud Lab, Example Institute, City, Country}
-
-\date{\today}
+\usepackage{lastpage}
+\usepackage[format=plain,justification=raggedright,singlelinecheck=false,font=small,labelfont=bf,labelsep=space]{caption}
+\usepackage{fancyhdr}
+\usepackage{url}
+\usepackage{lipsum} % placeholder text only -- remove for real submissions % placeholder text only -- remove for real submissions
+\pagestyle{fancy}
 
 \begin{document}
-\maketitle
 
-\begin{abstract}
-\lipsum[1]
-\end{abstract}
+\thispagestyle{plain}
+\fancypagestyle{plain}{
+\fancyhead[L]{\includegraphics[height=8pt]{headers/LH}}
+\fancyhead[C]{\hspace{-1cm}\includegraphics[height=20pt]{headers/CH}}
+\fancyhead[R]{\includegraphics[height=10pt]{headers/RH}\vspace{-0.2cm}}
+\renewcommand{\headrulewidth}{1pt}}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\renewcommand\footnoterule{\vspace*{1pt}%
+\hrule width 3.4in height 0.4pt \vspace*{5pt}}
+\setcounter{secnumdepth}{5}
+
+\makeatletter
+\def\subsubsection{\@startsection{subsubsection}{3}{10pt}{-1.25ex plus -1ex minus -.1ex}{0ex plus 0ex}{\normalsize\bf}}
+\def\paragraph{\@startsection{paragraph}{4}{10pt}{-1.25ex plus -1ex minus -.1ex}{0ex plus 0ex}{\normalsize\textit}}
+\renewcommand\@biblabel[1]{#1}
+\renewcommand\@makefntext[1]%
+{\noindent\makebox[0pt][r]{\@thefnmark\,}#1}
+\makeatother
+\renewcommand{\figurename}{\small{Fig.}~}
+\sectionfont{\large}
+\subsectionfont{\normalsize}
+
+\fancyfoot{}
+\fancyfoot[LO,RE]{\vspace{-7pt}\includegraphics[height=9pt]{headers/LF}}
+\fancyfoot[CO]{\vspace{-7.2pt}\hspace{12.2cm}\includegraphics{headers/RF}}
+\fancyfoot[CE]{\vspace{-7.5pt}\hspace{-13.5cm}\includegraphics{headers/RF}}
+\fancyfoot[RO]{\footnotesize{\sffamily{1--\pageref{LastPage} ~\textbar  \hspace{2pt}\thepage}}}
+\fancyfoot[LE]{\footnotesize{\sffamily{\thepage~\textbar\hspace{3.45cm} 1--\pageref{LastPage}}}}
+\fancyhead{}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+\setlength{\arrayrulewidth}{1pt}
+\setlength{\columnsep}{6.5mm}
+\setlength\bibsep{1pt}
+
+\twocolumn[
+  \begin{@twocolumnfalse}
+\noindent\LARGE{\textbf{A bare-bones Digital Discovery submission template$^\dag$}}
+\vspace{0.6cm}
+
+\noindent\large{\textbf{Jane Doe,$^{\ast}$\textit{$^{a}$} John Smith\textit{$^{a,b}$} and
+Alex Roe\textit{$^{a}$}}}\vspace{0.5cm}
+
+\noindent\textit{\small{\textbf{Received Xth XXXXXXXXXX 20XX, Accepted Xth XXXXXXXXX 20XX\newline
+First published on the web Xth XXXXXXXXXX 20XX}}}
+
+\noindent \textbf{\small{DOI: 10.1039/b000000x}}
+\vspace{0.6cm}
+
+\noindent \normalsize{\lipsum[1][1-4]}
+\vspace{0.5cm}
+ \end{@twocolumnfalse}
+  ]
+
+%Footnotes
+\footnotetext{\dag~Electronic Supplementary Information (ESI) available: [details of any supplementary information available should be included here]. See DOI: 10.1039/b000000x/}
+\footnotetext{\textit{$^{a}$~Department of Powder Science, University of Example, Town, Country. E-mail: jane.doe@example.org}}
+\footnotetext{\textit{$^{b}$~Vertical Cloud Lab, Example Institute, Town, Country.}}
 
 \section{Introduction}
 \lipsum[2-3]
 
-\section{Methods}
-\lipsum[4]
+\section{Results and discussion}
+\lipsum[4-5]
 
-\section{Results and Discussion}
-\lipsum[5-6]
+\section{Experimental}
+\lipsum[6]
 
 \section{Conclusions}
 \lipsum[7]
 
-\section*{Conflicts of Interest}
+\section*{Author contributions}
+J.~Doe: conceptualization, methodology, writing -- original draft.
+J.~Smith: software, investigation.
+A.~Roe: writing -- review \& editing, supervision.
+
+\section*{Conflicts of interest}
 There are no conflicts to declare.
 
-\section*{Acknowledgements}
-\lipsum[8]
+\section*{Data availability}
+The data supporting this article have been included as part of the
+Electronic Supplementary Information. Source code is available at
+\url{https://github.com/vertical-cloud-lab/powder-excavator}.
 
-\begin{thebibliography}{1}
-\bibitem{example}
-A.~Author, B.~Author and C.~Author, \emph{J. Example}, 2026, \textbf{1}, 1--10.
-\end{thebibliography}
+\section*{Acknowledgements}
+\lipsum[8][1-2]
+
+\balance
+
+\renewcommand\refname{Notes and references}
+
+\footnotesize{
+\bibliography{rsc}
+\bibliographystyle{rsc}
+}
 
 \end{document}

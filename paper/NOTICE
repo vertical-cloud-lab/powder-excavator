@@ -1,0 +1,26 @@
+RSC LaTeX template files
+========================
+
+The following files in this directory are the official Royal Society of
+Chemistry article ("Paper") LaTeX template, distributed by the RSC for
+authors preparing journal submissions:
+
+    rsc.bst
+    rsc.bib
+    mhchem.sty
+    balance.sty
+    caption.sty
+    caption3.sty
+    fancyhdr.sty
+    secsty.sty
+    headers/CH.{eps,pdf}
+    headers/LH.{eps,pdf}
+    headers/RH.{eps,pdf}
+    headers/LF.{eps,pdf}
+    headers/RF.{eps,pdf}
+
+Copyright (c) The Royal Society of Chemistry. They are vendored unchanged
+into this repository so that authors can build a Digital Discovery (RSC)
+style submission without having to download the template separately.
+
+The manuscript source (`main.tex`) is original to this project.
