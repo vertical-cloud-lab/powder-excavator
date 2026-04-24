@@ -1,9 +1,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bare-bones manuscript template for Digital Discovery (Royal Society of
 % Chemistry).  Built on the official RSC "Article" / "Paper" LaTeX template
-% (Copyright The Royal Society of Chemistry 2010), distributed by the RSC for
-% authors preparing submissions and mirrored verbatim under paper/ in this
-% repository (rsc.bst, headers/, mhchem.sty, balance.sty, etc.).
+% (Copyright The Royal Society of Chemistry 2010).  Only the RSC-specific
+% assets (rsc.bst, rsc.bib, headers/) are vendored under paper/; all other
+% LaTeX packages used below (mhchem, balance, caption, fancyhdr, lipsum,
+% ...) are expected to be supplied by the local TeX distribution.
 %
 % Body text is filled with lorem ipsum (\lipsum) so the file is a placeholder
 % only.  Replace each section's content with your manuscript text.
@@ -12,7 +13,7 @@
 %   cd paper && latexmk -pdf main.tex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[8.5pt,twoside,twocolumn]{article}
+\documentclass[9pt,twoside,twocolumn]{extarticle}
 \oddsidemargin -1.2cm
 \evensidemargin -1.2cm
 \textwidth 18cm
@@ -20,9 +21,8 @@
 \topmargin -3.5cm
 \textheight 22cm
 \usepackage[super,sort&compress,comma]{natbib}
-\usepackage{mhchem}
+\usepackage[version=3]{mhchem}
 \usepackage{times,mathptmx}
-\usepackage{sectsty}
 \usepackage{balance}
 \usepackage{graphicx}
 \usepackage{lastpage}
@@ -53,8 +53,16 @@
 {\noindent\makebox[0pt][r]{\@thefnmark\,}#1}
 \makeatother
 \renewcommand{\figurename}{\small{Fig.}~}
-\sectionfont{\large}
-\subsectionfont{\normalsize}
+% Minimal section-font tweaks (replaces previous use of the `sectsty` package,
+% which doesn't support the `extarticle` document class).
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+  {-3.5ex \@plus -1ex \@minus -.2ex}{2.3ex \@plus.2ex}%
+  {\large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+  {-3.25ex\@plus -1ex \@minus -.2ex}{1.5ex \@plus .2ex}%
+  {\normalsize\bfseries}}
+\makeatother
 
 \fancyfoot{}
 \fancyfoot[LO,RE]{\vspace{-7pt}\includegraphics[height=9pt]{headers/LF}}

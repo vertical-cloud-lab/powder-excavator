@@ -6,16 +6,19 @@
 
 A bare-bones LaTeX template in the Digital Discovery (Royal Society of
 Chemistry) submission style is available in [`paper/`](paper). It is built on
-the official RSC "Paper" article template (two-column, 8.5pt Times,
+the official RSC "Paper" article template (two-column, 9 pt Times,
 `natbib`/`rsc.bst` bibliography, RSC running headers/footers) and uses
 `lipsum` placeholder text. A pre-built PDF is committed alongside it at
 [`paper/main.pdf`](paper/main.pdf).
 
-To rebuild the PDF locally (requires a TeX Live installation that includes
-`latexmk` and standard packages such as `natbib`, `mhchem`, `times`,
-`mathptmx`, `lastpage`, `lipsum` and `url`; the RSC class assets — `rsc.bst`,
-`rsc.bib`, `headers/`, `mhchem.sty`, `balance.sty`, `caption.sty`,
-`caption3.sty`, `fancyhdr.sty`, `secsty.sty` — are vendored in `paper/`):
+To rebuild the PDF locally you need a TeX Live installation that includes
+`latexmk` plus the standard packages used by the template (`natbib`,
+`mhchem`, `balance`, `caption`, `fancyhdr`, `lastpage`, `lipsum`,
+`url`, `times`/`mathptmx`, `extsizes`). On Debian/Ubuntu these are provided
+by `texlive-latex-recommended`, `texlive-latex-extra`,
+`texlive-fonts-recommended`, `texlive-science`, and `latexmk`. Only the
+RSC-specific assets (`rsc.bst`, `rsc.bib`, `headers/`) are vendored in
+`paper/`; all other packages are taken from the system TeX distribution.
 
 ```sh
 cd paper
