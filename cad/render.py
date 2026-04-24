@@ -2,7 +2,7 @@
 
 Where ``scripts/generate_figures.py`` draws hand-laid-out *schematic* figures
 that explain the design intent, this module produces *honest renders* of the
-geometry returned by :mod:`cad.excavator` — i.e.\\ what the part will
+geometry returned by :mod:`cad.excavator` -- i.e.\\ what the part will
 actually look like when it comes off the FDM printer. Each part gets a small
 vector SVG (hidden-line removed) under ``docs/figures/cad/``; the full
 assembly gets one extra render so the trough/arms/pin relationship is
@@ -22,8 +22,10 @@ Implementation notes:
   exportType='SVG', opt=...)``). This is a vector projection with hidden-
   line removal; no raster renderer or X server is required.
 
-* The same isometric projection direction is used for every part so they
-  all read as views of the same coordinate system.
+* The model uses CadQuery's +Y as "world up" (open top of the trough) and
+  +Z as the trough's longitudinal pin axis L. The default isometric
+  projection direction sits the camera on the +X / +Y / +Z octant so the
+  open ladle interior is visible.
 
 * The assembly is rendered by collapsing it to a single ``Compound`` via
   ``asm.toCompound()``; this loses per-part colour but keeps geometry,
@@ -51,9 +53,16 @@ from .excavator import (
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RENDER_DIR = REPO_ROOT / "docs" / "figures" / "cad"
 
+# Isometric viewpoint: camera on +X / +Y / +Z octant, looking back toward
+# the origin. CadQuery's ``projectionDir`` is the camera's look-at direction
+# (from camera to scene), so a vector with all-negative components puts the
+# camera in the all-positive octant. With the trough's open top facing +Y
+# this exposes the ladle interior, end caps, and rim lips simultaneously.
+_ISO_DIR = (-0.7, -1.0, -0.6)
+
 # Shared SVG exporter options. Picked so every part renders into the same
 # isometric viewpoint with hidden-line dashes turned on, which is what a
-# reader expects from a "CAD render" — a clean orthographic-style line
+# reader expects from a "CAD render" -- a clean orthographic-style line
 # drawing rather than a shaded raster.
 _BASE_OPT: dict[str, Any] = {
     "width": 720,
@@ -61,7 +70,7 @@ _BASE_OPT: dict[str, Any] = {
     "marginLeft": 20,
     "marginTop": 20,
     "showAxes": False,
-    "projectionDir": (1.0, -1.0, 0.6),  # iso-ish: looks down +Z, from +X / -Y
+    "projectionDir": _ISO_DIR,
     "strokeWidth": 0.4,
     "strokeColor": (40, 40, 40),
     "hiddenColor": (180, 180, 180),
@@ -95,11 +104,20 @@ def main() -> None:
         out = _render(fn(p), name)
         print(f"wrote {out.relative_to(REPO_ROOT)}")
 
-    # Full assembly — collapse to a single Compound so the SVG exporter can
-    # project it. ``toCompound`` preserves the per-instance placements.
+    # Full assembly. We render three views so the arm / pin / trough
+    # relationship is unambiguous: an isometric (default), an end view
+    # (looking along the pin axis -- shows the half-cylinder cross-section
+    # and how the arms grip the end caps), and a side view (perpendicular
+    # to the pin axis -- shows the full length L and both arms).
     asm = build_assembly(p)
-    out = _render(asm.toCompound(), "assembly", width=900, height=600)
-    print(f"wrote {out.relative_to(REPO_ROOT)}")
+    comp = asm.toCompound()
+    for view, proj in (
+        ("assembly",          _ISO_DIR),         # iso
+        ("assembly-end",      (0.0, 0.0, -1.0)), # along the pin axis
+        ("assembly-side",     (1.0, 0.0, 0.0)),  # perpendicular to pin axis
+    ):
+        out = _render(comp, view, width=900, height=600, projectionDir=proj)
+        print(f"wrote {out.relative_to(REPO_ROOT)}")
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -227,18 +227,34 @@ def build_arm(p: ExcavatorParams) -> CQObject:
     """One vertical arm.
 
     Two of these are mirrored about z = L/2 to grip the trough's two end
-    caps. The arm hangs from a carriage above it (not modelled here) and has
-    a clearance hole for the pivot pin near its bottom.
+    caps. The arm hangs from a carriage above it (not modelled here) down
+    to the pivot pin at its lower end. In model coordinates:
+
+    * +Y is the trough's open-top direction (and also "world up"), so the
+      arm extends from Y = 0 (its pin-hole height, which is placed at the
+      pivot height in :func:`build_assembly`) up in +Y to the carriage.
+    * +Z is the trough's longitudinal pin axis, so the arm is thin along
+      Z (``arm_thickness``) and the pin clearance hole runs along Z too.
+    * The arm's wide face (``arm_width``) is along X, perpendicular to
+      both, giving good bending stiffness against the cam reaction load.
     """
     arm = (
         cq.Workplane("XY")
-        .box(p.arm_thickness, p.arm_width, p.arm_length, centered=(True, True, False))
+        .box(
+            p.arm_width,        # X (wide face — bending stiffness)
+            p.arm_length,       # Y (vertical drop from gantry carriage)
+            p.arm_thickness,    # Z (along pin axis = along trough length L)
+            centered=(True, False, True),
+        )
     )
+    # Pin clearance hole at the bottom of the arm (Y = 0 in arm-local
+    # coords), drilled along +Z so it matches the pin's axis. Extruded
+    # ``both=True`` so it punches all the way through the arm regardless
+    # of arm_thickness.
     pin_hole = (
-        cq.Workplane("YZ")
+        cq.Workplane("XY")
         .circle((p.pin_diameter + p.pin_clearance) / 2)
         .extrude(p.arm_thickness * 2, both=True)
-        .translate((0, 0, p.arm_thickness / 2))
     )
     return arm.cut(pin_hole)
 

@@ -52,6 +52,7 @@ commit) is intended to widen this comparison.
 |---|---|
 | [`excavator.py`](excavator.py) | Parametric model. `ExcavatorParams` dataclass + `build_*` functions for the trough, arms, pivot pin, strike-off bar, smooth cam ramp, and the pin-slot board (Panel E variant). |
 | [`build.py`](build.py) | Exporter — writes STEP + STL for every part and a STEP for the assembly into `cad/build/`, plus a `manifest.json` with the parameter snapshot. |
+| [`render.py`](render.py) | **Visualisation.** Renders every part and the full assembly to vector SVGs under [`docs/figures/cad/`](../docs/figures/cad/) using CadQuery's built-in hidden-line SVG exporter — no rasterizer or X server required. Useful for "what does the print actually look like?" without having to load STEP/STL into a viewer. |
 | [`dfm.py`](dfm.py) | **Feedback mechanism.** Runs FDM-printability and gantry-only kinematics checks against the current parameter set; non-zero exit code on failure (CI-friendly). |
 | [`tests/test_excavator.py`](tests/test_excavator.py) | Unit tests: parts build at default parameters, DFM passes at defaults, deliberate regressions (sub-min-wall trough, off-board slot path) are caught. |
 
@@ -65,6 +66,9 @@ pip install cadquery
 
 # generate STEP/STL for every part + assembly + the manifest
 python -m cad.build
+
+# render every part + full assembly to docs/figures/cad/*.svg
+python -m cad.render
 
 # run the design-for-manufacturing + gantry-kinematics feedback
 python -m cad.dfm

@@ -467,6 +467,23 @@ introduce a new class of failure.
   \label{fig:pinslot}
 \end{figure}
 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.95\linewidth]{../figures/cad/assembly}
+  \caption{Honest hidden-line render of the parametric CAD assembly
+    (trough + two arms + pivot pin) at the default
+    \texttt{ExcavatorParams}, projected from
+    \texttt{(-0.7,\,-1.0,\,-0.6)}. Unlike the schematic figures above
+    (which are hand-laid-out for clarity), this image is generated
+    directly from the same CadQuery solids that
+    \texttt{python -m cad.build} writes to STEP/STL for the slicer ---
+    so what you see here is what the printer will produce. End-on and
+    side views (\texttt{docs/figures/cad/assembly-end} and
+    \texttt{assembly-side}) and per-part renders are produced
+    alongside it by \texttt{python -m cad.render}.}
+  \label{fig:cadrender}
+\end{figure}
+
 % --------------------------------------------------------------------------
 \section{Open questions and what we'd actually need to measure}
 \label{sec:measure}
