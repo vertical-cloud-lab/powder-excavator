@@ -24,6 +24,7 @@ toward a passive bistable trough, and the Edison-recommended bench-test plan.
 | 12 | [`12-industrial-bulk-vendor-specs.md`](12-industrial-bulk-vendor-specs.md) — Vendor-Specific Model Level Specifications For Industrial Powder Handling Equipment | literature (PaperQA3) | `a61e05d3-46bd-4439-a599-1a143995adcd` |
 | 13 | [`13-mti-mixers-survey.md`](13-mti-mixers-survey.md) — MTI Mixers and MTI Group Equipment Survey | literature (PaperQA3) | `e2919d20-86cc-44eb-a1f0-d2fc5b2db4f3` |
 | 14 | [`14-mti-corporation-catalog.md`](14-mti-corporation-catalog.md) — MTI Powder Handling Equipment Catalog | literature (PaperQA3) | `ab9e026e-946d-4918-a0b6-49e09d7bc962` |
+| 15 | [`15-bimodal-trough-design-feedback.md`](15-bimodal-trough-design-feedback.md) — Bimodal Compliant-Trough Design Feedback (v4, with iso PNG + SCAD + scripts uploaded) | analysis (Crow, high) | `c829f7db-f6a4-488c-8fc4-83f8f1106b8c` |
 
 ## Reproducing
 
