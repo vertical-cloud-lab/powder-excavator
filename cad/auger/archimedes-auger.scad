@@ -19,14 +19,39 @@
 //   - Top cap increased to 6mm
 //   - fin_inner_r increased to 2.0mm for cleaner central flow path
 //
+// v2.1 changes vs v2 (manifold/printability):
+//   - Helical fin outer edge overlaps tube wall by 0.4mm and top/bottom
+//     overlap funnel/boss by 0.2mm. v2 had zero-thickness coincident
+//     surfaces that broke CGAL union (99 disconnected volumes in STL).
+//     v2.1 exports as a single manifold solid (admesh: 0 issues, 1 part).
+//
 // Print:   PLA or PETG, 0.2mm layer height, 0.4mm nozzle
-//          Print VERTICALLY (flat bottom on build plate)
-//          3+ perimeters on outer walls, 40% infill fins
-//          NO supports needed when printed vertically
-//          After printing: tap M3 boss hole with M3 hand tap
+//          Print VERTICALLY (flat bottom — exit hole — on build plate)
+//          3+ perimeters on outer walls, 40% gyroid infill
+//          ENABLE supports + 4mm brim:
+//             - Brim required: bottom contact is a thin annular ring
+//               around the 1.5mm exit hole (low bed adhesion).
+//             - Supports required: helix inner edge starts at r=2mm
+//               above the funnel cavity (floating bridge anchor); top
+//               cap also bridges the boss-to-wall annulus at z=94.
+//          After printing: tap M3 boss hole with M3 hand tap.
+//          Ultimaker note: standard Ultimaker filament is 2.85mm
+//          (not 2.4mm); this file slices fine for 2.85mm with the
+//          PrusaSlicer settings documented in the PR.
 //
 // Render:  Paste into https://openscad.org/demo/ → F6 (Render)
 // Export:  File → Export → Export as STL
+// Headless STL + checks (CI/local):
+//   xvfb-run -a openscad -o archimedes-auger.stl \
+//       --export-format=binstl archimedes-auger.scad
+//   admesh -fundecvb /tmp/clean.stl archimedes-auger.stl
+// Headless slice for Ultimaker (PrusaSlicer 2.7+):
+//   prusa-slicer --export-gcode -o auger.gcode \
+//       --filament-diameter 2.85 --nozzle-diameter 0.4 \
+//       --filament-type PLA --layer-height 0.2 \
+//       --perimeters 3 --fill-density 40% --fill-pattern gyroid \
+//       --brim-width 4 --support-material --support-material-auto \
+//       --support-material-threshold 50 archimedes-auger.stl
 //
 // ================================================================
 
@@ -143,18 +168,26 @@ module top_cap() {
 
 // Helical fin — Archimedes element.
 // Single-start helix from fin_inner_r to inner_r.
-// Outer edge flush with tube inner wall (structurally bonded).
+// Outer edge overlaps tube inner wall by `fin_wall_overlap` (avoids
+// zero-thickness coincident surfaces that break CGAL union → manifold STL).
+// Vertical extent overlaps funnel/boss by `fin_z_overlap` for the same reason.
 // Inner edge (fin_inner_r=2mm) clear of M3 boss (boss_r=4mm in overlap zone).
+fin_wall_overlap = 0.4;   // mm — fin outer edge sinks into outer wall
+fin_z_overlap    = 0.2;   // mm — fin top/bottom sink into boss/funnel
+
 module helical_fin() {
-    fin_width = inner_r - fin_inner_r;
-    translate([0, 0, helix_z_start])
+    fin_outer = inner_r + fin_wall_overlap;        // 8.4mm
+    fin_width = fin_outer - fin_inner_r;           // 6.4mm
+    z_start   = helix_z_start - fin_z_overlap;
+    z_height  = helix_height + 2 * fin_z_overlap;
+    translate([0, 0, z_start])
     linear_extrude(
-        height    = helix_height,
+        height    = z_height,
         twist     = turns * 360,
         slices    = total_slices,
         convexity = 10
     ) {
-        translate([(fin_inner_r + inner_r) / 2, 0])
+        translate([(fin_inner_r + fin_outer) / 2, 0])
             square([fin_width, fin_thickness], center=true);
     }
 }
