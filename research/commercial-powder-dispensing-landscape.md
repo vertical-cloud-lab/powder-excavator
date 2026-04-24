@@ -13,31 +13,37 @@ dispensing solutions, motivating the design of `powder-excavator`.
 
 ## Status
 
-Five Edison Scientific literature queries were submitted in a prior session
-and have now been fetched. The full citation-backed answers are stored
-verbatim under [`edison_results/`](./edison_results/) — one Markdown file
-per query, plus the raw JSON response. The synthesis below references those
-files and pulls out the most useful evidence-backed findings; consult the
+**All eleven Edison Scientific literature queries have now been fetched**
+(five from the first batch + six from the second batch). The full
+citation-backed answers are stored verbatim under
+[`edison_results/`](./edison_results/) — one Markdown file per query,
+plus the raw JSON response. The synthesis below references those files
+and pulls out the most useful evidence-backed findings; consult the
 per-query files for full tables and citations.
 
-A **second batch of six follow-up queries** has now been submitted (not
-yet awaited; to be fetched in a follow-up session) to fill the gaps
+A second batch of six follow-up queries was added to fill the gaps
 identified in the first synthesis — in particular **MTI** (both MTI
 Corporation lab equipment and MTI Mixers industrial), Acrison / Hapman /
 AZO / PSL / Matcon, mainstream liquid-handler powder modules (Hamilton,
 Tecan, Zinsser, Gilson, Sartorius, CyBio, Anton Paar), acoustic / piezo
 dry-powder microdispensers and the specific Quantos QX1/QX2 and Chemspeed
 Powdernium product lines, and academic / open-source robotic dispensers.
-See the [Submitted Edison queries](#submitted-edison-queries) section for
-the full list and task IDs.
+A short summary of what those second-batch queries actually returned is in
+[§ 6 below](#6-second-batch-findings-mti-bulk-vendors-liquid-handler-powder-modules-acousticpiezo-academicopen-source).
 
-| Tag (file) | Focus |
-| --- | --- |
-| [`commercial-powder-dispensers-overview`](./edison_results/commercial-powder-dispensers-overview.md) | Cross-cutting landscape (lab + industrial) |
-| [`lab-automated-powder-dispensing-companies`](./edison_results/lab-automated-powder-dispensing-companies.md) | Lab vendors and model names |
-| [`powder-dosing-technology-comparison`](./edison_results/powder-dosing-technology-comparison.md) | Technology-by-technology comparison |
-| [`industrial-powder-feeders-bulk-handling`](./edison_results/industrial-powder-feeders-bulk-handling.md) | Industrial / bulk vendors |
-| [`micro-dose-mg-precision-dispensers`](./edison_results/micro-dose-mg-precision-dispensers.md) | mg / sub-mg precision instruments |
+| Tag (file) | Focus | Batch |
+| --- | --- | --- |
+| [`commercial-powder-dispensers-overview`](./edison_results/commercial-powder-dispensers-overview.md) | Cross-cutting landscape (lab + industrial) | 1 |
+| [`lab-automated-powder-dispensing-companies`](./edison_results/lab-automated-powder-dispensing-companies.md) | Lab vendors and model names | 1 |
+| [`powder-dosing-technology-comparison`](./edison_results/powder-dosing-technology-comparison.md) | Technology-by-technology comparison | 1 |
+| [`industrial-powder-feeders-bulk-handling`](./edison_results/industrial-powder-feeders-bulk-handling.md) | Industrial / bulk vendors | 1 |
+| [`micro-dose-mg-precision-dispensers`](./edison_results/micro-dose-mg-precision-dispensers.md) | mg / sub-mg precision instruments | 1 |
+| [`mti-corporation-lab-powder-equipment`](./edison_results/mti-corporation-lab-powder-equipment.md) | MTI Corporation (mtixtl.com) lab/materials-research equipment | 2 |
+| [`mti-mixers-industrial-powder-handling`](./edison_results/mti-mixers-industrial-powder-handling.md) | MTI Mixers / MTI Group industrial powder mixing & handling | 2 |
+| [`industrial-bulk-vendors-acrison-hapman-azo-psl-matcon`](./edison_results/industrial-bulk-vendors-acrison-hapman-azo-psl-matcon.md) | Acrison, Hapman, AZO, PSL, Matcon model-level specs | 2 |
+| [`lab-liquid-handlers-with-powder-modules`](./edison_results/lab-liquid-handlers-with-powder-modules.md) | Hamilton, Tecan, Zinsser, Gilson, Sartorius, CyBio, Anton Paar solid-dispensing modules | 2 |
+| [`acoustic-piezo-capacitive-microdose-and-quantos-qx-chemspeed-powdernium`](./edison_results/acoustic-piezo-capacitive-microdose-and-quantos-qx-chemspeed-powdernium.md) | Acoustic / piezo dry-powder dispensers + Quantos QX1/QX2 + Chemspeed Powdernium / GDU specifics | 2 |
+| [`academic-and-open-source-powder-dispensing-robots`](./edison_results/academic-and-open-source-powder-dispensing-robots.md) | Academic / open-source / self-driving-lab powder dispensing robots | 2 |
 
 ## Synthesis
 
@@ -186,6 +192,124 @@ commercial offerings that motivate this project:
    orchestration; new entrants have a clear opening on
    automation-friendly integration.
 
+### 6. Second-batch findings (MTI, bulk vendors, liquid-handler powder modules, acoustic/piezo, academic/open-source)
+
+These six queries were specifically targeted at the gaps called out in
+§ 1–§ 4. The dominant outcome is **negative evidence**: for most of the
+vendor product families that motivated the queries, Edison's
+literature-search tooling could not retrieve primary datasheets or
+peer-reviewed quantitative specs — only project specifications,
+patents, and indirect mentions. That is itself useful: it confirms that
+specs for these instruments are not openly published in the academic
+corpus and would have to be obtained from vendor PDFs or direct contact.
+
+- **MTI Corporation (mtixtl.com) lab equipment**
+  ([`mti-corporation-lab-powder-equipment`](./edison_results/mti-corporation-lab-powder-equipment.md)) —
+  No vendor datasheets retrieved. Peer-reviewed papers do confirm
+  recurring use of MTI hardware in battery / ceramics / additive
+  research: the **MSK-SFM-3** desktop high-speed vibrating ball-mill
+  mixer (and **MSK-SFM-3-F** SS variant) for dry milling of oxide /
+  niobate / glass powders, and MTI as a supplier of graphite powder /
+  Cu foil and the **BST8-WA** battery analyzer. Mechanism, dose ranges,
+  glovebox compatibility, and pricing are not stated in the retrieved
+  sources. The model line implied by the *AM-PD6* powder-dispensing
+  station shown in our image set (panel "MTI Corp. powder station") is
+  not substantiated by retrievable literature.
+- **MTI Mixers / MTI Group industrial**
+  ([`mti-mixers-industrial-powder-handling`](./edison_results/mti-mixers-industrial-powder-handling.md)) —
+  No primary brochures retrieved. Edison did, however, give a useful
+  **disambiguation**: at least three distinct "MTI" entities appear
+  in the powder literature — MTI Corporation (mtixtl.com, lab/battery
+  supplier), MTI Mixers (mtimixer.com, industrial mixers), and
+  **Mischtechnik International (MTI) GmbH** (a separate German
+  mixing-technology firm cited in powder-coating R&D for ~1 kg
+  Premixer batches). Treat the three as different companies in any
+  downstream reference.
+- **Acrison / Hapman / AZO / PSL / Matcon**
+  ([`industrial-bulk-vendors-acrison-hapman-azo-psl-matcon`](./edison_results/industrial-bulk-vendors-acrison-hapman-azo-psl-matcon.md)) —
+  Only two model-level numeric specs were retrievable, both indirect:
+  (i) an **Acrison-compatible volumetric auger feeder** in a project
+  specification — 0.03–0.9 ft³/h (≈0.56–16.6 lb/h), ±2 % full-scale
+  accuracy, 30:1 VFD turndown, 4–20 mA control; and (ii) **Matcon's
+  IBC cone-valve discharge apparatus** from patent WO2021099805A1 —
+  ≈200–500 mm body (typical 250 mm), <1 s lift, lockable lever for
+  metered discharge, qualitative containment via multiple seals. No
+  vendor-datasheet specs were retrievable for Hapman, AZO, or PSL.
+  These remain on the "needs vendor PDF" list.
+- **Liquid-handler powder modules (Hamilton, Tecan, Zinsser, Gilson, Sartorius, CyBio, Anton Paar)**
+  ([`lab-liquid-handlers-with-powder-modules`](./edison_results/lab-liquid-handlers-with-powder-modules.md)) —
+  Across all seven vendor ecosystems, the **only** powder-dispensing
+  technology with retrievable mechanistic evidence as an on-deck or
+  adjacent solids station was the **Mettler-Toledo Quantos** hopper /
+  feeder with rotary tapping. No vendor-branded "powder head" was
+  substantiated for Hamilton STAR/STARlet/Vantage, Tecan
+  Fluent/Freedom EVO, Zinsser SpeedyDoser, Gilson PIPETMAX/GX-271,
+  Sartorius Cubis II MCA, Analytik Jena CyBio, or Anton Paar; one
+  retrieved paper explicitly flags Quantos integration on a *non-
+  Hamilton* robotic platform as a feasibility precedent. **Practical
+  takeaway:** if a current liquid-handler workflow needs solids,
+  Quantos is still the de-facto add-on, regardless of which liquid
+  robot sits next to it.
+- **Acoustic / piezo / capacitive dry-powder + Quantos QX1/QX2 + Chemspeed Powdernium / GDU**
+  ([`acoustic-piezo-capacitive-microdose-and-quantos-qx-chemspeed-powdernium`](./edison_results/acoustic-piezo-capacitive-microdose-and-quantos-qx-chemspeed-powdernium.md)) —
+  No retrievable evidence for **dry-powder** acoustic dispensing on
+  EDC Biosystems ATS Gen5/Gen6, Scienion sciDROP-PICO, or Labcyte/
+  Beckman Echo — the available literature on these instruments is
+  liquid-only (assays, compound dispensing). Likewise, **no vendor-
+  datasheet specs** were retrievable for Quantos QX1 / QX2 or for
+  Chemspeed *Powdernium* / GDU-V/Pfd/S/P variants beyond what is
+  already summarised in § 1. Confirms our earlier suspicion that
+  "Powdernium", "Quantos QX1/QX2", and "Hamilton STAR powder head"
+  appear to be marketing- or configuration-level names rather than
+  separately documented product datasheets.
+- **Academic / open-source robotic powder dispensing**
+  ([`academic-and-open-source-powder-dispensing-robots`](./edison_results/academic-and-open-source-powder-dispensing-robots.md)) —
+  The richest of the second-batch answers. Concrete systems include:
+  the **Jiang et al. 2023** dual-arm biomimetic spatula dispenser
+  (ABB YuMi + analytical balance, 20 mg–1 g, ~2 % error on
+  non-challenging solids, fuzzy-logic shaking, code/models on
+  GitHub/Zenodo, struggles with hygroscopic and compressible powders);
+  the **Berkeley A-Lab** autonomous inorganic-synthesis platform
+  using a central robot arm to dose powders into furnaces; and a
+  family of FLIP-style flow-aware ML dosing controllers,
+  ChemOS/Coscientist/ARES integrations, and emerging Opentrons /
+  3D-printed open-hardware add-ons. Common conclusions across the
+  academic corpus: open systems are slower than Quantos / Chemspeed
+  per dispense, but cover a broader powder zoo, and almost
+  universally cite **<10 mg dispensing** and **cohesive / hygroscopic
+  powders** as the unsolved frontier — the same gaps identified in
+  § 5 above.
+
+#### Updated gaps after batch 2
+
+Batch 2 mostly *strengthens* the gap analysis in § 5 rather than
+closing it:
+
+- **Vendor publication gap.** Even with targeted, vendor-specific
+  Edison queries, datasheet-grade specs for Acrison, Hapman, AZO,
+  PSL, MTI Mixers, MTI Corporation powder stations, Hamilton/Tecan/
+  Gilson/Zinsser/Sartorius/CyBio/Anton Paar solid modules, Quantos
+  QX1/QX2, and Chemspeed Powdernium/GDU variants are largely
+  *not in the open literature*. Anyone designing against these
+  systems will need the vendor PDFs in hand.
+- **No on-deck powder head from the major liquid-handler OEMs.** Their
+  documented strategy is to integrate Mettler-Toledo Quantos rather
+  than ship a first-party powder dispenser — leaving a clear opening
+  for an open / interoperable powder module that talks to liquid
+  handlers natively.
+- **"MTI" is genuinely ambiguous.** Disambiguating MTI Corporation
+  vs MTI Mixers vs Mischtechnik International (MTI) GmbH should be
+  done explicitly anywhere these vendors are cited.
+- **Acoustic dry-powder dispensing remains a research aspiration**,
+  not a commercially-substantiated capability — relevant prior art for
+  any future `powder-excavator` direction targeting nano-/microparticle
+  ejection.
+- **The academic open-source corpus already provides credible reference
+  designs** (Jiang 2023 spatula, A-Lab, FLIP) but none yet matches
+  Quantos / Chemspeed on per-dispense speed at ≤10 mg — the natural
+  benchmark for `powder-excavator`.
+
+
 ## Submitted Edison queries
 
 See [`edison_queries.json`](./edison_queries.json) for the full prompts and
@@ -202,7 +326,7 @@ answers (Markdown + JSON, one pair per tag).
 | `industrial-powder-feeders-bulk-handling` | Industrial / bulk vendors |
 | `micro-dose-mg-precision-dispensers` | mg / sub-mg precision instruments |
 
-**Second batch** (submitted, *not* yet fetched — pull in next session):
+**Second batch** (fetched, in `edison_results/`; second-batch synthesis is in [§ 6 above](#6-second-batch-findings-mti-bulk-vendors-liquid-handler-powder-modules-acousticpiezo-academicopen-source)):
 
 | Tag | Focus |
 | --- | --- |
@@ -213,9 +337,18 @@ answers (Markdown + JSON, one pair per tag).
 | `acoustic-piezo-capacitive-microdose-and-quantos-qx-chemspeed-powdernium` | Acoustic/piezo dry-powder dispensers + Quantos QX1/QX2 + Chemspeed Powdernium / GDU specifics |
 | `academic-and-open-source-powder-dispensing-robots` | Academic / open-source / self-driving-lab powder dispensing robots |
 
+> The original second-batch task IDs got stuck (`get_task` returned
+> HTTP 500 / progress 99 %); the user rotated the API key and the
+> queries were re-submitted. The resubmitted task IDs are recorded
+> under a `resubmissions[]` field on each entry of
+> [`edison_queries.json`](./edison_queries.json) (originals preserved),
+> and all six completed successfully under the new key.
+
 ## Reproducing the fetch
 
-All five tasks completed with `status=success`. They were re-fetched with:
+All eleven tasks completed with `status=success` (the five first-batch
+tasks under their original IDs; the six second-batch tasks under the
+resubmitted IDs in `resubmissions[]`). They were re-fetched with:
 
 ```python
 import json, os
