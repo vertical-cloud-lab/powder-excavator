@@ -4,3 +4,5 @@ If using Edison Scientific, you may need to wait up until 10 minutes to get the 
 from edison_client import EdisonClient, JobNames
 client = EdisonClient(api_key=EDISON_API_KEY)
 ```
+
+If you make changes to CAD drawings, recompile/render them (images, GIFs, STLs, etc.).
