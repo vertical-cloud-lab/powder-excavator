@@ -67,13 +67,17 @@ recommendation:
   risk, warping). A Python port is planned. This is a more credible
   open-source DFM source to lean on than what I have in `cad/dfm.py` today and
   is worth wrapping or reimplementing for the closed-loop side of #6.
-* **Closed-loop testing target = Jubilee + balance + OpenCV + Ax/BoTorch.**
-  The synthesis lands on this as the canonical open-hardware/open-software
-  stack for "design → print → measure → re-design", with concrete prior art
-  (Deneault 2021 "AM ARES" Bayesian-opt of FDM params; Pelkie 2025
-  Science-Jubilee SDL paper). That's the natural physical-feedback companion
-  to the parametric CadQuery model and the right thing to point at when
-  resolving the "feedback mechanisms" half of the original PR-2 ask.
+* **Closed-loop testing target — the literature canonical answer is
+  Jubilee + balance + OpenCV + Ax/BoTorch**, with concrete prior art (Deneault
+  2021 "AM ARES" Bayesian-opt of FDM params; Pelkie 2025 Science-Jubilee SDL
+  paper). **That is *not* the rig we're actually building.** For
+  powder-excavator the planned hardware is a **Genmitsu 3018-Pro V2** desktop
+  GRBL CNC plus a **Prusa i3 / MK3 (or Ender)** FDM printer — both manual-load,
+  no auto-sample-changer, no integrated load cell or camera. So Jubilee /
+  Science-Jubilee is the wrong reference platform here, and Ax/BoTorch is
+  overkill while every trial is human-evaluated. The literature pick is the
+  right *aspirational* target for a future SDL build-out; the v1 stack that
+  matches our actual hardware is in §6 below.
 * **Generative-CAD fields beyond my scoreboard.** Topology-optimisation
   commercial tools (nTop, Altair Inspire, Ansys Discovery, Fusion GD, NX) are
   reviewed as a class: the literature finding is that they all "fall short in
@@ -89,9 +93,11 @@ recommendation:
 The synthesis does **not** change the per-tool verdicts in the scoreboard
 above. It does add **build123d** as a sibling pick to CadQuery, points at
 **Will It Print** as a better DFM target than what I have, and names
-**Jubilee + Ax/BoTorch** as the right physical-feedback rig to wire to the
-parametric model. Those are the concrete follow-ups; everything else in the
-synthesis is supporting evidence rather than a course correction.
+**Jubilee + Ax/BoTorch** as the *literature-canonical* physical-feedback rig
+(noting we are not actually building that rig — see §6 for the stack that
+matches the Genmitsu 3018 + Prusa MK3 / Ender we plan to use). Those are the
+concrete follow-ups; everything else in the synthesis is supporting evidence
+rather than a course correction.
 
 ---
 
@@ -324,23 +330,96 @@ replace or dual-source the CadQuery model.
 
 ---
 
+## 6. Hardware-aware pipeline for Genmitsu 3018-Pro V2 + Prusa MK3 / Ender
+
+The literature synthesis (§"Independent corroboration") points at **Jubilee +
+balance + OpenCV + Ax/BoTorch** as the canonical SDL rig. That is the right
+*aspirational* target, but it is not what we are actually building. The
+planned hardware for powder-excavator is:
+
+* **Genmitsu 3018-Pro V2** — desktop GRBL CNC, ~300×180×45 mm work envelope,
+  ~10k RPM 775 spindle, ER11 collet, Woodpecker-style controller speaking
+  GRBL G-code over USB. Manual workholding, no auto-tool-change, no probe by
+  default.
+* **Prusa i3 / MK3 (or Creality Ender-3)** — manual-load FDM printer, no
+  sample changer, no instrumented bed.
+
+Both are good-enough hobby-grade machines; neither is a Jubilee and neither
+exposes a closed-loop instrumented-feedback hook out of the box. So the v1
+"meta-tool" stack that actually fits this hardware is:
+
+| Stage | Tool | Why it fits this hardware |
+|-------|------|---------------------------|
+| Parametric CAD | **CadQuery** (or **build123d**) | Unchanged — pip-installable, headless, real STEP/STL out, runs in CI. |
+| Second-source / sanity check | **OpenSCAD** | Unchanged — `apt install openscad`, already builds an STL on the runner. |
+| FDM slicing (MK3 / Ender) | **PrusaSlicer CLI** | Headless, ships profiles for both MK3S and Ender-3 in-box, exports G-code plus per-print metrics (time, filament use, support volume) that are useful as DFM signals. |
+| CNC CAM for the 3018 | **FreeCAD Path workbench** (headless via `freecadcmd`), or **Kiri:Moto** for STL-in / GRBL-out without scripting | Both emit GRBL-flavored G-code suitable for the 3018's Woodpecker controller. FreeCAD Path is the CI-friendly option; Kiri:Moto is the low-friction option. |
+| G-code simulation | **Camotics** (apt) or **NC Viewer** (web) | Visualise the toolpath before crashing a 3.175 mm endmill into the bed. Camotics is fine for spot checks. |
+| Sender to the 3018 | **UGS** (Universal Gcode Sender) or **bCNC** | Standard GRBL senders. Not a CI thing — listed so the meta-tool list matches reality. |
+| DFM | Will-It-Print-style checks (overhang, small feature, warping, toppling, surface) for the FDM side; geometric guards (min endmill diameter, max depth-of-cut per pass, no internal sharp corners smaller than tool radius, no features taller than ~40 mm Z) for the CNC side | Keep `cad/dfm.py` — split FDM-vs-CNC. |
+| Design-space exploration | **Manual parameter sweeps + a small pandas/Jupyter scorecard** by default. Optional: **Optuna** with `n_trials≈10–20` if you grow past ~5 parameters and are willing to do that many physical builds | No automated objective function exists yet — every trial requires a human to print/mill/measure. BO over <5 hand-evaluated trials isn't worth the framework overhead; a Latin-hypercube of 6–9 designs evaluated in a notebook beats Ax here. |
+| Glue | Python + Jupyter | Unchanged. |
+
+**Net stack for v1:** CadQuery (+ OpenSCAD second source) → PrusaSlicer CLI
+for the MK3/Ender parts, FreeCAD Path → GRBL for the 3018 parts → Camotics
+preview → manual build/measure → pandas scorecard in Jupyter. Optuna only if
+the parameter count justifies it; Ax/BoTorch and Science-Jubilee stay on the
+"future SDL" wishlist for if/when a load cell, scale, or webcam ever gets
+bolted onto the bench.
+
+### Cost / Linux-headless reality check for the paid-tool rows
+
+The scoreboard above lists three paid tools as "would survive CI if you pay
+the vendor": Rhino+Compute, Onshape FeatureScript, and nTop Automate. Concrete
+2026 numbers, so this is not re-litigated next time:
+
+| Tool | List price (USD) | Academic / education option | Linux-headless reality |
+|------|------------------|------------------------------|-------------------------|
+| **Rhino 8** (single-user, perpetual) | ~$995 commercial | **~$195** academic single-user, perpetual, full-featured (proof of student/educator status required); some authorised resellers occasionally as low as ~$140–$180 | **No native Linux build, no supported headless mode.** Rhino 8 is Windows + macOS only. The pure-Python `rhino3dm` library and the `rhino.compute` proxy run on Linux, but the actual geometry kernel (`compute.geometry`) needs Rhino-for-Windows behind it (Windows host, Wine + license, or a paid hosted Compute). The academic licence does not change that. |
+| **Onshape** | Free **Public** plan ($0, all docs world-visible, non-commercial); **Standard** ~$1,500/user/yr (private docs, commercial use); **Professional** ~$2,500/user/yr (PDM, workflows, simulation); **Enterprise** quote-only | **Education plan is free** for verified individual students and educators (full features, non-commercial). Education *Enterprise* (institution-managed) is paid. | Browser + cloud REST API — Linux-native by construction. The runner just `pip install onshape-client` and posts to `cad.onshape.com`. Works in CI today with `ONSHAPE_ACCESS_KEY` / `ONSHAPE_SECRET_KEY` secrets. For an academic project the free Education plan is the obvious entry point, though for an open repo the Public free tier (everything world-visible) is the simplest match. |
+| **nTop / nTop Automate** | **Quote-only — no public list price.** Comparable enterprise CAD tools sit in the $2.4k–$8k/user/yr range, and nTop is generally reported at or above that band. Automate is a licensable add-on, also quote-only. | nTop offers academic pricing but **does not publish rates** — institution, seat count, and teaching-vs-research use all factor in. Contact academic@ntop.com. | **nTop Automate for Linux** is a real headless tarball intended for HPC/CI batch use, but the download dashboard (`app.ntop.com`) is login-walled and the runtime requires a paid licence file. So "Linux-headless" is technically yes, "fresh-clone CI without secrets" is no. |
+
+Practical read for this project: **Onshape (free Education plan)** is the only
+one of the three that's actually free, Linux-native, and ready to wire into
+CI. **Rhino academic** is cheap-ish ($195) but fundamentally Windows/Mac and
+doesn't unlock a Linux CI path on its own. **nTop** is the most powerful for
+generative/lattice work but the price is opaque and almost certainly not
+justified at the v1 trough-design scale; revisit only if/when geometry pushes
+past CadQuery's BREP kernel.
+
+---
+
 ## Revised recommendation
 
 Drop the original blanket dismissal and replace it with:
 
 * **Primary CAD authoring + CI DFM**: keep CadQuery (best fresh-runner story,
-  unifies authoring + DFM + tests in one Python codebase).
+  unifies authoring + DFM + tests in one Python codebase). Treat **build123d**
+  as a sibling pick on the same kernel.
 * **Non-Python second source**: OpenSCAD is a one-liner to add and gives
   us a sanity check that geometry behaves the same in two kernels.
+* **FDM toolchain (MK3 / Ender)**: PrusaSlicer CLI, headless, in CI.
+* **CNC toolchain (Genmitsu 3018-Pro V2)**: FreeCAD Path → GRBL G-code (or
+  Kiri:Moto for STL-in / GRBL-out without scripting); Camotics for toolpath
+  preview; UGS / bCNC as the sender (operator side, not CI).
+* **DFM**: split `cad/dfm.py` into FDM checks (Will-It-Print-style) and CNC
+  checks (geometric guards against tool radius and Z reach).
+* **Design-space exploration**: manual sweeps + a pandas/Jupyter scorecard
+  by default; reach for **Optuna** only past ~5 parameters and 15+ physical
+  builds. Hold **Ax/BoTorch** and **Science-Jubilee**-style closed-loop SDL
+  on the wishlist for if/when the bench gets instrumented.
 * **Generative / NURBS path** (if we ever need it):
   * **Onshape FeatureScript** via `onshape-client` + repo secrets — easiest
-    to stand up; gives us real generative parametric features and cloud
-    rendering for free.
-  * **nTop Automate** for actual generative / lattice work — needs a paid
-    license but is genuinely Linux-headless-ready; the right tool if we
-    take the bimodal compliant-mechanism scoop (#4) seriously.
-  * **Rhino + Grasshopper via Rhino Compute** — viable as a hosted service,
-    not viable as something CI builds from scratch on Linux.
+    to stand up; **free Education plan** covers individual academic use, so
+    cost is not a blocker. Linux-native via REST.
+  * **nTop Automate** for actual generative / lattice work — genuinely
+    Linux-headless-ready, but quote-only commercial pricing (no public
+    list), so only worth it if the bimodal compliant-mechanism scoop (#4)
+    grows past CadQuery's BREP kernel.
+  * **Rhino + Grasshopper via Rhino Compute** — academic Rhino is cheap
+    (~$195 perpetual, single-user) but Rhino itself is **Windows / macOS
+    only**, so this is viable as a hosted service or a Windows-side worker,
+    not as something a Linux CI runner builds from scratch.
 * **Fusion 360 Generative Design**: don't pursue. Cloud-token-billed,
   GUI-only authoring, no headless API, no Linux. Inventor + APS Design
   Automation would be the Autodesk-side option to revisit, separately.
