@@ -82,6 +82,16 @@ Issue #1 — *"a pure mechanical approach that can be connected to a gantry syst
 
 ---
 
+# Then we animated the side view: the gantry pushes right, a wall ramp tips the trough, and the powder pours.
+
+<!-- _class: image-only -->
+
+![h:480](assets/mechanism.gif)
+
+PR #2 — `mechanism.gif`, generated from the parametric CadQuery model. Pure-X gantry motion → cam ramp → trough rotation about the pin → dump.
+
+---
+
 # Real powders behaved like none of the textbook assumptions.
 
 <!-- _class: image-only -->
