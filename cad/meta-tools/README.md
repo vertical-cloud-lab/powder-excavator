@@ -353,6 +353,7 @@ exposes a closed-loop instrumented-feedback hook out of the box. So the v1
 | Parametric CAD | **CadQuery** (or **build123d**) | Unchanged — pip-installable, headless, real STEP/STL out, runs in CI. |
 | Second-source / sanity check | **OpenSCAD** | Unchanged — `apt install openscad`, already builds an STL on the runner. |
 | FDM slicing (MK3 / Ender) | **PrusaSlicer CLI** | Headless, ships profiles for both MK3S and Ender-3 in-box, exports G-code plus per-print metrics (time, filament use, support volume) that are useful as DFM signals. |
+| FDM slicing (Cura / CuraEngine path) | **CuraEngine** (`CuraEngine slice -j fdmprinter.def.json -l model.3mf -o out.gcode`) — feed it **3MF**, not STEP. Cura GUI and CuraEngine CLI are mesh-only (`-l` accepts `.stl`, `.obj`, `.3mf`); STEP/IGES are not supported and unmaintained STEP-reader plugins just tessellate on import. | Headless, packaged for Linux. Use 3MF when Cura is the consumer (units baked in, per-mesh material/profile metadata, ~10× smaller than STL). |
 | CNC CAM for the 3018 | **FreeCAD Path workbench** (headless via `freecadcmd`), or **Kiri:Moto** for STL-in / GRBL-out without scripting | Both emit GRBL-flavored G-code suitable for the 3018's Woodpecker controller. FreeCAD Path is the CI-friendly option; Kiri:Moto is the low-friction option. |
 | G-code simulation | **Camotics** (apt) or **NC Viewer** (web) | Visualise the toolpath before crashing a 3.175 mm endmill into the bed. Camotics is fine for spot checks. |
 | Sender to the 3018 | **UGS** (Universal Gcode Sender) or **bCNC** | Standard GRBL senders. Not a CI thing — listed so the meta-tool list matches reality. |
@@ -366,6 +367,31 @@ preview → manual build/measure → pandas scorecard in Jupyter. Optuna only if
 the parameter count justifies it; Ax/BoTorch and Science-Jubilee stay on the
 "future SDL" wishlist for if/when a load cell, scale, or webcam ever gets
 bolted onto the bench.
+
+### Export-format targets from the CadQuery build
+
+Per the STL-vs-STEP discussion on this PR, the CadQuery build should emit
+**three** sibling artefacts per part rather than STL only, and let the
+downstream consumer pick:
+
+| Target | Format | Consumer |
+|--------|--------|----------|
+| `*.stl` | Mesh, ASCII or binary | Lowest-common-denominator slicer input; OpenSCAD diff/sanity check; legacy CAM. |
+| `*.3mf` | Mesh + units + per-mesh metadata (zip) | **Preferred slicer input** for Cura / CuraEngine, PrusaSlicer, Bambu Studio / OrcaSlicer. Units baked in, ~10× smaller than STL, no scale-mismatch foot-guns. |
+| `*.step` | BREP (OpenCascade) | Archival, FreeCAD Path / Fusion CAM (Genmitsu CNC side), reuse in any other BREP kernel. Note: Cura / CuraEngine do **not** read STEP. |
+
+In CadQuery this is three one-liners against the same `result` object:
+
+```python
+import cadquery as cq
+cq.exporters.export(result, "trough.stl")
+cq.exporters.export(result, "trough.3mf")
+cq.exporters.export(result, "trough.step")
+```
+
+build123d has the same shape (`export_stl`, `export_3mf`, `export_step`).
+OpenSCAD and `rhino3dm` cannot emit STEP — that's CadQuery / build123d /
+Onshape (REST `translations` endpoint, `formatName: "STEP"`) only.
 
 ### Cost / Linux-headless reality check for the paid-tool rows
 
