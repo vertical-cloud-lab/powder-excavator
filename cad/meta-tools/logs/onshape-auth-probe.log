@@ -1,0 +1,12 @@
+BASE = https://cad.onshape.com
+access key: len=24
+secret key: len=48
+
+== GET /api/v6/users/sessioninfo ==
+HTTP 204
+{}
+
+== GET /api/v6/documents (own, first page) ==
+HTTP 401
+{"message":"Unauthenticated API request", "status":401}
+items returned: 0

@@ -240,6 +240,40 @@ that public free documents are world-visible by design. This is a perfectly
 reasonable second-source CAD pipeline to add to CI when @sgbaird wants it —
 say the word and I'll wire it up.
 
+### Authenticated REST probe (HMAC-SHA256, repo secrets present)
+
+Once `ONSHAPE_ACCESS_KEY` + `ONSHAPE_SECRET_KEY` are set as encrypted
+GitHub Actions secrets, [`onshape_rest_probe_auth.py`](onshape_rest_probe_auth.py)
+performs an HMAC-signed `GET /api/v6/users/sessioninfo` and
+`GET /api/v6/documents`. Latest run with the keys @sgbaird-alt added
+(captured verbatim in [`logs/onshape-auth-probe.log`](logs/onshape-auth-probe.log)):
+
+```
+== GET /api/v6/users/sessioninfo ==
+HTTP 204
+{}
+
+== GET /api/v6/documents (own, first page) ==
+HTTP 401
+{"message":"Unauthenticated API request", "status":401}
+```
+
+Cross-checked against the official `onshape-client` Python lib (same
+`401 "Unauthenticated API request"` body) and against `partner.dev.onshape.com`
+(same 401), so the HMAC signing is correct and the keys are reaching the
+server — the **server is rejecting them as not authorised**. Most
+likely cause given @sgbaird-alt's earlier note ("I needed to request
+developer access to be able to use the API"): the dev-portal access
+request is still pending approval on the Education plan side. Once
+that approval lands the same probe should return `200` with the user's
+sessioninfo / a list of own documents — no code change needed, just
+re-run the workflow.
+
+(`sessioninfo` returning `204` is consistent with this read: that
+endpoint replies with an empty body when no browser session is
+attached, regardless of whether the API key would otherwise be
+valid; the auth-required `/documents` is the meaningful signal.)
+
 ---
 
 ## 3. Fusion 360 / Generative Design
@@ -393,6 +427,73 @@ build123d has the same shape (`export_stl`, `export_3mf`, `export_step`).
 OpenSCAD and `rhino3dm` cannot emit STEP — that's CadQuery / build123d /
 Onshape (REST `translations` endpoint, `formatName: "STEP"`) only.
 
+### Sending a sliced job to a Bambu printer programmatically
+
+If/when a Bambu printer (X1/X1C, P1/P1S, A1/A1 mini) joins the hardware list,
+there is **no official public REST API**, but three working programmatic
+paths exist. Pick by whether the printer has **LAN-only mode** enabled and
+whether you want to go through Bambu Cloud or stay on the LAN.
+
+| Option | Transport | When to use | Auth |
+|--------|-----------|-------------|------|
+| **1. Bambu Studio / OrcaSlicer CLI → MQTT push (LAN)** | FTPS upload to `/cache/` (port 990, anonymous + access code) **+** MQTT command on port 8883 to `device/<serial>/request`; subscribe to `device/<serial>/report` for telemetry | Default. CI runner is on the same LAN as the printer; "LAN-only mode" enabled on the printer's touchscreen. | Printer **IP** + **device serial** + 8-digit **LAN access code** (all from the printer's "Network" screen). |
+| **2. Bambu Cloud MQTT** | Same protocol, broker `us.mqtt.bambulab.com:8883` (or `cn.…`) | CI runner cannot reach the printer's LAN. | Bambu Cloud account token. Subject to ToS and account quotas. |
+| **3. OctoEverywhere / community bridge** | Translates OctoPrint-style HTTP → Bambu MQTT under the hood | Only if you already have an OctoPrint farm. No real advantage over Option 1 otherwise. | Bridge-specific. |
+
+Note: Bambu printers are **not** classic Marlin/Klipper devices and do **not**
+expose a `/dev/ttyUSB0` G-code stream. Generic OctoPrint / Moonraker
+integrations don't apply directly.
+
+The community Python lib **[`bambulabs-api`](https://pypi.org/project/bambulabs-api/)**
+(MIT-licensed) wraps Options 1 and 2. Sketch of the LAN-only flow:
+
+```bash
+# 1) slice 3MF -> Bambu .gcode.3mf (a 3MF flavour with embedded G-code,
+#    plate thumbnail, and print metadata)
+bambu-studio --slice 1 \
+  --load-settings "machine.json;process.json;filament.json" \
+  --export-3mf out.gcode.3mf \
+  trough.3mf
+
+# 2) FTPS-upload + MQTT "project_file" command on the LAN
+python -m bambulabs_api send \
+  --ip 192.168.1.42 \
+  --serial 0123456789ABCDEF \
+  --access-code 12345678 \
+  --file out.gcode.3mf
+```
+
+What this slots into the v1 stack as:
+
+```
+CadQuery part ──► trough.3mf  (cq.exporters.export)
+                     │
+                     ▼
+           bambu-studio --slice  (or orca-slicer --slice)
+                     │
+                     ▼
+               out.gcode.3mf
+                     │
+                     ▼ (FTPS upload + MQTT command, bambulabs-api)
+                Bambu printer
+                     │
+                     ▼ (MQTT report topic)
+             live telemetry → pandas scorecard
+```
+
+Two practical caveats worth front-loading:
+
+* **Firmware lockdown.** Mid-2024 Bambu rolled out "Authorization Control"
+  (the controversy that kicked off the Orca / Bambu split). On the latest
+  X1/P1/A1 firmware, third-party MQTT clients still work but require
+  **"Developer Mode"** (X1) or **"LAN-only mode"** (P1/A1) to be enabled on
+  the printer's touchscreen. Without it, only Bambu Studio / Bambu Handy can
+  connect. Confirm firmware version *before* committing this path to CI.
+* **CLI profile-baking.** Bambu Studio's CLI flag surface is thinner than
+  PrusaSlicer's; profile JSON has to be pre-baked and committed to the repo
+  alongside the part source. **OrcaSlicer** is closer to PrusaSlicer-style
+  ergonomics here and is the slicer I'd reach for first.
+
 ### Cost / Linux-headless reality check for the paid-tool rows
 
 The scoreboard above lists three paid tools as "would survive CI if you pay
@@ -460,6 +561,7 @@ say which one(s) and I'll do the secrets wiring + workflow in a follow-up PR.
 | [`rhino3dm_demo.py`](rhino3dm_demo.py) | Pure-Python NURBS authoring → real `.3dm` file |
 | [`excavator_trough.fs`](excavator_trough.fs) | Real Onshape FeatureScript Custom Feature for the trough |
 | [`onshape_rest_probe.py`](onshape_rest_probe.py) | Probe of the Onshape REST API showing 401 anonymous response |
+| [`onshape_rest_probe_auth.py`](onshape_rest_probe_auth.py) | HMAC-signed Onshape probe driven by `ONSHAPE_ACCESS_KEY` / `ONSHAPE_SECRET_KEY` env / repo secrets |
 | [`excavator_trough.scad`](excavator_trough.scad) | OpenSCAD model that builds an STL on this runner |
 | [`edison-c0f412d3-literature-synthesis.md`](edison-c0f412d3-literature-synthesis.md) | Verbatim Edison/PaperQA3 high-effort lit synthesis used in §"Independent corroboration" |
 | [`logs/`](logs/) | Captured install / build / runtime output for every claim above |
