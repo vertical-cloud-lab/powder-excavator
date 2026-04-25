@@ -24,6 +24,7 @@ Composite previews of all eight:
 
 | Composite | Preview |
 | --- | --- |
+| **2-D dispensing animations** (per-concept loading + dispensing motion, side view) | [`cad/alternatives/composite-animation.gif`](../../cad/alternatives/composite-animation.gif) |
 | **Annotated explainer panels** (title + iso + cutaway + numbered parts + 3-step operation cycle, per concept) | [`cad/alternatives/composite-panel.png`](../../cad/alternatives/composite-panel.png) |
 | Rotating GIF (transparent) | [`cad/alternatives/composite-spin.gif`](../../cad/alternatives/composite-spin.gif) |
 | Cross-section tile | [`cad/alternatives/composite-cutaway.png`](../../cad/alternatives/composite-cutaway.png) |

@@ -38,22 +38,27 @@ PNG -> half-cutaway PNG -> 36-frame transparent rotating GIF ->
 PrusaSlicer slice on the MK3S+ profile (PETG, 0.2 mm, 3 perimeters,
 30% gyroid infill, 4 mm brim, supports on -- all 8 sliced cleanly).
 
-NEW since the prior analysis submission: the project reviewer
-reported that the raw SCAD renders alone were too abstract to
-understand the mechanism, so we have added a per-concept
-**annotated explainer panel** (title + iso render + half-cutaway +
-numbered key-parts list + 3-step operation cycle) for each of A-H,
-and a 4x2 composite of all eight panels (composite-panel.png). The
-annotator script (scripts/annotate_alternatives.py, pure Pillow)
-is also attached. The composite-panel.png is the best single
-artefact to read first; please use it as the entry point for your
-review of the geometry.
+NEW since the prior analysis submission: the project reviewer asked
+for **2-D animated visualizations** showing each mechanism actually
+loading and dispensing powder, since the static SCAD renders alone
+did not communicate motion. We have added a per-concept side-view
+schematic GIF (`<letter>-<slug>-animation.gif`) plus a 4x2 composite
+(`composite-animation.gif`) that walks through the loading and
+dispensing phases for each concept (cup descent + strike, chamber
+fill + pawl punch, capillary dip + wiper + eject, brush sweep +
+comb scrape, salt-shaker oscillation, rack-driven auger, ERM
+continuous flow, solenoid closed-loop with balance readout). The
+generator script (`scripts/animate_dispensing.py`, pure Pillow) is
+attached. The composite-animation.gif is the best single artefact
+to read first now; please use it as the entry point for your review.
 
-The eight SCAD sources, iso renders, cutaway sections, the three
-composite previews (composite-panel.png, composite-spin.gif,
-composite-cutaway.png), and the eight per-concept panels are all
-attached. The pipeline driver (scripts/render_alternatives.py) and
-the panel annotator (scripts/annotate_alternatives.py) are also
+The eight SCAD sources, iso renders, cutaway sections, the four
+composite previews (composite-animation.gif, composite-panel.png,
+composite-spin.gif, composite-cutaway.png), the eight per-concept
+panels, and the eight per-concept dispensing animations are all
+attached. The pipeline driver (scripts/render_alternatives.py),
+the panel annotator (scripts/annotate_alternatives.py), and the
+new dispensing animator (scripts/animate_dispensing.py) are also
 attached so you can see exactly what was generated.
 
 Please give us a critical engineering review covering:
@@ -68,17 +73,19 @@ Please give us a critical engineering review covering:
    already cited in our prior literature query (Besenhard 2015
    vibratory sieve-chute, Faulhammer 2014 dosator, Alsenz 2011
    PowderPicking, Hou 2024, Jiang 2023). We previously concluded G
-   then A. With the geometry now visible, do you still agree, or
-   does any other concept now look more promising?
+   then A. With the geometry and motion now both visible, do you
+   still agree, or does any other concept now look more promising?
 
 3. Cohesive sub-100-um powder failure modes specific to each
-   geometry: bridging in B's chambers, capillary plug variability
-   in C, brush retention in D, hole-clogging in E, helix pull-down
-   in F, etc. Cite peer-reviewed sources where available.
+   geometry and motion sequence: bridging in B's chambers,
+   capillary plug variability in C, brush retention in D,
+   hole-clogging in E, helix pull-down in F, etc. Cite
+   peer-reviewed sources where available.
 
-4. Specific incremental design changes (a sentence or two each per
-   concept) that would most reduce variability or improve one-day-
-   build success. Be concrete -- we are about to print these.
+4. Specific incremental design or motion-cycle changes (a sentence
+   or two each per concept) that would most reduce variability or
+   improve one-day-build success. Be concrete -- we are about to
+   print these.
 
 5. Anything obviously missing (a concept we should add, a
    peer-reviewed analogue we should be benchmarking against, a
@@ -96,10 +103,12 @@ def _collect_files() -> list[str]:
         HERE / "edison_result.md",
         REPO / "scripts" / "render_alternatives.py",
         REPO / "scripts" / "annotate_alternatives.py",
+        REPO / "scripts" / "animate_dispensing.py",
         REPO / "cad" / "alternatives" / "render-report.txt",
         REPO / "cad" / "alternatives" / "composite-spin.gif",
         REPO / "cad" / "alternatives" / "composite-cutaway.png",
         REPO / "cad" / "alternatives" / "composite-panel.png",
+        REPO / "cad" / "alternatives" / "composite-animation.gif",
         REPO / "cad" / "alternatives" / "README.md",
     ]
     alt_dir = REPO / "cad" / "alternatives"
@@ -107,6 +116,7 @@ def _collect_files() -> list[str]:
     paths += sorted(alt_dir.glob("[A-H]-*-iso.png"))
     paths += sorted(alt_dir.glob("[A-H]-*-cutaway.png"))
     paths += sorted(alt_dir.glob("[A-H]-*-panel.png"))
+    paths += sorted(alt_dir.glob("[A-H]-*-animation.gif"))
     return [str(p) for p in paths if p.exists()]
 
 
