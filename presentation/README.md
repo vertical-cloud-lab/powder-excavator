@@ -11,12 +11,35 @@ npx marp --html --allow-local-files slides.md -o slides.html
 npx marp --pdf  --html --allow-local-files slides.md -o slides.pdf
 ```
 
+## How to present (with the videos playing)
+
+The embedded `<video>` only plays in the **HTML** build, not the PDF. Three
+ways to drive the live deck:
+
+1. **Browser, fullscreen** *(recommended)* — open `slides.html` in
+   Chrome/Firefox, press <kbd>F11</kbd> for fullscreen, then arrow keys to
+   advance. The video on slide 10 autoplays muted and loops; click it for
+   audio. This is the most reliable path on a presenter laptop.
+2. **Marp watch/server mode** — for editing while presenting, run
+
+   ```bash
+   npx marp --html --allow-local-files --server .
+   ```
+
+   then open <http://localhost:8080/slides.html>. Edits to `slides.md` reload
+   live.
+3. **Marp Preview / VS Code Marp extension** — opens the deck in a
+   presenter-style window with speaker notes; `<video>` plays here too.
+
+Slide 11 is the **GIF** version of the same moment, so the **PDF** export
+still carries the motion (e.g. when sharing the deck after the talk).
+
 ## Files
 
 - [`slides.md`](slides.md) — source (Marp Markdown)
 - [`slides.html`](slides.html) — built HTML deck (renders the embedded video)
-- [`slides.pdf`](slides.pdf) — built PDF (static; video shows poster frame)
-- [`assets/`](assets) — images and the print video referenced by the slides
+- [`slides.pdf`](slides.pdf) — built PDF (the GIF slide preserves the motion)
+- [`assets/`](assets) — images, GIFs, and the print video referenced by the slides
 
 ## Design principles
 

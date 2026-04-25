@@ -152,6 +152,26 @@ Verdict per tool, with install logs and one-line export examples.
 
 ---
 
+# Along the way we prototyped a bistable snap-through trough as a sibling concept.
+
+<!-- _class: image-only -->
+
+![h:420](assets/bimodal-mechanism.gif)
+
+PR #5 — parametric OpenSCAD + FEA cross-check, peak snap **2.36 N**, wells at **±1.9 mm**, 24 tests passing.
+
+---
+
+# When that didn't fit the workshop budget, we generated eight alternative dosing concepts in one panel.
+
+<!-- _class: image-only -->
+
+![h:440](assets/composite-spin.gif)
+
+PR #13 — sieve cup, Pez strip, capillary dip, brush pickup, salt-shaker, passive auger, ERM-augmented sieve, solenoid-tap. Edison promoted the ERM-augmented sieve above the gantry-tap on published vibratory-sieve evidence (Besenhard 2015).
+
+---
+
 # Edison Scientific turned a 60-minute session into a 60-citation literature synthesis.
 
 - **PR #2 → Edison PaperQA3** (high-effort): introduction-grade powder-handling synthesis
@@ -205,9 +225,19 @@ PR #16 — `cad/auger/archimedes-auger.{stl,stp}`, sliced for both Ultimaker (Cu
 
 <!-- _class: image-only -->
 
-<video src="assets/final-print-video.mp4" controls autoplay muted loop style="max-height:70vh; display:block; margin:0 auto;"></video>
+<video src="assets/final-print-video.mp4" poster="assets/final-print-on-ultimaker.jpg" controls autoplay muted loop playsinline style="max-height:70vh; display:block; margin:0 auto;"></video>
 
-PR #16 — first successful print on the Ultimaker 3 Extended.
+PR #16 — first successful print on the Ultimaker 3 Extended. *(In the HTML build the MP4 plays inline; the next slide carries the same motion as a GIF for the PDF.)*
+
+---
+
+# Same moment, GIF version — included so the PDF carries the same signal as the HTML.
+
+<!-- _class: image-only -->
+
+![h:480](assets/final-print-video.gif)
+
+PR #16 — auger coming off the Ultimaker 3 Extended bed.
 
 ---
 
