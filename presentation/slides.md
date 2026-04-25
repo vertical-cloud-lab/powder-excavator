@@ -62,6 +62,9 @@ footer: "powder-excavator · project wrap-up"
 
 **powder-excavator** — project wrap-up
 
+Sterling Baird · Devora Najjar · Ron
+*with Nasa's help on the Ultimaker print*
+
 vertical-cloud-lab · April 2026
 
 ---
@@ -70,11 +73,11 @@ vertical-cloud-lab · April 2026
 
 - Target dose range: **micrograms to milligrams** of micron-sized solid powders
 - Hardware on hand: a Genmitsu 3018-PROVer V2 gantry and a 3D printer
-- One workshop week, one engineer, one coding agent
+- One workshop week, a small team (Sterling, Devora, Ron), one coding agent
 
 > A 3D-printed scoop will retain powder on its walls after dumping —
 > electrostatics and van der Waals dominate at this scale.
-> *— issue #3, technical-viability writeup*
+> *— Devora's technical-viability writeup, issue #3*
 
 ---
 
@@ -224,9 +227,9 @@ PR #13 — sieve cup, Pez strip, capillary dip, brush pickup, salt-shaker, passi
 
 <div>
 
-### Why we pivoted (issue #1, final comment)
+### Why we pivoted (issue #1, in-person conversation)
 
-> moving towards a vertical auger / Archimedes screw — based system with a sieve at the end, possibly a solenoid for tapping and a small disc vibration motor
+> **Devora, Ron, and I talked.** We're moving towards a vertical auger / Archimedes screw — based system with a sieve at the end, possibly a solenoid for tapping and a small disc vibration motor.
 
 </div>
 
@@ -234,7 +237,7 @@ PR #13 — sieve cup, Pez strip, capillary dip, brush pickup, salt-shaker, passi
 
 ![w:280](assets/auger-iso.png)
 
-**Dose ≈ rotations × pitch.** Sieve decouples flow from release; tap solenoid + ERM motor break electrostatic clinging.
+**Dose ≈ rotations × pitch.** Sieve decouples flow from release; tap solenoid + ERM motor break electrostatic clinging. Devora opened **PR #16** with the initial OpenSCAD auger.
 
 </div>
 
@@ -248,7 +251,7 @@ PR #13 — sieve cup, Pez strip, capillary dip, brush pickup, salt-shaker, passi
 
 ![h:460](assets/final-print-on-ultimaker.jpg)
 
-PR #16 — `cad/auger/archimedes-auger.{stl,stp}`, sliced for both Ultimaker and Ender‑3.
+PR #16 (Devora's CAD) — `cad/auger/archimedes-auger.{stl,stp}`, sliced for both Ultimaker and Ender‑3, printed with Nasa's help.
 *Outer tube shown; the internal helix is hidden inside the print.*
 
 ---
@@ -259,7 +262,7 @@ PR #16 — `cad/auger/archimedes-auger.{stl,stp}`, sliced for both Ultimaker and
 
 <video src="assets/final-print-video.mp4" poster="assets/final-print-on-ultimaker.jpg" controls autoplay muted loop playsinline style="max-height:64vh; display:block; margin:0 auto;"></video>
 
-PR #16 — print in progress on the Ultimaker 3 Extended. *(In the HTML build the MP4 plays inline; the GIF on the next slide preserves the motion in the PDF.)*
+PR #16 — print in progress on the Ultimaker 3 Extended (Nasa ran the print). *(In the HTML build the MP4 plays inline; the GIF on the next slide preserves the motion in the PDF.)*
 
 ---
 
@@ -269,7 +272,7 @@ PR #16 — print in progress on the Ultimaker 3 Extended. *(In the HTML build th
 
 ![h:460](assets/final-print-video.gif)
 
-PR #16 — print in progress on the Ultimaker 3 Extended.
+PR #16 — print in progress on the Ultimaker 3 Extended (Nasa ran the print).
 
 ---
 
