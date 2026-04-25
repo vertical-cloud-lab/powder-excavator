@@ -2,7 +2,9 @@ name: Deploy slides to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - copilot/use-marp-create-project-wrapup-presentation
     paths:
       - 'presentation/**'
       - '.github/workflows/pages.yml'
