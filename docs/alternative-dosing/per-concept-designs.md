@@ -24,8 +24,28 @@ Composite previews of all eight:
 
 | Composite | Preview |
 | --- | --- |
+| **Annotated explainer panels** (title + iso + cutaway + numbered parts + 3-step operation cycle, per concept) | [`cad/alternatives/composite-panel.png`](../../cad/alternatives/composite-panel.png) |
 | Rotating GIF (transparent) | [`cad/alternatives/composite-spin.gif`](../../cad/alternatives/composite-spin.gif) |
 | Cross-section tile | [`cad/alternatives/composite-cutaway.png`](../../cad/alternatives/composite-cutaway.png) |
+
+Per-concept annotated panels (each one composes the existing iso + cutaway
+render with a numbered key-parts list and a 3-step operation cycle so the
+mechanism is readable without opening the SCAD source):
+
+| Concept | Panel |
+| --- | --- |
+| A. Tap-driven sieve cup (passive)            | [`A-tap-sieve-panel.png`](../../cad/alternatives/A-tap-sieve-panel.png) |
+| B. Pez-style chamber strip                   | [`B-pez-strip-panel.png`](../../cad/alternatives/B-pez-strip-panel.png) |
+| C. Capillary dip + fixed wiper               | [`C-capillary-wiper-panel.png`](../../cad/alternatives/C-capillary-wiper-panel.png) |
+| D. Brush / swab pickup + comb knock-off      | [`D-brush-comb-panel.png`](../../cad/alternatives/D-brush-comb-panel.png) |
+| E. Salt-shaker oscillation                   | [`E-shaker-panel.png`](../../cad/alternatives/E-shaker-panel.png) |
+| F. Passive auger (rack-and-pinion)           | [`F-passive-auger-panel.png`](../../cad/alternatives/F-passive-auger-panel.png) |
+| G. ERM-augmented sieve (top pick)            | [`G-erm-sieve-panel.png`](../../cad/alternatives/G-erm-sieve-panel.png) |
+| H. Solenoid-tapped sieve (closed-loop)       | [`H-solenoid-sieve-panel.png`](../../cad/alternatives/H-solenoid-sieve-panel.png) |
+
+Re-render the panels with
+[`scripts/annotate_alternatives.py`](../../scripts/annotate_alternatives.py)
+(pure Pillow; no OpenSCAD invocation; rebuilds in <1 s).
 
 Per-concept render report: [`cad/alternatives/render-report.txt`](../../cad/alternatives/render-report.txt) (admesh `bad_edges = 0` for every part, slice succeeded for every part).
 

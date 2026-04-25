@@ -38,10 +38,23 @@ PNG -> half-cutaway PNG -> 36-frame transparent rotating GIF ->
 PrusaSlicer slice on the MK3S+ profile (PETG, 0.2 mm, 3 perimeters,
 30% gyroid infill, 4 mm brim, supports on -- all 8 sliced cleanly).
 
-The eight SCAD sources, iso renders, cutaway sections, and the two
-composite previews (composite-spin.gif, composite-cutaway.png) are
-attached. The pipeline driver (scripts/render_alternatives.py) is
-also attached so you can see exactly what was generated.
+NEW since the prior analysis submission: the project reviewer
+reported that the raw SCAD renders alone were too abstract to
+understand the mechanism, so we have added a per-concept
+**annotated explainer panel** (title + iso render + half-cutaway +
+numbered key-parts list + 3-step operation cycle) for each of A-H,
+and a 4x2 composite of all eight panels (composite-panel.png). The
+annotator script (scripts/annotate_alternatives.py, pure Pillow)
+is also attached. The composite-panel.png is the best single
+artefact to read first; please use it as the entry point for your
+review of the geometry.
+
+The eight SCAD sources, iso renders, cutaway sections, the three
+composite previews (composite-panel.png, composite-spin.gif,
+composite-cutaway.png), and the eight per-concept panels are all
+attached. The pipeline driver (scripts/render_alternatives.py) and
+the panel annotator (scripts/annotate_alternatives.py) are also
+attached so you can see exactly what was generated.
 
 Please give us a critical engineering review covering:
 
@@ -82,15 +95,18 @@ def _collect_files() -> list[str]:
         HERE / "per-concept-designs.md",
         HERE / "edison_result.md",
         REPO / "scripts" / "render_alternatives.py",
+        REPO / "scripts" / "annotate_alternatives.py",
         REPO / "cad" / "alternatives" / "render-report.txt",
         REPO / "cad" / "alternatives" / "composite-spin.gif",
         REPO / "cad" / "alternatives" / "composite-cutaway.png",
+        REPO / "cad" / "alternatives" / "composite-panel.png",
         REPO / "cad" / "alternatives" / "README.md",
     ]
     alt_dir = REPO / "cad" / "alternatives"
     paths += sorted(alt_dir.glob("[A-H]_*.scad"))
     paths += sorted(alt_dir.glob("[A-H]-*-iso.png"))
     paths += sorted(alt_dir.glob("[A-H]-*-cutaway.png"))
+    paths += sorted(alt_dir.glob("[A-H]-*-panel.png"))
     return [str(p) for p in paths if p.exists()]
 
 
