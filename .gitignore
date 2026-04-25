@@ -212,3 +212,12 @@ cad/meta-tools/build/
 # Meta-CAD tools eval — keep the audit-trail logs even though *.log is ignored
 !cad/meta-tools/logs/
 !cad/meta-tools/logs/*.log
+# LaTeX build artifacts
+*.aux
+*.fdb_latexmk
+*.fls
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
