@@ -44,7 +44,7 @@ the final-print photo on the Ultimaker 3 Extended
 (`final-print-on-ultimaker.jpg`) and the print video
 (`final-print-video.mp4`). The early sketch is `initial-sketch.jpg`.
 
-Context: the deck is meant to follow Jean-luc Doumont's presentation
+Context: the deck is meant to follow Jean-Luc Doumont's presentation
 principles — title areas are message areas (full-sentence messages),
 maximize signal-to-noise, reduce on-slide noise. Narrative goal: tell the
 story of the project across all 9 issues / 9 PRs, highlight the
@@ -78,10 +78,15 @@ def main() -> None:
     client = EdisonClient(api_key=API_KEY)
 
     data_uris: list[str] = []
+    missing: list[Path] = [p for p in files_to_upload if not p.exists()]
+    if missing:
+        sys.stderr.write(
+            "Refusing to submit: required files are missing:\n"
+            + "".join(f"  - {p}\n" for p in missing)
+        )
+        sys.exit(2)
+
     for path in files_to_upload:
-        if not path.exists():
-            sys.stderr.write(f"[skip] missing: {path}\n")
-            continue
         uri = client.upload_file(
             file_path=path,
             name=path.name,
@@ -90,6 +95,10 @@ def main() -> None:
         )
         print(f"uploaded {path.name} -> {uri}")
         data_uris.append(uri)
+
+    if not data_uris:
+        sys.stderr.write("Refusing to submit: nothing was uploaded.\n")
+        sys.exit(2)
 
     task = TaskRequest(
         name=JobNames.ANALYSIS,

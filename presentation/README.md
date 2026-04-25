@@ -60,7 +60,7 @@ when sharing the deck after the talk).
 
 ## Design principles
 
-Slides follow Jean-luc Doumont's principles:
+Slides follow Jean-Luc Doumont's principles:
 
 - The **title area is the message area** — every slide title is a complete
   sentence stating the message of the slide.
